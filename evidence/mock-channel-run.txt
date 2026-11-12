@@ -1,0 +1,40 @@
+CASE_ID      : MOCK-SERVICE-INSTANCE
+TITLE        : 独立可控模拟支付渠道服务实例启动与转发冒烟
+TIME         : 2026-11-12T15:11:04.562205+08:00
+PROCESSES    : business=:18084 (go build), mock-channel=:18085 (python, independent process)
+MAIN_HEALTH  : {"mode": "demo-memory", "status": "ok"}
+MOCK_HEALTH  : {"status": "ok", "service": "mock-channel", "target": "http://127.0.0.1:18084", "time": "2026-11-12T15:11:04.560675+08:00"}
+SCOPE_NOTE   : 不是真实第三方支付接入；不含业务状态机；不落库、不改订单状态。
+
+PREPARE      : 业务服务直接创建订单 ORD-1794467464562181000-1001-1
+CASE_ID      : MOCK-01
+REQUEST      : POST http://127.0.0.1:18085/notify/payment  body={"order_no": "ORD-1794467464562181000-1001-1", "channel_trade_no": "R4-MOCK-PAY-1", "amount": 10000, "signature_valid": true}
+UPSTREAM     : /api/v1/payment/callback (status=200)
+RESPONSE_RAW : {"code": "0", "message": "ok", "data": {"amount": 10000, "channel_trade_no": "R4-MOCK-PAY-1", "effective": true, "event_id": 2, "event_type": "支付成功", "failure_code": "", "failure_reason": "", "id": 2, "need_refund": false, "occurred_at": "2026-11-12T15:11:04.6074813+08:00", "order_id": 1, "order_no": "ORD-1794467464562181000-1001-1", "order_status_snapshot": "待发货", "result": "已记款", "signature_valid": true}}
+EXPECTED     : 0   ACTUAL: 0
+ASSERTION    : PASS
+
+CASE_ID      : MOCK-02
+REQUEST      : POST http://127.0.0.1:18085/notify/timeout  body={"order_no": "ORD-1794467464562181000-1001-1", "channel_trade_no": "R4-MOCK-TO-1", "reason": "独立模拟渠道超时通知"}
+UPSTREAM     : /api/v1/payment/timeout (status=200)
+RESPONSE_RAW : {"code": "0", "message": "ok", "data": {"event_id": 3, "order_no": "ORD-1794467464562181000-1001-1", "order_status": "待发货", "channel_trade_no": "R4-MOCK-TO-1", "duplicate": false, "order_status_unchanged": true, "notice": "渠道超时通知已登记为只追加审计；订单状态不变，超时关单仍由服务端 10 分钟规则触发"}}
+EXPECTED     : 0   ACTUAL: 0
+ASSERTION    : PASS
+
+CASE_ID      : MOCK-03
+REQUEST      : POST http://127.0.0.1:18085/notify/timeout  body={"order_no": "ORD-1794467464562181000-1001-1", "channel_trade_no": "R4-MOCK-TO-1", "reason": "重复通知"}
+UPSTREAM     : /api/v1/payment/timeout (status=200)
+RESPONSE_RAW : {"code": "0", "message": "ok", "data": {"event_id": 3, "order_no": "ORD-1794467464562181000-1001-1", "order_status": "待发货", "channel_trade_no": "R4-MOCK-TO-1", "duplicate": true, "order_status_unchanged": true, "notice": "重复渠道超时通知已幂等处理，未产生第二笔业务结果；订单状态不变"}}
+EXPECTED     : 0   ACTUAL: 0
+ASSERTION    : PASS
+
+CASE_ID      : MOCK-04
+REQUEST      : POST http://127.0.0.1:18085/notify/payment  body={"order_no": "NO-SUCH-ORDER", "channel_trade_no": "R4-MOCK-BAD", "amount": 10000, "signature_valid": true}
+UPSTREAM     : /api/v1/payment/callback (status=200)
+RESPONSE_RAW : {"code": "M-30", "message": "支付通知指向未知订单，订单状态不变", "data": {"amount": 10000, "channel_trade_no": "R4-MOCK-BAD", "effective": null, "event_id": 4, "event_type": "支付通知处理结果", "failure_code": "M-30", "failure_reason": "支付通知指向未知订单，订单状态不变", "id": 4, "need_refund": false, "occurred_at": "2026-11-12T15:11:04.6869892+08:00", "order_id": 0, "order_no": "NO-SUCH-ORDER", "order_status_snapshot": "", "result": "已拒绝", "signature_valid": true}}
+EXPECTED     : M-30   ACTUAL: M-30
+ASSERTION    : PASS
+
+POST_CHECK   : 订单状态=待发货（超时通知不改状态）
+SUMMARY      : 4 cases, ALL_PASS=True
+VERSION      : dev/01 HEAD 6083edd06cb4b289ee251bbca28efcdd83e15d6c + 第四轮工作区增量
