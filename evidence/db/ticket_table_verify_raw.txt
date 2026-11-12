@@ -1,0 +1,86 @@
+===== 工单表 ticket_no 唯一索引 & 数据持久化验证（真实 MySQL/InnoDB）=====
+时间：2026-11-12 20:15:23
+
+===== 步骤 0：执行建表脚本与环境核对 =====
+$ mysql -uroot shop_trade < evidence/db/ticket_schema.sql
+
+[exit=0]
+----- 版本与默认引擎 -----
+$ mysql -uroot 
+mysql_version	default_engine	charset_server
+8.4.11-0ubuntu0.26.04.1	InnoDB	utf8mb4
+[exit=0]
+----- ticket 表引擎与字符集 -----
+$ mysql -uroot shop_trade
+TABLE_NAME	ENGINE	TABLE_COLLATION
+ticket	InnoDB	utf8mb4_0900_ai_ci
+[exit=0]
+----- ticket 表约束 -----
+$ mysql -uroot shop_trade
+CONSTRAINT_NAME	TABLE_NAME	CONSTRAINT_TYPE
+PRIMARY	ticket	PRIMARY KEY
+uk_ticket_ticket_no	ticket	UNIQUE
+[exit=0]
+
+===== 步骤 1：首次插入工单（插入成功）=====
+----- 清理历史验证数据 -----
+$ mysql -uroot shop_trade
+
+[exit=0]
+----- 首次插入 -----
+$ mysql -uroot shop_trade
+
+[exit=0]
+----- 插入结果校验 -----
+$ mysql -uroot shop_trade
+id	ticket_no	user_id	content	status	created_at
+1	TK001	1	订单 ORD001 未收到货，请协助核查	pending	2026-11-12 20:15:24.672
+[exit=0]
+
+===== 步骤 2：重复插入相同 ticket_no（唯一索引拦截）=====
+----- 重复插入 -----
+$ mysql -uroot shop_trade
+ERROR 1062 (23000) at line 1: Duplicate entry 'TK001' for key 'ticket.uk_ticket_ticket_no'
+[exit=1]
+
+===== 步骤 3：唯一索引定义核对 =====
+----- SHOW INDEX -----
+$ mysql -uroot shop_trade
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+ticket	0	uk_ticket_ticket_no	1	ticket_no	A	1	NULL	NULL		BTREE			YES	NULL
+[exit=0]
+
+===== 步骤 4：事务回滚后不落盘 =====
+----- 事务回滚 -----
+$ mysql -uroot shop_trade
+rows_in_transaction
+1
+rows_after_rollback
+0
+[exit=0]
+
+===== 步骤 5：数据库重启后数据持久化校验 =====
+$ service mysql restart
+
+$ mysqladmin ping -> mysqld is alive
+----- 重启后仍可查询 -----
+$ mysql -uroot shop_trade
+id	ticket_no	user_id	content	status	created_at
+1	TK001	1	订单 ORD001 未收到货，请协助核查	pending	2026-11-12 20:15:24.672
+[exit=0]
+----- 重启后索引仍在 -----
+$ mysql -uroot shop_trade
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+ticket	0	uk_ticket_ticket_no	1	ticket_no	A	1	NULL	NULL		BTREE			YES	NULL
+[exit=0]
+
+===== 步骤 6：清理验证数据 =====
+----- 删除验证数据 -----
+$ mysql -uroot shop_trade
+
+[exit=0]
+----- 清理后校验 -----
+$ mysql -uroot shop_trade
+rows_after_cleanup
+0
+[exit=0]
