@@ -1,0 +1,90 @@
+# 第五轮提交后门禁复核原始输出
+# EXECUTED_AT: 2026-11-12T16:29:34.743627+08:00
+# BRANCH: dev/01
+# 被复核的 HEAD: 68801cb51dd2af7fc4680dadce0d7414ad918d1a
+# 说明：以下全部为真实执行输出；race 探针的环境限制见 evidence/r5-quality-output.txt。
+# 本文件自身的提交哈希以 git log -1 为准，不在此写死。
+
+=== git branch --show-current ===
+dev/01
+(exit=0)
+=== git log --format="%H|%h|%ad|%s" --date=iso -6 ===
+68801cb51dd2af7fc4680dadce0d7414ad918d1a|68801cb|2026-11-12 16:28:54 +0800|[docs] [v1.2.0] 回补版本链核查与第五轮提交记录
+537453c366588fdb0d947ed61821423d8541458d|537453c|2026-11-12 16:28:10 +0800|[docs] [v1.2.0] 补齐接口边界矩阵与第五轮证据闭环文档
+00520bdffe4bbc67052f7dc3427b4c38e836f43f|00520bd|2026-11-12 16:28:02 +0800|[test] [v1.2.0] 补充第五轮边界单测与证据采集产物
+018551c4370e3f7d84047411cb8b8677fd2e650a|018551c|2026-11-12 16:27:50 +0800|[opt] [v1.2.0] 补齐模拟支付渠道服务与第四轮冒烟产物
+6083edd06cb4b289ee251bbca28efcdd83e15d6c|6083edd|2026-11-12 14:07:29 +0800|[opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物
+6cc6f134ee071e0a1cb8e71f03f824a178a249e0|6cc6f13|2026-11-12 12:44:01 +0800|feat: 电商订单售前退款完整业务实现
+(exit=0)
+=== git rev-parse HEAD ===
+68801cb51dd2af7fc4680dadce0d7414ad918d1a
+(exit=0)
+=== git status --short ===
+?? scripts/r5_post_commit_verify.py
+(exit=0)
+=== git remote -v ===
+(无输出)
+(exit=0)
+=== python scripts/check_commit_message.py ===
+�淶ԭ�ģ�commit-convention.md���⼯�渽���������ű�����д��
+У�����python scripts/check_commit_message.py
+------------------------------------------------------------------------------
+[1] 68801cb51dd2 | [docs] [v1.2.0] �ز��汾���˲���������ύ��¼
+     ����=docs �汾��=v1.2.0 ���=(��) ����=�ز��汾���˲���������ύ��¼
+     ������򣺰汾��=False ���=False
+     ���ۣ�PASS ���Ϲ淶
+[2] 537453c36658 | [docs] [v1.2.0] ����ӿڱ߽�����������֤�ݱջ��ĵ�
+     ����=docs �汾��=v1.2.0 ���=(��) ����=����ӿڱ߽�����������֤�ݱջ��ĵ�
+     ������򣺰汾��=False ���=False
+     ���ۣ�PASS ���Ϲ淶
+[3] 00520bdffe4b | [test] [v1.2.0] ��������ֱ߽絥����֤�ݲɼ�����
+     ����=test �汾��=v1.2.0 ���=(��) ����=��������ֱ߽絥����֤�ݲɼ�����
+     ������򣺰汾��=False ���=False
+     ���ۣ�PASS ���Ϲ淶
+[4] 018551c4370e | [opt] [v1.2.0] ����ģ��֧�����������������ð�̲���
+     ����=opt �汾��=v1.2.0 ���=(��) ����=����ģ��֧�����������������ð�̲���
+     ������򣺰汾��=True ���=False
+     ���ۣ�PASS ���Ϲ淶
+[5] 6083edd06cb4 | [opt] [v1.1.0] �������ռ��Skill����Ʒ���۵Ƚ�������
+     ����=opt �汾��=v1.1.0 ���=(��) ����=�������ռ��Skill����Ʒ���۵Ƚ�������
+     ������򣺰汾��=True ���=False
+     ���ۣ�PASS ���Ϲ淶
+[6] 6cc6f134ee07 | feat: ���̶�����ǰ�˿�����ҵ��ʵ��
+     ���ۣ�FAIL �����Ϲ淶
+       - ������ `[����] [�汾��] [����/Bug���] ��������` ��ʽ
+------------------------------------------------------------------------------
+�ϼ� 6 ����PASS 5 ����FAIL 1 ��
+˵������ʽ�Ϲ治���� meegle ��ź���ͨ�������� meegle CLI �����ã�feat/fix ��ź���������/����֤��ȱʧ������α�졣
+(exit=0)
+=== go test ./... ===
+ok  	shop-trade	(cached)
+ok  	shop-trade/server/api/v1	(cached)
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	(cached)
+ok  	shop-trade/server/model	(cached)
+ok  	shop-trade/server/router	(cached)
+ok  	shop-trade/server/service	(cached)
+(exit=0)
+=== gofmt -l . ===
+(无输出)
+(exit=0)
+=== go vet ./... ===
+(无输出)
+(exit=0)
+=== go test -cover ./server/service/... ===
+ok  	shop-trade/server/service	(cached)	coverage: 98.5% of statements
+(exit=0)
+=== go test -coverpkg=./... -coverprofile=coverage-r5.out ./... ===
+ok  	shop-trade	(cached)	coverage: 5.7% of statements in ./...
+ok  	shop-trade/server/api/v1	(cached)	coverage: 63.5% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	(cached)	coverage: 4.7% of statements in ./...
+ok  	shop-trade/server/model	(cached)	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	(cached)	coverage: 2.6% of statements in ./...
+ok  	shop-trade/server/service	(cached)	coverage: 72.7% of statements in ./...
+(exit=0)
+=== go tool cover -func=coverage-r5.out (overall) ===
+shop-trade/server/service/types.go:179:			boolPtr					100.0%
+shop-trade/server/service/types.go:180:			stringPtr				100.0%
+total:							(statements)				94.2%
+(exit=0)
