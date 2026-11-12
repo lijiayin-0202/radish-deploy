@@ -1,0 +1,50 @@
+===== 阶段 4：唯一键冲突复现 =====
+--- 4.1 写入订单基线数据 ---
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO `order` (order_no,buyer_id,goods_id,goods_no,goods_name,quantity,unit_price,total_amount,status,expires_at) VALUES ('UNIQ-PROBE-0001',1001,1,'GOODS-ACT-001','活动商品',1,10000,10000,'待支付',NOW(3)+INTERVAL 10 MINUTE) ON DUPLICATE KEY UPDATE order_no=VALUES(order_no);"
+--------------------------------------------------------------
+--- 4.2 重复插入相同 order_no：预期 uk_order_order_no 唯一约束报错 ---
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO `order` (order_no,buyer_id,goods_id,goods_no,goods_name,quantity,unit_price,total_amount,status,expires_at) VALUES ('UNIQ-PROBE-0001',1002,1,'GOODS-ACT-001','活动商品',1,10000,10000,'待支付',NOW(3)+INTERVAL 10 MINUTE);"
+--------------------------------------------------------------
+ERROR 1062 (23000) at line 1: Duplicate entry 'UNIQ-PROBE-0001' for key 'order.uk_order_order_no'
+--- 4.3 重复插入相同 dedup_key：预期 uk_payment_dedup_key 唯一约束报错 ---
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO payment (order_id,order_no,channel_trade_no,dedup_key,effective,event_type,result,amount,occurred_at) VALUES (1,'UNIQ-PROBE-0001','TRADE-UNIQ-0001','DEDUP-UNIQ-0001',1,'支付通知','成功',10000,NOW(3));"
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO payment (order_id,order_no,channel_trade_no,dedup_key,effective,event_type,result,amount,occurred_at) VALUES (1,'UNIQ-PROBE-0001','TRADE-UNIQ-0001','DEDUP-UNIQ-0001',1,'支付通知','成功',10000,NOW(3));"
+--------------------------------------------------------------
+ERROR 1062 (23000) at line 1: Duplicate entry 'DEDUP-UNIQ-0001' for key 'payment.uk_payment_dedup_key'
+--- 4.4 重复插入相同 (channel_trade_no, effective)：预期 uk_payment_channel_effective 唯一约束报错 ---
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO payment (order_id,order_no,channel_trade_no,dedup_key,effective,event_type,result,amount,occurred_at) VALUES (1,'UNIQ-PROBE-0001','TRADE-UNIQ-0002','DEDUP-UNIQ-0002',1,'支付通知','成功',10000,NOW(3));"
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO payment (order_id,order_no,channel_trade_no,dedup_key,effective,event_type,result,amount,occurred_at) VALUES (1,'UNIQ-PROBE-0001','TRADE-UNIQ-0002','DEDUP-UNIQ-0003',1,'支付通知','成功',10000,NOW(3));"
+--------------------------------------------------------------
+ERROR 1062 (23000) at line 1: Duplicate entry 'TRADE-UNIQ-0002-1' for key 'payment.uk_payment_channel_effective'
+--- 4.5 effective 为 NULL 的审计事件允许重复追加（唯一索引对 NULL 不生效）---
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO payment (order_id,order_no,channel_trade_no,dedup_key,effective,event_type,result,amount,failure_reason,occurred_at) VALUES (1,'UNIQ-PROBE-0001','TRADE-UNIQ-0001',NULL,NULL,'支付通知','重复通知幂等',0,'重复支付通知已幂等处理，未重复记款',NOW(3));"
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "INSERT INTO payment (order_id,order_no,channel_trade_no,dedup_key,effective,event_type,result,amount,failure_reason,occurred_at) VALUES (1,'UNIQ-PROBE-0001','TRADE-UNIQ-0001',NULL,NULL,'支付通知','重复通知幂等',0,'重复支付通知已幂等处理，未重复记款',NOW(3));"
+--------------------------------------------------------------
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SELECT id, order_no, channel_trade_no, dedup_key, effective, event_type, result, amount FROM payment ORDER BY id;"
+--------------------------------------------------------------
+id	order_no	channel_trade_no	dedup_key	effective	event_type	result	amount
+1	UNIQ-PROBE-0001	TRADE-UNIQ-0001	DEDUP-UNIQ-0001	1	支付通知	成功	10000
+3	UNIQ-PROBE-0001	TRADE-UNIQ-0002	DEDUP-UNIQ-0002	1	支付通知	成功	10000
+5	UNIQ-PROBE-0001	TRADE-UNIQ-0001	NULL	NULL	支付通知	重复通知幂等	0
+6	UNIQ-PROBE-0001	TRADE-UNIQ-0001	NULL	NULL	支付通知	重复通知幂等	0

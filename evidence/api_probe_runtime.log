@@ -1,0 +1,188 @@
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> shop-trade/server/api/v1.Health (4 handlers)
+[GIN-debug] GET    /api/v1/me                --> shop-trade/server/api/v1.(*OrderApi).Me-fm (4 handlers)
+[GIN-debug] GET    /api/v1/goods             --> shop-trade/server/api/v1.(*OrderApi).ListGoods-fm (4 handlers)
+[GIN-debug] GET    /api/v1/admin/clock       --> shop-trade/server/api/v1.(*OrderApi).GetClock-fm (4 handlers)
+[GIN-debug] POST   /api/v1/admin/clock       --> shop-trade/server/api/v1.(*OrderApi).SetClock-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders            --> shop-trade/server/api/v1.(*OrderApi).CreateOrder-fm (4 handlers)
+[GIN-debug] GET    /api/v1/orders/:order_no  --> shop-trade/server/api/v1.(*OrderApi).GetOrder-fm (4 handlers)
+[GIN-debug] GET    /api/v1/orders/:order_no/status --> shop-trade/server/api/v1.(*OrderApi).GetOrderStatus-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/cancel --> shop-trade/server/api/v1.(*OrderApi).CancelOrder-fm (4 handlers)
+[GIN-debug] POST   /api/v1/payment/callback  --> shop-trade/server/api/v1.(*OrderApi).HandlePaymentCallback-fm (4 handlers)
+[GIN-debug] POST   /api/v1/admin/orders/close-expired --> shop-trade/server/api/v1.(*OrderApi).CloseExpiredOrders-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/apply --> shop-trade/server/api/v1.(*OrderApi).ApplyRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/reject --> shop-trade/server/api/v1.(*OrderApi).RejectRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/approve --> shop-trade/server/api/v1.(*OrderApi).ApproveRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/retry --> shop-trade/server/api/v1.(*OrderApi).RetryRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/refund/callback   --> shop-trade/server/api/v1.(*OrderApi).HandleRefundCallback-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/shipment --> shop-trade/server/api/v1.(*OrderApi).RegisterShipment-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/:event_id/verify --> shop-trade/server/api/v1.(*OrderApi).VerifyLatePayment-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/:event_id/refund/initiate --> shop-trade/server/api/v1.(*OrderApi).InitiateLatePaymentRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/refund/callback --> shop-trade/server/api/v1.(*OrderApi).HandleLatePaymentRefundCallback-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/refund/retry --> shop-trade/server/api/v1.(*OrderApi).RetryLatePaymentRefund-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ops/summary       --> shop-trade/server/api/v1.(*OrderApi).GetOpsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/admin/goods/:goods_id/price --> shop-trade/server/api/v1.(*ExtensionApi).UpdateGoodsPrice-fm (4 handlers)
+[GIN-debug] POST   /api/v1/payment/timeout   --> shop-trade/server/api/v1.(*ExtensionApi).HandleChannelTimeout-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ops/stock-check/:order_no --> shop-trade/server/api/v1.(*ExtensionApi).VerifyStockRestoration-fm (4 handlers)
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] GET    /                         --> shop-trade/server/initialize.Routers.func2 (4 handlers)
+2026/11/12 19:16:31 shop-trade 启动 addr=:18097 mode=demo-memory 健康检查=GET /health 静态页面=GET /
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :18097
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | GET      "/health"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/me"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/goods"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/goods"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/orders/{order_no}"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | GET      "/api/v1/orders/NOT-EXIST-0001"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/orders/{order_no}/status"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/cancel"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/cancel"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/callback"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/callback"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/payment/callback"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/orders/close-expired"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/orders/close-expired"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/apply"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/apply"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/reject"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/reject"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/approve"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/approve"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/retry"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/retry"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/refund/callback"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/refund/callback"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/refund/callback"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/shipment"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/shipment"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/shipment"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/{event_id}/verify"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/abc/verify"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/999999/verify"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/{event_id}/refund/initiate"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/abc/refund/initiate"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/callback"
+[GIN] 2026/11/12 - 19:16:32 | 400 |       514.2µs |       127.0.0.1 | POST     "/api/v1/late-payment/refund/callback"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/callback"
+[GIN] 2026/11/12 - 19:16:32 | 404 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/{event_id}/refund/retry"
+[GIN] 2026/11/12 - 19:16:32 | 404 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/abc/refund/retry"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/ops/summary"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | GET      "/api/v1/ops/summary"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/{goods_id}/price"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/abc/price"
+[GIN] 2026/11/12 - 19:16:32 | 400 |      1.0098ms |       127.0.0.1 | POST     "/api/v1/admin/goods/1/price"
+[GIN] 2026/11/12 - 19:16:32 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/1/price"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/timeout"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/timeout"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/timeout"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/ops/stock-check/{order_no}"
+[GIN] 2026/11/12 - 19:16:32 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/ops/stock-check/NOT-EXIST-0001"
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> shop-trade/server/api/v1.Health (4 handlers)
+[GIN-debug] GET    /api/v1/me                --> shop-trade/server/api/v1.(*OrderApi).Me-fm (4 handlers)
+[GIN-debug] GET    /api/v1/goods             --> shop-trade/server/api/v1.(*OrderApi).ListGoods-fm (4 handlers)
+[GIN-debug] GET    /api/v1/admin/clock       --> shop-trade/server/api/v1.(*OrderApi).GetClock-fm (4 handlers)
+[GIN-debug] POST   /api/v1/admin/clock       --> shop-trade/server/api/v1.(*OrderApi).SetClock-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders            --> shop-trade/server/api/v1.(*OrderApi).CreateOrder-fm (4 handlers)
+[GIN-debug] GET    /api/v1/orders/:order_no  --> shop-trade/server/api/v1.(*OrderApi).GetOrder-fm (4 handlers)
+[GIN-debug] GET    /api/v1/orders/:order_no/status --> shop-trade/server/api/v1.(*OrderApi).GetOrderStatus-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/cancel --> shop-trade/server/api/v1.(*OrderApi).CancelOrder-fm (4 handlers)
+[GIN-debug] POST   /api/v1/payment/callback  --> shop-trade/server/api/v1.(*OrderApi).HandlePaymentCallback-fm (4 handlers)
+[GIN-debug] POST   /api/v1/admin/orders/close-expired --> shop-trade/server/api/v1.(*OrderApi).CloseExpiredOrders-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/apply --> shop-trade/server/api/v1.(*OrderApi).ApplyRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/reject --> shop-trade/server/api/v1.(*OrderApi).RejectRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/approve --> shop-trade/server/api/v1.(*OrderApi).ApproveRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/refund/retry --> shop-trade/server/api/v1.(*OrderApi).RetryRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/refund/callback   --> shop-trade/server/api/v1.(*OrderApi).HandleRefundCallback-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders/:order_no/shipment --> shop-trade/server/api/v1.(*OrderApi).RegisterShipment-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/:event_id/verify --> shop-trade/server/api/v1.(*OrderApi).VerifyLatePayment-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/:event_id/refund/initiate --> shop-trade/server/api/v1.(*OrderApi).InitiateLatePaymentRefund-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/refund/callback --> shop-trade/server/api/v1.(*OrderApi).HandleLatePaymentRefundCallback-fm (4 handlers)
+[GIN-debug] POST   /api/v1/late-payment/refund/retry --> shop-trade/server/api/v1.(*OrderApi).RetryLatePaymentRefund-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ops/summary       --> shop-trade/server/api/v1.(*OrderApi).GetOpsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/admin/goods/:goods_id/price --> shop-trade/server/api/v1.(*ExtensionApi).UpdateGoodsPrice-fm (4 handlers)
+[GIN-debug] POST   /api/v1/payment/timeout   --> shop-trade/server/api/v1.(*ExtensionApi).HandleChannelTimeout-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ops/stock-check/:order_no --> shop-trade/server/api/v1.(*ExtensionApi).VerifyStockRestoration-fm (4 handlers)
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] GET    /                         --> shop-trade/server/initialize.Routers.func2 (4 handlers)
+2026/11/12 19:17:27 shop-trade 启动 addr=:18097 mode=demo-memory 健康检查=GET /health 静态页面=GET /
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :18097
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | GET      "/health"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/me"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/goods"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/goods"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/clock"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/orders/{order_no}"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | GET      "/api/v1/orders/NOT-EXIST-0001"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/orders/{order_no}/status"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/cancel"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/cancel"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/callback"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/callback"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/payment/callback"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/orders/close-expired"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/orders/close-expired"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/apply"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/apply"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/reject"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/reject"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/approve"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/approve"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/refund/retry"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/refund/retry"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/refund/callback"
+[GIN] 2026/11/12 - 19:17:28 | 400 |      1.0111ms |       127.0.0.1 | POST     "/api/v1/refund/callback"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/refund/callback"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/{order_no}/shipment"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/shipment"
+[GIN] 2026/11/12 - 19:17:28 | 200 |       603.9µs |       127.0.0.1 | POST     "/api/v1/orders/NOT-EXIST-0001/shipment"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/{event_id}/verify"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/abc/verify"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/999999/verify"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/{event_id}/refund/initiate"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/abc/refund/initiate"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/callback"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/callback"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/callback"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/retry"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/late-payment/refund/retry"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/ops/summary"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | GET      "/api/v1/ops/summary"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/{goods_id}/price"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/abc/price"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/1/price"
+[GIN] 2026/11/12 - 19:17:28 | 200 |            0s |       127.0.0.1 | POST     "/api/v1/admin/goods/1/price"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/timeout"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/timeout"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | POST     "/api/v1/payment/timeout"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/ops/stock-check/{order_no}"
+[GIN] 2026/11/12 - 19:17:28 | 400 |            0s |       127.0.0.1 | GET      "/api/v1/ops/stock-check/NOT-EXIST-0001"

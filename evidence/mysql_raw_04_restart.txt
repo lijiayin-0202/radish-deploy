@@ -1,0 +1,89 @@
+===== 阶段 3：数据库重启后复查 =====
+$ service mysql restart
+$ mysqladmin ping
+mysqld is alive
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SELECT VERSION() AS version, @@port AS port, @@innodb_version AS innodb_version;"
+--------------------------------------------------------------
+version	port	innodb_version
+8.4.11-0ubuntu0.26.04.1	3306	8.4.11
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW TABLES;"
+--------------------------------------------------------------
+Tables_in_shop_trade
+goods
+order
+payment
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW INDEX FROM `order`;"
+--------------------------------------------------------------
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+order	0	PRIMARY	1	id	A	0	NULL	NULL		BTREE			YES	NULL
+order	0	uk_order_order_no	1	order_no	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_refund_channel_trade_no	1	refund_channel_trade_no	A	0	NULL	NULL	YES	BTREE			YES	NULL
+order	1	idx_order_buyer_status	1	buyer_id	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_buyer_status	2	status	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_goods_id	1	goods_id	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_status	1	status	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_status_expires	1	status	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_status_expires	2	expires_at	A	0	NULL	NULL		BTREE			YES	NULL
+order	1	idx_order_deleted_at	1	deleted_at	A	0	NULL	NULL	YES	BTREE			YES	NULL
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW INDEX FROM `goods`;"
+--------------------------------------------------------------
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+goods	0	PRIMARY	1	id	A	2	NULL	NULL		BTREE			YES	NULL
+goods	0	uk_goods_goods_no	1	goods_no	A	2	NULL	NULL		BTREE			YES	NULL
+goods	1	idx_goods_status	1	status	A	1	NULL	NULL		BTREE			YES	NULL
+goods	1	idx_goods_available_stock	1	available_stock	A	2	NULL	NULL		BTREE			YES	NULL
+goods	1	idx_goods_deleted_at	1	deleted_at	A	1	NULL	NULL	YES	BTREE			YES	NULL
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW INDEX FROM `payment`;"
+--------------------------------------------------------------
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+payment	0	PRIMARY	1	id	A	2	NULL	NULL		BTREE			YES	NULL
+payment	0	uk_payment_dedup_key	1	dedup_key	A	2	NULL	NULL	YES	BTREE			YES	NULL
+payment	0	uk_payment_channel_effective	1	channel_trade_no	A	2	NULL	NULL		BTREE			YES	NULL
+payment	0	uk_payment_channel_effective	2	effective	A	2	NULL	NULL	YES	BTREE			YES	NULL
+payment	1	idx_payment_order_id	1	order_id	A	1	NULL	NULL		BTREE			YES	NULL
+payment	1	idx_payment_order_no	1	order_no	A	1	NULL	NULL		BTREE			YES	NULL
+payment	1	idx_payment_event_type	1	event_type	A	1	NULL	NULL		BTREE			YES	NULL
+payment	1	idx_payment_result	1	result	A	1	NULL	NULL		BTREE			YES	NULL
+payment	1	idx_payment_related_event_id	1	related_event_id	A	1	NULL	NULL		BTREE			YES	NULL
+payment	1	idx_payment_occurred_at	1	occurred_at	A	2	NULL	NULL		BTREE			YES	NULL
+payment	1	idx_payment_deleted_at	1	deleted_at	A	1	NULL	NULL	YES	BTREE			YES	NULL
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA='shop_trade' ORDER BY TABLE_NAME;"
+--------------------------------------------------------------
+CONSTRAINT_NAME	TABLE_NAME	CONSTRAINT_TYPE
+PRIMARY	goods	PRIMARY KEY
+uk_goods_goods_no	goods	UNIQUE
+PRIMARY	order	PRIMARY KEY
+uk_order_order_no	order	UNIQUE
+PRIMARY	payment	PRIMARY KEY
+uk_payment_channel_effective	payment	UNIQUE
+uk_payment_dedup_key	payment	UNIQUE
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SELECT COUNT(*) AS goods_rows FROM goods;"
+--------------------------------------------------------------
+goods_rows
+2
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SELECT COUNT(*) AS order_rows FROM `order`;"
+--------------------------------------------------------------
+order_rows
+1
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SELECT COUNT(*) AS payment_rows FROM payment;"
+--------------------------------------------------------------
+payment_rows
+4

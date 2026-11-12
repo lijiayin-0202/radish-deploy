@@ -1,0 +1,42 @@
+===== 阶段 0：实例与版本 =====
+
+--------------------------------------------------------------
+$ /usr/sbin/mysqld --version
+--------------------------------------------------------------
+/usr/sbin/mysqld  Ver 8.4.11-0ubuntu0.26.04.1 for Linux on x86_64 ((Ubuntu))
+$ service mysql start
+$ mysqladmin ping
+mysqld is alive
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SELECT VERSION() AS version, @@default_storage_engine AS default_engine, @@character_set_server AS charset_server, @@collation_server AS collation_server;"
+--------------------------------------------------------------
+version	default_engine	charset_server	collation_server
+8.4.11-0ubuntu0.26.04.1	InnoDB	utf8mb4	utf8mb4_0900_ai_ci
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SHOW ENGINES;"
+--------------------------------------------------------------
+Engine	Support	Comment	Transactions	XA	Savepoints
+ndbcluster	NO	Clustered, fault-tolerant tables	NULL	NULL	NULL
+MEMORY	YES	Hash based, stored in memory, useful for temporary tables	NO	NO	NO
+InnoDB	DEFAULT	Supports transactions, row-level locking, and foreign keys	YES	YES	YES
+PERFORMANCE_SCHEMA	YES	Performance Schema	NO	NO	NO
+MyISAM	YES	MyISAM storage engine	NO	NO	NO
+FEDERATED	NO	Federated MySQL storage engine	NULL	NULL	NULL
+ndbinfo	NO	MySQL Cluster system information storage engine	NULL	NULL	NULL
+MRG_MYISAM	YES	Collection of identical MyISAM tables	NO	NO	NO
+BLACKHOLE	YES	/dev/null storage engine (anything you write to it disappears)	NO	NO	NO
+CSV	YES	CSV storage engine	NO	NO	NO
+ARCHIVE	YES	Archive storage engine	NO	NO	NO
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SHOW VARIABLES WHERE Variable_name IN ('bind_address','port','innodb_version','lower_case_table_names','transaction_isolation','innodb_lock_wait_timeout');"
+--------------------------------------------------------------
+Variable_name	Value
+bind_address	127.0.0.1
+innodb_lock_wait_timeout	50
+innodb_version	8.4.11
+lower_case_table_names	0
+port	3306
+transaction_isolation	REPEATABLE-READ

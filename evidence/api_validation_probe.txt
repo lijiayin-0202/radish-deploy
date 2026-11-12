@@ -1,0 +1,68 @@
+===== 接口入参校验与异常分支巡检（真实 HTTP 探测）=====
+时间：2026-11-12 19:17:26
+目标：http://127.0.0.1:18097（demo-memory 模式本地实例）
+$ go build -o C:\Users\10990\AppData\Local\Temp\shop-trade-probe.exe .  -> exit=0
+GET /health -> 服务已启动（mode=demo-memory）
+
+接口       路径                                             用例             HTTP   业务码                判定
+----------------------------------------------------------------------------------------------------------------------
+API-19       /api/v1/me                                     缺失身份           400    PARAM_ERROR        OK
+API-18       /api/v1/goods                                  缺失身份           400    PARAM_ERROR        OK
+API-18       /api/v1/goods                                  未知身份           400    PARAM_ERROR        OK
+API-20       /api/v1/admin/clock                            缺失身份           400    PARAM_ERROR        OK
+API-20       /api/v1/admin/clock                            缺失身份           400    PARAM_ERROR        OK
+API-20       /api/v1/admin/clock                            非法 JSON        400    PARAM_ERROR        OK
+API-20       /api/v1/admin/clock                            offset 越界      400    PARAM_ERROR        OK
+API-01       /api/v1/orders                                 缺失身份           400    PARAM_ERROR        OK
+API-01       /api/v1/orders                                 非法 JSON        400    PARAM_ERROR        OK
+API-01       /api/v1/orders                                 quantity 非正    200    M-03               OK
+API-01       /api/v1/orders                                 quantity 超限    200    M-03               OK
+API-01       /api/v1/orders                                 goods_id 缺失    200    M-04               OK
+API-02       /api/v1/orders/{order_no}                      缺失身份           400    PARAM_ERROR        OK
+API-02       /api/v1/orders/NOT-EXIST-0001                  订单号不存在         200    M-30               OK
+API-17       /api/v1/orders/{order_no}/status               缺失身份           400    PARAM_ERROR        OK
+API-03       /api/v1/orders/{order_no}/cancel               缺失身份           400    PARAM_ERROR        OK
+API-03       /api/v1/orders/NOT-EXIST-0001/cancel           订单号不存在         200    M-30               OK
+API-04       /api/v1/payment/callback                       缺失身份           400    PARAM_ERROR        OK
+API-04       /api/v1/payment/callback                       非法 JSON        400    PARAM_ERROR        OK
+API-04       /api/v1/payment/callback                       订单号为空          200    M-30               OK
+API-05       /api/v1/admin/orders/close-expired             缺失身份           400    PARAM_ERROR        OK
+API-05       /api/v1/admin/orders/close-expired             非法 JSON        400    PARAM_ERROR        OK
+API-06       /api/v1/orders/{order_no}/refund/apply         缺失身份           400    PARAM_ERROR        OK
+API-06       /api/v1/orders/NOT-EXIST-0001/refund/apply     订单号不存在         200    M-30               OK
+API-07       /api/v1/orders/{order_no}/refund/reject        缺失身份           400    PARAM_ERROR        OK
+API-07       /api/v1/orders/NOT-EXIST-0001/refund/reject    订单号不存在         200    M-30               OK
+API-08       /api/v1/orders/{order_no}/refund/approve       缺失身份           400    PARAM_ERROR        OK
+API-08       /api/v1/orders/NOT-EXIST-0001/refund/approve   订单号不存在         200    M-30               OK
+API-09       /api/v1/orders/{order_no}/refund/retry         缺失身份           400    PARAM_ERROR        OK
+API-09       /api/v1/orders/NOT-EXIST-0001/refund/retry     订单号不存在         200    M-30               OK
+API-10       /api/v1/refund/callback                        缺失身份           400    PARAM_ERROR        OK
+API-10       /api/v1/refund/callback                        非法 JSON        400    PARAM_ERROR        OK
+API-10       /api/v1/refund/callback                        订单号为空          200    M-30               OK
+API-11       /api/v1/orders/{order_no}/shipment             缺失身份           400    PARAM_ERROR        OK
+API-11       /api/v1/orders/NOT-EXIST-0001/shipment         非法 JSON        400    PARAM_ERROR        OK
+API-11       /api/v1/orders/NOT-EXIST-0001/shipment         承运方为空          200    M-23               OK
+API-12       /api/v1/late-payment/{event_id}/verify         缺失身份           400    PARAM_ERROR        OK
+API-12       /api/v1/late-payment/abc/verify                event_id 非数字   400    PARAM_ERROR        OK
+API-12       /api/v1/late-payment/999999/verify             事件不存在          200    M-14               OK
+API-13       /api/v1/late-payment/{event_id}/refund/initiate 缺失身份           400    PARAM_ERROR        OK
+API-13       /api/v1/late-payment/abc/refund/initiate       event_id 非数字   400    PARAM_ERROR        OK
+API-14       /api/v1/late-payment/refund/callback           缺失身份           400    PARAM_ERROR        OK
+API-14       /api/v1/late-payment/refund/callback           非法 JSON        400    PARAM_ERROR        OK
+API-14       /api/v1/late-payment/refund/callback           订单号为空          200    M-14               OK
+API-15       /api/v1/late-payment/refund/retry              缺失身份           400    PARAM_ERROR        OK
+API-15       /api/v1/late-payment/refund/retry              event_id 非数字   400    PARAM_ERROR        OK
+API-16       /api/v1/ops/summary                            缺失身份           400    PARAM_ERROR        OK
+API-16       /api/v1/ops/summary                            买家越权           200    M-20               OK
+扩展 API-21    /api/v1/admin/goods/{goods_id}/price           缺失身份           400    PARAM_ERROR        OK
+扩展 API-21    /api/v1/admin/goods/abc/price                  goods_id 非数字   400    PARAM_ERROR        OK
+扩展 API-21    /api/v1/admin/goods/1/price                    unit_price 非正  400    PARAM_ERROR        OK
+扩展 API-21    /api/v1/admin/goods/1/price                    买家越权           200    M-20               OK
+扩展 API-22    /api/v1/payment/timeout                        缺失身份           400    PARAM_ERROR        OK
+扩展 API-22    /api/v1/payment/timeout                        非法 JSON        400    PARAM_ERROR        OK
+扩展 API-22    /api/v1/payment/timeout                        订单号为空          400    PARAM_ERROR        OK
+扩展 API-23    /api/v1/ops/stock-check/{order_no}             缺失身份           400    PARAM_ERROR        OK
+扩展 API-23    /api/v1/ops/stock-check/NOT-EXIST-0001         订单号不存在         400    PARAM_ERROR        OK
+----------------------------------------------------------------------------------------------------------------------
+探针总数：57；不合规响应（500 / INTERNAL_ERROR / 非 JSON）：0
+判定：全部异常分支均被显式兜住

@@ -1,0 +1,98 @@
+===== 真实 MySQL(InnoDB) 模式：应用级持久化与并发验证 =====
+工作目录：D:\Desktop\shop
+时间：2026-11-12 19:02:50
+
+--- 0. 准备：读取 WSL 内应用账号口令（仅存在于 WSL /tmp，不写入仓库）---
+[准备] 未找到 /tmp/shop_dsn_pw，先执行 mysql_prepare_user.sh 重建应用账号
+app user prepared:
+user	host
+shoptrade	%
+password file: /tmp/shop_dsn_pw (mode 600, value not echoed)
+
+[准备] 已读取应用账号口令（值不回显、不落盘）
+
+--- 0.5 重置验证基线（验证环境专用，业务数据可清空后重建）---
+
+
+
+goods_no	available_stock	occupied_stock
+GOODS-ACT-001	5	0
+
+
+--- 1. 构建应用二进制 ---
+$ go build -o C:\Users\10990\AppData\Local\Temp\shop-trade-mysql-verify.exe .
+
+build_exit=0
+
+--- 2. 启动进程1（MySQL 模式）---
+[启动] 进程1 pid=32344 DSN=shoptrade:***@tcp(127.0.0.1:3306)/shop_trade?charset=utf8mb4
+[启动] 进程1 就绪，GET /health -> HTTP 200
+GET /api/v1/me -> {"code": "0", "message": "ok", "data": {"account": "buyer01", "mode": "mysql-innodb", "role": "买家", "user_id": 1001}}
+[断言] PASS | 应用以 mysql-innodb 模式启动 | mode=mysql-innodb
+    商品 {"available_stock": 5, "goods_no": "GOODS-ACT-001", "id": 1, "name": "活动商品", "occupied_stock": 0, "status": "在售", "unit_price": 10000}
+    商品 {"available_stock": 2, "goods_no": "GOODS-DEMO-002", "id": 2, "name": "演示商品", "occupied_stock": 0, "status": "在售", "unit_price": 10000}
+
+--- 3. 真实业务：下单 -> 支付 -> 查单（全部落库）---
+POST /api/v1/orders -> {"code": "0", "message": "ok", "data": {"buyer_id": 1001, "cancelled_at": null, "closed_at": null, "expires_at": "2026-11-12T19:12:54.6983488+08:00", "goods_id": 1, "goods_name": "活动商品", "goods_no": "GOODS-ACT-001", "id": 15, "late_payment_refunded": false, "order_no": "ORD-1794481374698348800-1001-1", "paid_at": null, "quantity": 2, "refund_channel_trade_no": "", "refund_kind": "未申请", "refund_reason": "", "refund_retry_count": 0, "refund_state": "未申请", "refunded_at": null, "shipment_carrier": "", "shipment_tracking_no": "", "shipped_at": null, "status": "待支付", "stock_restored": false, "total_amount": 20000, "unit_price": 10000}}
+[断言] PASS | 下单成功 | code=0 message=ok
+[订单] order_no=ORD-1794481374698348800-1001-1 total_amount=20000
+SQL 订单落库：
+order_no	status	quantity	unit_price	total_amount
+ORD-1794481374698348800-1001-1	待支付	2	10000	20000
+
+SQL 库存扣减：
+goods_no	available_stock	occupied_stock
+GOODS-ACT-001	3	2
+
+POST /api/v1/payment/callback -> {"code": "0", "message": "ok", "data": {"amount": 20000, "channel_trade_no": "TRADE-MYSQL-VERIFY-0001", "effective": true, "event_id": 26, "event_type": "支付成功", "failure_code": "", "failure_reason": "", "id": 26, "need_refund": false, "occurred_at": "2026-11-12T19:02:55.1382095+08:00", "order_id": 15, "order_no": "ORD-1794481374698348800-1001-1", "order_status_snapshot": "待发货", "result": "已记款", "signature_valid": true}}
+GET /api/v1/orders/ORD-1794481374698348800-1001-1 -> {"code": "0", "message": "ok", "data": {"buyer_id": 1001, "cancelled_at": null, "closed_at": null, "expires_at": "2026-11-12T19:12:54.698+08:00", "goods_id": 1, "goods_name": "活动商品", "goods_no": "GOODS-ACT-001", "id": 15, "late_payment_refunded": false, "order_no": "ORD-1794481374698348800-1001-1", "paid_at": "2026-11-12T19:02:55.095+08:00", "quantity": 2, "refund_channel_trade_no": "", "refund_kind": "未申请", "refund_reason": "", "refund_retry_count": 0, "refund_state": "未申请", "refunded_at": null, "shipment_carrier": "", "shipment_tracking_no": "", "shipped_at": null, "status": "待发货", "stock_restored": false, "total_amount": 20000, "unit_price": 10000}}
+[断言] PASS | 支付后订单状态为待发货 | status=待发货
+SQL 支付事件落库：
+id	order_no	channel_trade_no	dedup_key	effective	event_type	result	amount
+25	ORD-1794481374698348800-1001-1	ORDER:ORD-1794481374698348800-1001-1	NULL	NULL	下单成功	库存预扣成功	20000
+26	ORD-1794481374698348800-1001-1	TRADE-MYSQL-VERIFY-0001	PAY:TRADE-MYSQL-VERIFY-0001	1	支付成功	已记款	20000
+
+
+--- 4. 操作4：终止应用进程后重启，同一订单仍可查询 ---
+[停止] 进程1 已退出（用于模拟服务重启）
+SQL（进程已停止，MySQL 中数据仍在）：
+order_no	status	paid_at
+ORD-1794481374698348800-1001-1	待发货	2026-11-12 19:02:55.095
+
+[启动] 进程2 pid=35984 DSN=shoptrade:***@tcp(127.0.0.1:3306)/shop_trade?charset=utf8mb4
+[启动] 进程2 就绪，GET /health -> HTTP 200
+[重启后] GET /api/v1/orders/ORD-1794481374698348800-1001-1 -> {"code": "0", "message": "ok", "data": {"buyer_id": 1001, "cancelled_at": null, "closed_at": null, "expires_at": "2026-11-12T19:12:54.698+08:00", "goods_id": 1, "goods_name": "活动商品", "goods_no": "GOODS-ACT-001", "id": 15, "late_payment_refunded": false, "order_no": "ORD-1794481374698348800-1001-1", "paid_at": "2026-11-12T19:02:55.095+08:00", "quantity": 2, "refund_channel_trade_no": "", "refund_kind": "未申请", "refund_reason": "", "refund_retry_count": 0, "refund_state": "未申请", "refunded_at": null, "shipment_carrier": "", "shipment_tracking_no": "", "shipped_at": null, "status": "待发货", "stock_restored": false, "total_amount": 20000, "unit_price": 10000}}
+[断言] PASS | 应用重启后同一订单仍可查询且状态一致 | code=0 status=待发货
+SQL（重启后再次读取）：
+order_no	status	paid_at	total_amount
+ORD-1794481374698348800-1001-1	待发货	2026-11-12 19:02:55.095	20000
+
+goods_no	available_stock	occupied_stock
+GOODS-ACT-001	3	2
+
+
+--- 5. 操作5：20 并发下单，真实 InnoDB 行锁下不超卖 ---
+[并发前] available_stock=3 occupied_stock=2
+[并发结果] 发起 20 次下单，收到响应 20 次，成功 3 次，失败 17 次
+    失败 17 次 -> M-02:可售数量不足，下单失败
+[并发后] available_stock=0 occupied_stock=5
+[断言] PASS | 并发成功数不超过可售库存（无超卖） | 可售=3 成功=3
+[断言] PASS | 库存守恒：available + occupied == 初始总量 5 | available=0 occupied=5 合计=5
+[断言] PASS | 占用增量等于成功下单数（占用 2 + 成功数） | 占用=5 期望=5
+
+--- 6. 幂等复核：同一渠道交易号重复通知不重复记款 ---
+重复支付通知 -> {"code": "0", "message": "ok", "data": {"amount": 20000, "channel_trade_no": "TRADE-MYSQL-VERIFY-0001", "effective": null, "event_id": 30, "event_type": "重复支付通知", "failure_code": "M-25", "failure_reason": "重复支付通知已幂等处理，未重复记款", "id": 30, "need_refund": false, "occurred_at": "2026-11-12T19:02:56.9435334+08:00", "order_id": 15, "order_no": "ORD-1794481374698348800-1001-1", "order_status_snapshot": "待发货", "result": "重复支付通知已幂等处理，未重复记款", "signature_valid": true}}
+SQL 有效收款笔数：1
+[断言] PASS | 重复支付通知后有效收款仍为 1 笔 | effective_rows=1
+
+[停止] 进程2 已退出（用于模拟服务重启）
+===== 断言汇总 =====
+断言通过 8 / 8
+  PASS | 应用以 mysql-innodb 模式启动 | mode=mysql-innodb
+  PASS | 下单成功 | code=0 message=ok
+  PASS | 支付后订单状态为待发货 | status=待发货
+  PASS | 应用重启后同一订单仍可查询且状态一致 | code=0 status=待发货
+  PASS | 并发成功数不超过可售库存（无超卖） | 可售=3 成功=3
+  PASS | 库存守恒：available + occupied == 初始总量 5 | available=0 occupied=5 合计=5
+  PASS | 占用增量等于成功下单数（占用 2 + 成功数） | 占用=5 期望=5
+  PASS | 重复支付通知后有效收款仍为 1 笔 | effective_rows=1

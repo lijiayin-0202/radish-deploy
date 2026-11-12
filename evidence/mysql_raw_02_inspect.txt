@@ -1,0 +1,184 @@
+===== 阶段 2：库表结构、索引与约束核查 =====
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SHOW DATABASES LIKE 'shop_trade';"
+--------------------------------------------------------------
+Database (shop_trade)
+shop_trade
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW TABLES;"
+--------------------------------------------------------------
+Tables_in_shop_trade
+goods
+order
+payment
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SELECT TABLE_NAME, ENGINE, TABLE_COLLATION, TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA='shop_trade' ORDER BY TABLE_NAME;"
+--------------------------------------------------------------
+TABLE_NAME	ENGINE	TABLE_COLLATION	TABLE_COMMENT
+goods	InnoDB	utf8mb4_0900_ai_ci	商品与库存表：可售/占用分离，下单扣减可售并增加占用，超时关单与退款恢复库存
+order	InnoDB	utf8mb4_0900_ai_ci	订单表：一单一种商品，保存下单时价格快照；终态不可回退，超时关单释放占用
+payment	InnoDB	utf8mb4_0900_ai_ci	支付/退款/异常支付与只追加审计流水表；unique 仅约束有效业务结果，审计事件可重复追加
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW CREATE TABLE `goods`\G"
+--------------------------------------------------------------
+*************************** 1. row ***************************
+       Table: goods
+Create Table: CREATE TABLE `goods` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '商品ID',
+  `created_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `updated_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  `deleted_at` datetime(3) DEFAULT NULL COMMENT '软删除时间',
+  `goods_no` varchar(64) NOT NULL COMMENT '商品编号（业务唯一键）',
+  `name` varchar(128) NOT NULL COMMENT '商品名称',
+  `unit_price` bigint NOT NULL COMMENT '单价，单位分；下单时快照到订单',
+  `available_stock` int NOT NULL DEFAULT '0' COMMENT '可售数量',
+  `occupied_stock` int NOT NULL DEFAULT '0' COMMENT '预扣占用数量（待支付订单占用）',
+  `status` varchar(32) NOT NULL COMMENT '商品状态：在售/下架',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_goods_goods_no` (`goods_no`),
+  KEY `idx_goods_status` (`status`),
+  KEY `idx_goods_available_stock` (`available_stock`),
+  KEY `idx_goods_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商品与库存表：可售/占用分离，下单扣减可售并增加占用，超时关单与退款恢复库存'
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW CREATE TABLE `order`\G"
+--------------------------------------------------------------
+*************************** 1. row ***************************
+       Table: order
+Create Table: CREATE TABLE `order` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '订单主键',
+  `created_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `updated_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  `deleted_at` datetime(3) DEFAULT NULL COMMENT '软删除时间',
+  `order_no` varchar(64) NOT NULL COMMENT '订单号（业务唯一键）',
+  `buyer_id` bigint unsigned NOT NULL COMMENT '买家ID',
+  `goods_id` bigint unsigned NOT NULL COMMENT '单一商品ID',
+  `goods_no` varchar(64) NOT NULL COMMENT '下单时商品编号快照',
+  `goods_name` varchar(128) NOT NULL COMMENT '下单时商品名称快照',
+  `quantity` int NOT NULL COMMENT '数量，仅允许 1 或 2',
+  `unit_price` bigint NOT NULL COMMENT '下单时单价快照，单位分',
+  `total_amount` bigint NOT NULL COMMENT '应付金额快照，单位分',
+  `status` varchar(32) NOT NULL COMMENT '订单状态：待支付/待发货/退款审核中/退款处理中/已发货/已退款/已关闭/已取消',
+  `expires_at` datetime(3) NOT NULL COMMENT '服务端判定的支付到期时间（下单后10分钟）',
+  `paid_at` datetime(3) DEFAULT NULL COMMENT '支付成功时间',
+  `closed_at` datetime(3) DEFAULT NULL COMMENT '超时关闭时间',
+  `cancelled_at` datetime(3) DEFAULT NULL COMMENT '主动取消时间',
+  `refund_kind` varchar(32) NOT NULL DEFAULT '' COMMENT '退款类型：正常售前/迟到支付',
+  `refund_reason` varchar(512) NOT NULL DEFAULT '' COMMENT '退款申请原因',
+  `refund_apply_at` datetime(3) DEFAULT NULL COMMENT '退款申请时间',
+  `refund_audit_at` datetime(3) DEFAULT NULL COMMENT '退款审核时间',
+  `refund_auditor_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '审核客服ID',
+  `refund_audit_remark` varchar(512) NOT NULL DEFAULT '' COMMENT '审核/核实原因',
+  `refund_state` varchar(32) NOT NULL DEFAULT '' COMMENT '退款处理子状态',
+  `refund_retry_count` int NOT NULL DEFAULT '0' COMMENT '渠道退款失败后的重试次数',
+  `refund_channel_trade_no` varchar(128) DEFAULT NULL COMMENT '退款渠道交易号',
+  `refunded_at` datetime(3) DEFAULT NULL COMMENT '退款成功时间',
+  `stock_restored` tinyint(1) NOT NULL DEFAULT '0' COMMENT '正常售前退款是否已恢复库存（保证只恢复一次）',
+  `late_payment_refunded` tinyint(1) NOT NULL DEFAULT '0' COMMENT '迟到支付退款是否完成',
+  `shipment_carrier` varchar(128) NOT NULL DEFAULT '' COMMENT '承运方',
+  `shipment_tracking_no` varchar(128) NOT NULL DEFAULT '' COMMENT '运单号',
+  `shipped_at` datetime(3) DEFAULT NULL COMMENT '发货登记时间',
+  `shipment_registered_by` bigint unsigned NOT NULL DEFAULT '0' COMMENT '仓库登记人ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_order_no` (`order_no`),
+  KEY `idx_order_refund_channel_trade_no` (`refund_channel_trade_no`),
+  KEY `idx_order_buyer_status` (`buyer_id`,`status`),
+  KEY `idx_order_goods_id` (`goods_id`),
+  KEY `idx_order_status` (`status`),
+  KEY `idx_order_status_expires` (`status`,`expires_at`),
+  KEY `idx_order_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='订单表：一单一种商品，保存下单时价格快照；终态不可回退，超时关单释放占用'
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SHOW CREATE TABLE `payment`\G"
+--------------------------------------------------------------
+*************************** 1. row ***************************
+       Table: payment
+Create Table: CREATE TABLE `payment` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '事件ID',
+  `created_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+  `updated_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+  `deleted_at` datetime(3) DEFAULT NULL COMMENT '软删除时间',
+  `order_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '关联订单主键 order.id',
+  `order_no` varchar(64) NOT NULL DEFAULT '' COMMENT '关联订单号快照',
+  `channel_trade_no` varchar(128) NOT NULL COMMENT '渠道交易号（模拟支付渠道）',
+  `dedup_key` varchar(191) DEFAULT NULL COMMENT '幂等键：同一笔有效业务结果只允许一条',
+  `effective` tinyint(1) DEFAULT NULL COMMENT '是否有效业务结果：1=有效；NULL=审计/拒绝/重复留痕（可多条）',
+  `event_type` varchar(64) NOT NULL COMMENT '事件类型：支付通知/退款回调/异常支付/审计',
+  `result` varchar(64) NOT NULL COMMENT '处理结果',
+  `amount` bigint NOT NULL DEFAULT '0' COMMENT '金额，单位分',
+  `signature_valid` tinyint(1) NOT NULL DEFAULT '1' COMMENT '验签是否通过',
+  `failure_code` varchar(16) DEFAULT NULL COMMENT 'M-xx 失败原因编号',
+  `failure_reason` varchar(512) NOT NULL DEFAULT '' COMMENT '中文失败/拒绝原因',
+  `order_status_snapshot` varchar(32) NOT NULL DEFAULT '' COMMENT '事件发生时订单状态快照',
+  `need_refund` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否需要客服发起退款（迟到支付）',
+  `restored_stock` tinyint(1) NOT NULL DEFAULT '0' COMMENT '本事件是否恢复库存',
+  `related_event_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '关联异常事件ID',
+  `operator_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '操作人ID',
+  `occurred_at` datetime(3) NOT NULL COMMENT '事件发生时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_payment_dedup_key` (`dedup_key`),
+  UNIQUE KEY `uk_payment_channel_effective` (`channel_trade_no`,`effective`),
+  KEY `idx_payment_order_id` (`order_id`),
+  KEY `idx_payment_order_no` (`order_no`),
+  KEY `idx_payment_event_type` (`event_type`),
+  KEY `idx_payment_result` (`result`),
+  KEY `idx_payment_related_event_id` (`related_event_id`),
+  KEY `idx_payment_occurred_at` (`occurred_at`),
+  KEY `idx_payment_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='支付/退款/异常支付与只追加审计流水表；unique 仅约束有效业务结果，审计事件可重复追加'
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA='shop_trade' ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX;"
+--------------------------------------------------------------
+TABLE_NAME	INDEX_NAME	NON_UNIQUE	SEQ_IN_INDEX	COLUMN_NAME
+goods	idx_goods_available_stock	1	1	available_stock
+goods	idx_goods_deleted_at	1	1	deleted_at
+goods	idx_goods_status	1	1	status
+goods	PRIMARY	0	1	id
+goods	uk_goods_goods_no	0	1	goods_no
+order	idx_order_buyer_status	1	1	buyer_id
+order	idx_order_buyer_status	1	2	status
+order	idx_order_deleted_at	1	1	deleted_at
+order	idx_order_goods_id	1	1	goods_id
+order	idx_order_refund_channel_trade_no	1	1	refund_channel_trade_no
+order	idx_order_status	1	1	status
+order	idx_order_status_expires	1	1	status
+order	idx_order_status_expires	1	2	expires_at
+order	PRIMARY	0	1	id
+order	uk_order_order_no	0	1	order_no
+payment	idx_payment_deleted_at	1	1	deleted_at
+payment	idx_payment_event_type	1	1	event_type
+payment	idx_payment_occurred_at	1	1	occurred_at
+payment	idx_payment_order_id	1	1	order_id
+payment	idx_payment_order_no	1	1	order_no
+payment	idx_payment_related_event_id	1	1	related_event_id
+payment	idx_payment_result	1	1	result
+payment	PRIMARY	0	1	id
+payment	uk_payment_channel_effective	0	1	channel_trade_no
+payment	uk_payment_channel_effective	0	2	effective
+payment	uk_payment_dedup_key	0	1	dedup_key
+
+--------------------------------------------------------------
+$ mysql -uroot  -e "SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA='shop_trade' ORDER BY TABLE_NAME, CONSTRAINT_NAME;"
+--------------------------------------------------------------
+CONSTRAINT_NAME	TABLE_NAME	CONSTRAINT_TYPE
+PRIMARY	goods	PRIMARY KEY
+uk_goods_goods_no	goods	UNIQUE
+PRIMARY	order	PRIMARY KEY
+uk_order_order_no	order	UNIQUE
+PRIMARY	payment	PRIMARY KEY
+uk_payment_channel_effective	payment	UNIQUE
+uk_payment_dedup_key	payment	UNIQUE
+
+--------------------------------------------------------------
+$ mysql -uroot shop_trade -e "SELECT goods_no, name, unit_price, available_stock, occupied_stock, status FROM goods ORDER BY id;"
+--------------------------------------------------------------
+goods_no	name	unit_price	available_stock	occupied_stock	status
+GOODS-ACT-001	活动商品	10000	5	0	在售
+GOODS-DEMO-002	演示商品	10000	2	0	在售

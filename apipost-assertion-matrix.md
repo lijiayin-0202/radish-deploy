@@ -4,6 +4,7 @@
 > 不得写死成功、不得返回空结果。失败原因一律引用 `M-01~M-30` 中文文案。
 > 来源：`docs/interface-list.md` v1.0（定稿）；身份头为 `X-Demo-Account`。
 > 来源：`docs/interface-list.md` v1.0（定稿）；身份头为 `X-Demo-Account`。
+> 来源：`docs/interface-list.md` v1.0（定稿）；身份头为 `X-Demo-Account`。
 
 ## 一、M-xx 失败原因断言
 

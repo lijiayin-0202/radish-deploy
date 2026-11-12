@@ -1,0 +1,14 @@
+== toolchain ==
+go version go1.26.8 linux/amd64
+gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+CGO_ENABLED=1
+GOPROXY=https://goproxy.cn,direct
+== go test -race ./... -count=1 ==
+ok  	shop-trade	1.035s
+ok  	shop-trade/server/api/v1	1.049s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.033s
+ok  	shop-trade/server/model	1.018s
+ok  	shop-trade/server/router	1.028s
+ok  	shop-trade/server/service	1.055s
+race_exit=0
