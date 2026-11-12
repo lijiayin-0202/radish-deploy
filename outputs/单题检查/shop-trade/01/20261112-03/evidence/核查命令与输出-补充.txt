@@ -1,0 +1,189 @@
+第三轮门禁复核：核查命令与原始输出（补充卷）
+日期：2026-11-12（Asia/Shanghai）
+工作区：d:/Desktop/shop ｜ 分支：dev/01 ｜ HEAD：6083edd06cb4b289ee251bbca28efcdd83e15d6c
+说明：本文件逐字保存本轮除 round3-verify.ps1 以外各命令的真实 stdout/stderr 与退出码。
+      round3-verify.ps1 的完整原始输出见同目录《核查命令与输出.txt》，可复现脚本见 round3-verify.ps1。
+      全部核查为只读/隔离运行，未修改学生业务代码；唯一新增文件位于本次审计输出目录 outputs/单题检查/shop-trade/01/20261112-03/。
+
+================================================================
+[CMD-01] Git 版本链、工作区与远端（复核开始时执行）
+命令：
+cd d:/Desktop/shop; git branch --show-current; git rev-parse HEAD; git rev-list --count HEAD; git log --pretty=format:"%h | %s | %cI" -2; git status --porcelain; git remote -v
+输出：
+dev/01
+
+6083edd06cb4b289ee251bbca28efcdd83e15d6c
+2
+6083edd | [opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物 | 2026-11-12T14:07:29+08:00
+6cc6f13 | feat: 电商订单售前退款完整业务实现 | 2026-11-12T12:44:01+08:00
+
+（git status --porcelain 与 git remote -v 均无输出：工作区干净、无远端）
+exitCode=0
+
+================================================================
+[CMD-02] 格式、静态检查、构建、全部单元测试
+命令：
+cd d:/Desktop/shop; Write-Output '=== gofmt -l . ==='; gofmt -l .; Write-Output "gofmt_exit=$LASTEXITCODE"; Write-Output '=== go vet ./... ==='; go vet ./...; Write-Output "vet_exit=$LASTEXITCODE"; Write-Output '=== go build ./... ==='; go build ./...; Write-Output "build_exit=$LASTEXITCODE"; Write-Output '=== go test ./... -count=1 ==='; go test ./... -count=1; Write-Output "test_exit=$LASTEXITCODE"
+输出：
+=== gofmt -l . ===
+
+gofmt_exit=0
+=== go vet ./... ===
+vet_exit=0
+=== go build ./... ===
+build_exit=0
+=== go test ./... -count=1 ===
+ok  	shop-trade	0.937s
+ok  	shop-trade/server/api/v1	0.868s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.888s
+ok  	shop-trade/server/model	0.358s
+ok  	shop-trade/server/router	0.835s
+ok  	shop-trade/server/service	0.684s
+test_exit=0
+
+exitCode=0
+
+================================================================
+[CMD-03] 覆盖率、环境事实与 race 探针
+命令：
+cd d:/Desktop/shop; Write-Output '=== overall coverage ==='; go test -coverpkg ./... -coverprofile "$env:TEMP\shop-r3-all.out" ./... | Out-Null; Write-Output "cover_all_exit=$LASTEXITCODE"; go tool cover -func "$env:TEMP\shop-r3-all.out" | Select-Object -Last 1; Write-Output '=== service coverage ==='; go test -cover ./server/service/...; Write-Output "cover_service_exit=$LASTEXITCODE"; Write-Output '=== environment constraints ==='; Write-Output ("CGO_ENABLED=" + (go env CGO_ENABLED)); Write-Output ("gcc=" + $(if (Get-Command gcc -ErrorAction SilentlyContinue) {'FOUND'} else {'NOT_FOUND'})); Write-Output ("clang=" + $(if (Get-Command clang -ErrorAction SilentlyContinue) {'FOUND'} else {'NOT_FOUND'})); Write-Output ("meegle=" + $(if (Get-Command meegle -ErrorAction SilentlyContinue) {'FOUND'} else {'NOT_FOUND'})); Write-Output ("GVA_MYSQL_DSN=" + $(if ($env:GVA_MYSQL_DSN) {'SET'} else {'NOT_SET'})); Write-Output '=== go test -race attempt ==='; go test ./server/service/... -race -count=1; Write-Output "race_exit=$LASTEXITCODE"
+输出：
+=== overall coverage ===
+
+cover_all_exit=0
+total:							(statements)					87.4%
+=== service coverage ===
+ok  	shop-trade/server/service	0.498s	coverage: 88.9% of statements
+cover_service_exit=0
+=== environment constraints ===
+CGO_ENABLED=0
+gcc=NOT_FOUND
+clang=NOT_FOUND
+meegle=NOT_FOUND
+GVA_MYSQL_DSN=NOT_SET
+=== go test -race attempt ===
+
+go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+race_exit=2
+
+exitCode=0（外层命令）；race 子命令 exit=2
+判定：race 未启动是 CGO/C 编译器缺失的前置条件问题，不是单元测试失败、不是业务逻辑错误、不是数据竞争报告。
+      按 rubric 第 41 行归【环境/过程证据缺失 / 待补证】，不判定为代码缺陷。
+
+================================================================
+[CMD-04] 8080 端口占用检查（隔离运行前置）
+命令：
+Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue | Select-Object LocalAddress,LocalPort,OwningProcess | Format-Table -AutoSize; Write-Output 'port_check_done'
+输出：
+port_check_done
+
+（无监听记录，端口空闲）
+exitCode=0
+
+================================================================
+[CMD-05] 第三轮全量运行核查（脚本执行与 Tee 留档）
+命令：
+$s='d:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-03/evidence/round3-verify.ps1'; $o='d:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-03/evidence/核查命令与输出.txt'; & $s *>&1 | Tee-Object -FilePath $o; Write-Output "script_exit=$LASTEXITCODE"; ...
+输出（完整内容见《核查命令与输出.txt》，此处摘关键行）：
+=== phase 1: go run main.go direct start (go=D:\Go\bin\go.exe) ===
+go_run_pid=35488
+health={"mode":"demo-memory","status":"ok"}
+PASS: go run main.go /health
+GET / status=200
+PASS: GET / root page
+[S1-01] ... [S5-09] 五组场景 40 步全部返回预期 code/M-xx
+PASS: TST-S1..S5 all steps executed
+PASS: five scenarios no failure lines
+=== phase 2: compiled instance, static pages + API-21/22/23 ===
+PASS: static /（及 /static/index.html、app.css、app.js、v01~v08 共 12 个静态资源全部 200）
+PASS: API-19 identity / API-18 goods / API-20 clock / API-16 summary / API-01 create order
+PASS: API-21 reprice / API-18 shows new price / existing order amount snapshot unchanged (M-12) / API-21 role isolation
+PASS: API-22 timeout notice / API-22 idempotent duplicate / API-17 status unchanged after timeout notice
+PASS: API-23 per-order stock check / API-23 role isolation
+ALL CHECKS PASSED: original interfaces and five scenarios intact, new artifacts verified
+=== phase 3: artifact counts ===
+static_html_count=9 names=index.html,v01-goods.html,v02-orders.html,v03-goods-admin.html,v04-ops-summary.html,v05-shipment-list.html,v06-shipment-form.html,v07-refund-review.html,v08-late-payment.html
+ci_non_comment_lines=0
+skill_dir_count=4 names=acceptance-check,apipost-case-gen,gva-model-generate,unit-test-race
+=== phase 4: git version chain ===
+dev/01
+6083edd06cb4b289ee251bbca28efcdd83e15d6c
+2
+6083edd06cb4b289ee251bbca28efcdd83e15d6c | [opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物
+6cc6f134ee071e0a1cb8e71f03f824a178a249e0 | feat: 电商订单售前退款完整业务实现
+git_status_porcelain_lines=1
+ROUND3 VERIFY COMPLETE
+script_exit=0
+verify_complete=True
+all_checks_passed=True
+说明：git_status_porcelain_lines=1 是本轮审计输出目录自身未跟踪，不是学生业务代码变更；CMD-01 时工作区干净。
+
+================================================================
+[CMD-06] 交付物全量清点
+命令：
+cd d:/Desktop/shop; $r='d:/Desktop/shop'; Write-Output '=== deliverable inventory ==='; foreach($p in @('README.md','运行说明.md','docs/运行说明.md','apipost-run-export.json','apipost-run-summary.md','events.jsonl','evidence/会话导出说明.md','evidence/验收报告说明.md','evidence/交付证据说明.md','docs/代码产物补齐说明.md','docs/完成声明边界.md','test-report.md','coverage.out','coverage-all.out','race-output.txt','.github/workflows/ci.yml','.codebuddy/skills/acceptance-check/SKILL.md','docs/git-提交指引.md','skill-usage.md','docs/interface-list.md')){...}; 视频/会话导出/Apipost 导出文件计数；git ls-files；git remote -v；git status --porcelain；apipost-run-summary.md 前 12 行
+输出：
+=== deliverable inventory ===
+
+README.md = False
+运行说明.md = False
+docs/运行说明.md = False
+apipost-run-export.json = False
+apipost-run-summary.md = True
+events.jsonl = False
+evidence/会话导出说明.md = True
+evidence/验收报告说明.md = True
+evidence/交付证据说明.md = True
+docs/代码产物补齐说明.md = True
+docs/完成声明边界.md = True
+test-report.md = True
+coverage.out = True
+coverage-all.out = True
+race-output.txt = True
+.github/workflows/ci.yml = True
+.codebuddy/skills/acceptance-check/SKILL.md = True
+docs/git-提交指引.md = True
+skill-usage.md = True
+docs/interface-list.md = True
+video_files=0
+session_export_files=1
+apipost_export_files=1
+tracked_files=114
+remote_lines=0
+untracked=?? "outputs/\345\215\225\351\242\230\346\243\200\346\237\245/shop-trade/01/20261112-03/"
+=== apipost run summary head ===
+（PowerShell 5.1 控制台默认编码把 UTF-8 中文显示为乱码；文件本身为 UTF-8，内容已核对：
+ 标题「Apipost 第 2 轮运行摘要（基于接口清单 v1.0 定稿重建，非运行结果）」，
+ 表格明确「通过数 / 失败数 = 未运行，无数据」「实际运行命令或 Apipost 运行标识 = 无」「运行导出文件 = 无；未生成 apipost-run-export.json，禁止编造」）
+exitCode=0
+说明：session_export_files=1 与 apipost_export_files=1 命中的是《会话导出说明.md》与《apipost-run-summary.md》两份「说明文档」，
+      均自述不是交付物本体；真实会话导出、events.jsonl、Apipost 运行导出、视频文件均为 0。
+
+================================================================
+[CMD-07] 计分（Skill 自带脚本，工作目录为技能根目录）
+命令：
+cd 'C:/Users/10990/.codebuddy/skills/student-project-audit'; python scripts/score_audit.py --input 'd:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-03/audit-input.json' --output 'd:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-03/score.json'
+输出：
+6.08/10 不合格；原始分 6.08
+score_exit=0
+（随后用 PowerShell ConvertFrom-Json 读取无 BOM 的 UTF-8 文件时出现编码导致的解析告警，属读取方式问题；
+ 改用 python -c 以 UTF-8 读取复核如下）
+python -c "import json;d=json.load(open(...,encoding='utf-8'));..."
+输出：
+final= 6.08 raw= 6.08 completion= 5.18 process= 0.90
+counts= {'pass': 14, 'partial': 20, 'fail': 6, 'unknown': 2, 'na': 0}
+blockers= 28
+cats= [('A1', '2.70'), ('A2', '1.05'), ('A3', '0.68'), ('A4', '0.75'), ('B1', '0.15'), ('B2', '0.40'), ('B3', '0.25'), ('B4', '0.10')]
+gate= 7.90 adjust= 0 provisional= True
+exitCode=0
+
+================================================================
+[CMD-08] 两份明细 CSV 生成
+命令：
+python 'd:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-03/evidence/gen_csv.py'
+输出：
+要求与评分明细.csv: 42 rows
+过程与提示词明细.csv: 29 history + 8 round3 rows
+gen_csv_exit=0
+exitCode=0

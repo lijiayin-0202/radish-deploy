@@ -1,0 +1,10 @@
+CASE_ID      : PAGE-index
+TITLE        : index Home 页面独立访问冒烟
+EXECUTED_AT  : 2026-11-12T14:58:14.986765+08:00
+REQUEST      : GET /static/index.html
+ROLE_ACCOUNT : buyer01
+HTTP_STATUS  : 200
+BYTES        : 1887
+MARKERS      : title=True h1=True app.js=True Shop.init=True out=True
+ASSERTION    : PASS
+SCOPE_NOTE   : HTTP 层单页访问断言；无浏览器截图文件，非第 3 轮浏览器验收、非独立验收会话。

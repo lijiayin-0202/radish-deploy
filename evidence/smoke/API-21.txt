@@ -1,0 +1,12 @@
+CASE_ID      : API-21
+TITLE        : 运营商品调价
+EXECUTED_AT  : 2026-11-12T14:58:11.715371+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : POST /api/v1/admin/goods/1/price
+HEADERS      : X-Demo-Account=ops01 (X-Role/X-User-Id ignored by server)
+BODY         : {"unit_price": 12000, "reason": "第四轮冒烟调价"}
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"goods_id":1,"goods_no":"GOODS-ACT-001","goods_name":"活动商品","old_unit_price":10000,"new_unit_price":12000,"operator_id":2001,"reason":"第四轮冒烟调价","hint":"已有订单的下单时商品与价格不受本次调价 / 上下架影响","constraint":"不得通过商品维护或改写订单状态消除异常记录","audit_event_id":3}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

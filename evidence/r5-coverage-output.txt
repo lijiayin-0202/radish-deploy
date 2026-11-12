@@ -1,0 +1,32 @@
+# 第五轮覆盖率真实执行输出
+# EXECUTED_AT: 2026-11-12T16:26:22.513585+08:00
+# 覆盖率原始文件：coverage-r5.out（仓库根目录）
+# 目标：service 包 ≥92%、整体 ≥92%
+=== go test -cover ./server/service/... ===
+ok  	shop-trade/server/service	0.865s	coverage: 98.5% of statements
+service_cover_exit=0
+
+=== go test -coverpkg=./... -coverprofile=coverage-r5.out ./... ===
+ok  	shop-trade	1.012s	coverage: 5.7% of statements in ./...
+ok  	shop-trade/server/api/v1	0.921s	coverage: 63.5% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.029s	coverage: 4.7% of statements in ./...
+ok  	shop-trade/server/model	0.660s	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	1.591s	coverage: 2.6% of statements in ./...
+ok  	shop-trade/server/service	0.806s	coverage: 72.7% of statements in ./...
+all_cover_exit=0
+
+=== go tool cover -func=coverage-r5.out (overall) ===
+shop-trade/server/service/types.go:179:			boolPtr					100.0%
+shop-trade/server/service/types.go:180:			stringPtr				100.0%
+total:							(statements)				94.2%
+cover_func_exit=0
+
+=== 按包统计（逐函数覆盖率的最低/最高） ===
+shop-trade: 文件数=3 逐函数最低=0.0% 最高=100.0%
+shop-trade/server/api/v1: 文件数=40 逐函数最低=57.1% 最高=100.0%
+shop-trade/server/initialize: 文件数=6 逐函数最低=60.0% 最高=100.0%
+shop-trade/server/model: 文件数=3 逐函数最低=100.0% 最高=100.0%
+shop-trade/server/router: 文件数=2 逐函数最低=100.0% 最高=100.0%
+shop-trade/server/service: 文件数=103 逐函数最低=85.7% 最高=100.0%
+完整逐函数明细见 coverage-r5.out 与 evidence/r5-coverage-func.txt

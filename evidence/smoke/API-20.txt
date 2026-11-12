@@ -1,0 +1,12 @@
+CASE_ID      : API-20
+TITLE        : 演示时钟 GET
+EXECUTED_AT  : 2026-11-12T14:58:11.650598+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : GET /api/v1/admin/clock
+HEADERS      : X-Demo-Account=ops01 (X-Role/X-User-Id ignored by server)
+BODY         : (none)
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"clock_offset_minutes":0,"mode":"demo-memory","server_time":"2026-11-12T14:58:11.6499003+08:00"}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

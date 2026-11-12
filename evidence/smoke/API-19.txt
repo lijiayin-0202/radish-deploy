@@ -1,0 +1,12 @@
+CASE_ID      : API-19
+TITLE        : 身份解析
+EXECUTED_AT  : 2026-11-12T14:58:11.636069+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : GET /api/v1/me
+HEADERS      : X-Demo-Account=buyer01 (X-Role/X-User-Id ignored by server)
+BODY         : (none)
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"account":"buyer01","mode":"demo-memory","role":"买家","user_id":1001}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

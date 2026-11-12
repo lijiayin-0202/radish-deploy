@@ -1,0 +1,12 @@
+CASE_ID      : API-03
+TITLE        : 取消弃单释放库存
+EXECUTED_AT  : 2026-11-12T14:58:11.711669+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : POST /api/v1/orders/ORD-1794466691679833800-1001-1/cancel
+HEADERS      : X-Demo-Account=buyer01 (X-Role/X-User-Id ignored by server)
+BODY         : (none)
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"buyer_id":1001,"cancelled_at":"2026-11-12T14:58:11.7106874+08:00","closed_at":null,"expires_at":"2026-11-12T15:08:11.6798338+08:00","goods_id":1,"goods_name":"活动商品","goods_no":"GOODS-ACT-001","id":1,"late_payment_refunded":false,"order_no":"ORD-1794466691679833800-1001-1","paid_at":null,"quantity":1,"refund_channel_trade_no":"","refund_kind":"未申请","refund_reason":"","refund_retry_count":0,"refund_state":"未申请","refunded_at":null,"shipment_carrier":"","shipment_tracking_no":"","shipped_at":null,"status":"已取消","stock_restored":false,"total_amount":10000,"unit_price":10000}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

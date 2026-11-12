@@ -1,0 +1,12 @@
+CASE_ID      : API-15
+TITLE        : 迟到支付退款重试
+EXECUTED_AT  : 2026-11-12T14:58:13.962441+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : POST /api/v1/late-payment/refund/retry
+HEADERS      : X-Demo-Account=cs01 (X-Role/X-User-Id ignored by server)
+BODY         : {"event_id": 3, "refund_no": "R4-LRF-1", "remark": "重试"}
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"amount":10000,"channel_trade_no":"R4-LRF-1","effective":null,"event_id":7,"event_type":"迟到支付退款重试","failure_code":"M-26","failure_reason":"重试","id":7,"need_refund":false,"occurred_at":"2026-11-12T15:09:13.9616423+08:00","order_id":1,"order_no":"ORD-1794466693886963600-1001-1","order_status_snapshot":"已关闭","result":"迟到支付退款重试已登记","signature_valid":true}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

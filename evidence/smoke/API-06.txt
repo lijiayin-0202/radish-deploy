@@ -1,0 +1,12 @@
+CASE_ID      : API-06
+TITLE        : 买家申请整单退款
+EXECUTED_AT  : 2026-11-12T14:58:12.926300+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : POST /api/v1/orders/ORD-1794466692897624400-1001-2/refund/apply
+HEADERS      : X-Demo-Account=buyer01 (X-Role/X-User-Id ignored by server)
+BODY         : {"reason": "不想要了"}
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"buyer_id":1001,"cancelled_at":null,"closed_at":null,"expires_at":"2026-11-12T15:08:12.8976244+08:00","goods_id":1,"goods_name":"活动商品","goods_no":"GOODS-ACT-001","id":2,"late_payment_refunded":false,"order_no":"ORD-1794466692897624400-1001-2","paid_at":"2026-11-12T14:58:12.9100385+08:00","quantity":1,"refund_channel_trade_no":"","refund_kind":"正常售前退款","refund_reason":"不想要了","refund_retry_count":0,"refund_state":"审核中","refunded_at":null,"shipment_carrier":"","shipment_tracking_no":"","shipped_at":null,"status":"退款审核中","stock_restored":false,"total_amount":10000,"unit_price":10000}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

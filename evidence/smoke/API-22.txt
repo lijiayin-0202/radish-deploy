@@ -1,0 +1,12 @@
+CASE_ID      : API-22
+TITLE        : 渠道超时通知
+EXECUTED_AT  : 2026-11-12T14:58:11.727330+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : POST /api/v1/payment/timeout
+HEADERS      : X-Demo-Account=mock01 (X-Role/X-User-Id ignored by server)
+BODY         : {"order_no": "ORD-1794466691679833800-1001-1", "channel_trade_no": "R4-TO-001", "reason": "渠道超时"}
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"event_id":4,"order_no":"ORD-1794466691679833800-1001-1","order_status":"已取消","channel_trade_no":"R4-TO-001","duplicate":false,"order_status_unchanged":true,"notice":"渠道超时通知已登记为只追加审计；订单状态不变，超时关单仍由服务端 10 分钟规则触发"}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

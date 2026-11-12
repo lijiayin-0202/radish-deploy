@@ -1,0 +1,1067 @@
+{
+  "student": "shop-trade（未提供姓名，以项目/仓库名作安全标识）",
+  "question": "01",
+  "revision": "6083edd06cb4b289ee251bbca28efcdd83e15d6c（dev/01 第 2 次提交，[opt] [v1.1.0]，2026-11-12T14:07:29+08:00）",
+  "completion_score": "5.18",
+  "process_score": "0.90",
+  "raw_score": "6.08",
+  "raw_score_exact": "152/25",
+  "gate_cap": "7.90",
+  "gate_adjustment_exact": "0",
+  "final_score": "6.08",
+  "verdict": "不合格",
+  "evidence_provisional": true,
+  "counts": {
+    "pass": 14,
+    "partial": 20,
+    "fail": 6,
+    "unknown": 2,
+    "na": 0
+  },
+  "blockers": [
+    {
+      "id": "R-A1-04",
+      "category": "A1",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "【第二轮代码/产物缺陷已补齐】渠道超时通知分支由 API-22 实现并实测：只登记只追加审计、order_status_unchanged=true、重复 TIMEOUT dedup 幂等 duplicate=true、API-17 状态未变（E3-013）。支付回调重复通知幂等、验签失败 M-28、金额不符 M-29、未知订单 M-30 在 S5 复跑通过（E3-004）。仍缺『独立模拟渠道服务实例与运行记录』及『真实 InnoDB 唯一键冲突实测』，二者统一归【环境/过程证据缺失】，不判定为代码缺陷（后者由 R-A2-04 单列）。",
+      "evidence": [
+        "E3-004",
+        "E3-010",
+        "E3-013",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A1-10",
+      "category": "A1",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "第三轮在全新 go run main.go 进程从头复跑五组场景 40 步（E3-004），并在独立编译进程二次复跑（E3-013），起点→多角色→正常/异常分支→运营核查闭环成立。仍缺真实 MySQL 持久化下的结果复核、Apipost 第 2 轮运行导出、覆盖五组场景的讲解视频；三项均归【环境/过程证据缺失】，不判定为代码缺陷，视频另列【不可补的过程证据项】。",
+      "evidence": [
+        "E3-003",
+        "E3-004",
+        "E3-013",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A2-01",
+      "category": "A2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "代码产物无缺陷：schema.sql 三表 ENGINE=InnoDB/utf8mb4、gorm_repository.go 事务与行锁、GVA_MYSQL_DSN 双模式初始化（E3-025）。第三轮环境核查 GVA_MYSQL_DSN=NOT_SET（E3-007），无真实实例、无初始化执行记录、无重启后业务结果仍可查询的实测。统一归【环境/过程证据缺失】，不判定为代码缺陷。",
+      "evidence": [
+        "E3-007",
+        "E3-020",
+        "E3-025"
+      ]
+    },
+    {
+      "id": "R-A2-02",
+      "category": "A2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "7 个预置账号、服务端身份映射与越权实测通过（E3-004）。账号为 controller 内存映射、演示商品数据未落库；第二轮提及的账号表不在本轮用户授权的补齐范围，如实登记为【环境/过程证据缺失】（无真实 MySQL 实例，E3-007），不判定为代码缺陷。",
+      "evidence": [
+        "E3-004",
+        "E3-007",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A2-03",
+      "category": "A2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "金额整数分、数量 1~2、available_stock>=quantity 条件更新；S2-01 第三轮实测 20 次抢单成功 3/被拒 17，go test ./... 全通过（E3-004/005）。并发验证在演示内存仓储与 sqlmock 上执行，未在真实 InnoDB 行锁下验证；go test -race 因 CGO_ENABLED=0 且无 gcc/clang 未启动（E3-007）。均归【环境/过程证据缺失】，不判定为代码缺陷。",
+      "evidence": [
+        "E3-004",
+        "E3-005",
+        "E3-006",
+        "E3-007"
+      ]
+    },
+    {
+      "id": "R-A2-04",
+      "category": "A2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "dedup_key 与 (channel_trade_no,effective) 唯一键设计、重复支付/退款通知幂等（S5-01/S3-08）、API-22 重复超时通知幂等、重复取消/发货拒绝均实测。仅缺真实 MySQL 实例下唯一键冲突的实际运行结果，归【环境/过程证据缺失】，不可由内存仓储模拟替代。",
+      "evidence": [
+        "E3-004",
+        "E3-007",
+        "E3-025"
+      ]
+    },
+    {
+      "id": "R-A2-06",
+      "category": "A2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "【第二轮代码/产物缺陷已补齐】API-04/10/14 可控 HTTP 通知入口 + 新增 API-22 超时通知分支第三轮全部实测（E3-013）；接口清单 v1.1 明确不得宣称为真实第三方接入成果（E3-011）。仅缺独立模拟渠道服务实例及其启动运行记录，归【环境/过程证据缺失】，不判定为代码缺陷。",
+      "evidence": [
+        "E3-004",
+        "E3-011",
+        "E3-013",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A3-01",
+      "category": "A3",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "第三轮独立复跑 go test ./... -count=1：7 个包全部 ok exit=0（E3-005）；本批新增 extension_test.go、extension_gorm_test.go、extension_api_test.go、extension_router_test.go、static_router_test.go 共 5 个测试文件，含 API-21/22/23 与静态路由断言（E3-018）。仍为开发 Agent 会话草案、基于内存仓储与 sqlmock，非独立测试 Agent 会话产物；该会话历史不可事后补造，归【不可补的过程证据项】，不判定为代码缺陷。",
+      "evidence": [
+        "E3-005",
+        "E3-017",
+        "E3-018",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A3-02",
+      "category": "A3",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "第三轮用独立临时 profile 复跑：-coverpkg ./... 整体 87.4%、server/service 88.9%，均 ≥85%，未排除自编 DAO/HTTP 代码（E3-006），较第二轮 86.0%/87.7% 提升。仍缺独立测试 Agent 会话出具的正式覆盖率、覆盖率原件与发布提交哈希绑定，归【环境/过程证据缺失】；不判定为代码缺陷。",
+      "evidence": [
+        "E3-006",
+        "E3-017",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A3-03",
+      "category": "A3",
+      "status": "unknown",
+      "label": "待补证，尚不能确认合规",
+      "reason": "【环境限制，不判定为代码缺陷】第三轮复跑 go test ./server/service/... -race -count=1 输出 go: -race requires cgo; enable cgo by setting CGO_ENABLED=1，exit=2；环境核查 CGO_ENABLED=0、gcc=NOT_FOUND、clang=NOT_FOUND（E3-007）。这不是单元测试失败、不是业务逻辑错误、不是数据竞争报告。按 rubric 第 41 行记 unknown（待补证，平台/权限阻塞），系数 0，报告标注『当前证据评分，待补证复核』；解除条件为在 CGO_ENABLED=1 + gcc/clang 环境执行并保存 race-output-raw.txt 且无数据竞争报告。CI 模板已写明该依赖（E3-014）。",
+      "evidence": [
+        "E3-007",
+        "E3-014",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A3-05",
+      "category": "A3",
+      "status": "fail",
+      "label": "必做要求未完全通过",
+      "reason": "【环境/过程证据缺失，不判定为代码缺陷】全量清点：无独立测试 Agent 会话导出、无缺陷登记单与 fix 复测交接、无验收 Agent 验收报告本体、无 apipost-run-export.json（apipost-run-summary.md 自述『未运行，无通过/失败数』，E3-022）；evidence/ 四份说明文档自述不是交付物本体（E3-021）。第三轮复核仍在同一会话执行，不冒充独立测试/验收会话。相关历史过程另列【不可补的过程证据项】。",
+      "evidence": [
+        "E3-020",
+        "E3-021",
+        "E3-022"
+      ]
+    },
+    {
+      "id": "R-A4-02",
+      "category": "A4",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "可控 HTTP 通知入口 API-04/10/14 与新增 API-22 超时通知第三轮在编译实例上实测可触发成功、失败、验签失败、金额不符、未知订单、重复通知与超时通知（E3-004/013）。仅缺独立模拟渠道服务实例与其启动记录，归【环境/过程证据缺失】；与 R-A2-06 属不同要求，引用同一事实但各自独立计分。",
+      "evidence": [
+        "E3-004",
+        "E3-013",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A4-03",
+      "category": "A4",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "【第二轮代码/产物缺陷已补齐】.github/workflows/ci.yml 已交付，纯注释模板、非注释行 0，写明 CGO/gcc、MySQL(InnoDB)、meegle、远端与平台权限依赖及应包含的门禁步骤，不触发流水线、不伪造可运行 CI（E3-014）。仍缺远端 CI 运行、部署地址、冒烟结果与回退说明，归【环境/过程证据缺失】，不判定为代码缺陷（E3-020/024）。",
+      "evidence": [
+        "E3-014",
+        "E3-020",
+        "E3-024"
+      ]
+    },
+    {
+      "id": "R-A4-04",
+      "category": "A4",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "dev/01 现有 2 次真实提交，HEAD 6083edd06cb4b289ee251bbca28efcdd83e15d6c 有效、本次 [opt] [v1.1.0] 提交格式合规；工作区仅第三轮复核报告目录为未跟踪，学生业务代码未被复核行为修改（E3-002/015）。仍缺远端、PR 源提交、合并提交、CI 运行、制品登记与部署版本，归【环境/过程证据缺失】；版本链只到『本地源提交 → 本地运行实例』。",
+      "evidence": [
+        "E3-002",
+        "E3-015",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-A4-05",
+      "category": "A4",
+      "status": "fail",
+      "label": "必做要求未完全通过",
+      "reason": "【环境/过程证据缺失，不判定为代码缺陷】第三轮全量清点 video_files=0，无视频/图片/音频、无带时间点的讲解目录、无当日班级群提交凭据（E3-020）。共同要求 10 与题面『当日不计合格完成』条件未满足；无法播放视频，非仅内容存疑。当日群提交与讲解时间点属【不可补的过程证据项】，不事后补造。",
+      "evidence": [
+        "E3-020",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B1-01",
+      "category": "B1",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "需求/原型/任务规划 v1.1 三份文档齐备，三轮检查报告（3.23→5.38→本轮）构成可核查复检链（E3-023）。仍无会话导出与 events.jsonl，无法核实 AGENTS.md 在业务开发前实际加载、独立测试→独立验收→部署的阶段前置关系；首次提交一次性含全部文件，分阶段真实历史不可重建。归【不可补的过程证据项】，非代码缺陷。",
+      "evidence": [
+        "E3-019",
+        "E3-020",
+        "E3-021",
+        "E3-023"
+      ]
+    },
+    {
+      "id": "R-B1-02",
+      "category": "B1",
+      "status": "fail",
+      "label": "必做要求未完全通过",
+      "reason": "【环境/过程证据缺失，不判定为代码缺陷】test-report.md 自述『开发会话草稿，不是第 1 轮正式证据』；evidence/会话导出说明.md 自述独立测试 Agent 会话未建立。第三轮门禁复核仍在同一会话执行，不冒充独立测试会话。该会话历史不可事后补造，单列【不可补的过程证据项】。",
+      "evidence": [
+        "E3-017",
+        "E3-019",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B1-03",
+      "category": "B1",
+      "status": "fail",
+      "label": "必做要求未完全通过",
+      "reason": "【环境/过程证据缺失，不判定为代码缺陷】验收检查 Skill 文件已补齐（E3-008/009），但 evidence/验收报告说明.md 明确声明非验收报告本体、不含通过/不通过结论；验收会话、逐项结论与证据位置、门禁核验清单仍不存在。Skill 文件不等于验收 Agent 独立会话成果，单列【不可补的过程证据项】。",
+      "evidence": [
+        "E3-008",
+        "E3-009",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B1-04",
+      "category": "B1",
+      "status": "fail",
+      "label": "必做要求未完全通过",
+      "reason": "【环境权限 + 不可补的过程证据项】git remote -v 为空，无 GitHub MCP 建仓的工具名/请求/结果/时间/仓库 URL 记录（E3-002/020）；交付证据说明第 4 节如实写明无 MCP 记录。题面 8.1 未满足；平台权限未提供属环境阻塞，不写成已证实学生违规。",
+      "evidence": [
+        "E3-002",
+        "E3-020",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B1-05",
+      "category": "B1",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "已完成：dev/01、rev-parse HEAD 有效、rev-list --count HEAD=2、本次提交格式合规、工作区仅复核产物未跟踪（E3-002/015）。首次提交格式偏差按 P-08 不 amend、永久保留在 git-提交指引 2.1 节；按需求/原型/计划/开发/测试/验收阶段保留的真实提交序列不可重建。归【不可补的过程证据项】，非代码缺陷。",
+      "evidence": [
+        "E3-002",
+        "E3-015",
+        "E3-020"
+      ]
+    },
+    {
+      "id": "R-B1-06",
+      "category": "B1",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "三轮审计『第一轮发现问题 → 用户整改指令 → 第二轮复核 → 第三批逐条补齐 → 第三轮复核』构成可核查的检查/修正/复检链（E3-019/023）；本轮 verify-extension.ps1 复验原有接口与五组场景未回归。仍无 Bug 登记单、开发 Agent 的 fix 提交、测试 Agent 复测与验收 Agent 复核的正式交接链，复检仍在开发会话内。归【不可补的过程证据项】。",
+      "evidence": [
+        "E3-017",
+        "E3-019",
+        "E3-023"
+      ]
+    },
+    {
+      "id": "R-B2-01",
+      "category": "B2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "AGENTS.md 针对题目 01 含三 Agent 职责/修改范围/授权清单/Git 门禁/覆盖率/脱敏/失败复测，保留 AGENTS-v1.0.md 与 v1.1 变更原因，第三轮复核实际读取并据此判定（E3-023）。仍无独立『开发前实际加载记录』文件、v1.1 行注明『本轮不提交』、无提交哈希可证明开发前生效、无学生逐项确认记录。归【不可补的过程证据项】，非代码缺陷。",
+      "evidence": [
+        "E3-019",
+        "E3-021",
+        "E3-023"
+      ]
+    },
+    {
+      "id": "R-B2-02",
+      "category": "B2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "会话导出说明.md 与事件清单说明.md 给出三方会话命名、JSONL 字段规范与不得事后补造的约束，并如实说明上下文压缩后无法还原精确时间戳、未生成伪数据（E3-021）。全量清点 events.jsonl=False、无真实会话导出与工具调用索引（E3-020）。归【不可补的过程证据项】，说明文档不等于交付物本体。",
+      "evidence": [
+        "E3-020",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B2-03",
+      "category": "B2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "evidence/AI使用说明.md 覆盖 AI 参与阶段、工具与 Skill、明确未做的事、三轮验证状态、学生核验责任与完成声明边界（E3-021）。仍无按任务编号展开的『提示→AI 行动→工具结果→学生判断→产物版本→验证』逐条链、无模型字段标注、无逐项不可获取清单。归【不可补的过程证据项】。",
+      "evidence": [
+        "E3-020",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B2-04",
+      "category": "B2",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "开发草稿主动标注不得冒充正式证据、race 未启动如实记录、覆盖率区分草稿/真实口径、提交格式偏差主动披露、CI 模板明示不可运行、Apipost 摘要自述未运行（E3-016/022/024）；第三轮复核未发现弱化断言、删除失败 case 或编造测试/部署结果。仍无学生逐项审核确认记录与可追溯索引。归【不可补的过程证据项】；未发现已证实的 AI 造假行为。",
+      "evidence": [
+        "E3-016",
+        "E3-017",
+        "E3-022",
+        "E3-024"
+      ]
+    },
+    {
+      "id": "R-B3-02",
+      "category": "B3",
+      "status": "partial",
+      "label": "必做要求未完全通过",
+      "reason": "skill-usage.md 第 3.1 节补齐 6 类说明、第 5 节新增调用记录、第 6 节登记 K-04 闭环、第 7 节如实写明『未通过工具加载、未由验收 Agent 独立会话执行』（E3-009）；第三轮复核真实加载 student-project-audit（E3-019）。仍缺验收 Agent 独立会话中的 Skill 真实触发与复检输入输出，归【不可补的过程证据项】，不编造闭环。",
+      "evidence": [
+        "E3-009",
+        "E3-019"
+      ]
+    },
+    {
+      "id": "R-B4-01",
+      "category": "B4",
+      "status": "fail",
+      "label": "必做要求未完全通过",
+      "reason": "【环境权限 + 不可补的过程证据项】git remote -v 为空、无 GitHub MCP 建仓记录与仓库 URL、无 main 分支保护配置读取结果（E3-002/020/021）。题面 8.1、8.5 未满足；平台权限未提供属环境阻塞单列，不写成已证实学生违规。",
+      "evidence": [
+        "E3-002",
+        "E3-020",
+        "E3-021"
+      ]
+    },
+    {
+      "id": "R-B4-03",
+      "category": "B4",
+      "status": "unknown",
+      "label": "待补证，尚不能确认合规",
+      "reason": "【平台/权限阻塞，待补证，不写成已证实违规】第三轮环境核查 meegle=NOT_FOUND、git remote -v 为空、无 PR/状态检查/合并记录与工作项索引（E3-007/020）；CI 模板已写明该依赖（E3-014）。按 rubric 第 41 行记 unknown，系数 0，单列阻塞归属；不得据此认定学生伪造核验或跳过门禁。解除条件：在具备 meegle CLI 与远端仓库的环境，于 feat/fix 提交前执行 meegle workitem get --work-item-id <编号> --project-key r17te9 并保存命令/时间/完整结果/退出码，再补 PR 与状态检查记录。",
+      "evidence": [
+        "E3-007",
+        "E3-014",
+        "E3-020"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "category": "A1",
+      "max": "3.00",
+      "applicable_weight": "3.00",
+      "score": "2.70",
+      "score_exact": "27/10",
+      "checks": [
+        {
+          "id": "R-A1-01",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-003",
+            "E3-004",
+            "E3-012",
+            "E3-013"
+          ],
+          "reason": "第三轮在全新 go run main.go 实例复跑五组场景 40 步全部返回预期 code/M-xx（E3-004）；7 个预置账号经 X-Demo-Account 服务端映射，S5-07/S5-08 越权与篡改编号均 M-20；本轮 V-01~V-08 静态页面补齐并逐个 HTTP 200（E3-012/013）。角色/规则/场景闭环在接口与页面层完整可操作，代码产物无缺陷。"
+        },
+        {
+          "id": "R-A1-02",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-010",
+            "E3-011",
+            "E3-013"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】第三轮实测 API-21 商品调价 10000→13000、API-18 显示新价、已有订单金额快照与总价保持不变（M-12）、buyer01 调价被拒 M-20；API-23 返回 available_stock/occupied_stock/consistent 运行时核查数据（E3-013）。接口清单 v1.1 第 6 节与 router/extension.go 一致（E3-010/011）。无剩余代码产物缺口。"
+        },
+        {
+          "id": "R-A1-03",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-004",
+            "E3-013"
+          ],
+          "reason": "S2-02/S2-03 复跑取消释放一次与重复取消 M-10；S4-02/S4-03 复跑演示教学时钟 +11 分钟后 API-05 超时关单；S4-11 迟到支付后终态仍为已关闭。10 分钟业务规则未改，仅注入服务端时间源。真实 MySQL 落库证据由 R-A2-01 单列，归环境缺失。"
+        },
+        {
+          "id": "R-A1-04",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-004",
+            "E3-010",
+            "E3-013",
+            "E3-020"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】渠道超时通知分支由 API-22 实现并实测：只登记只追加审计、order_status_unchanged=true、重复 TIMEOUT dedup 幂等 duplicate=true、API-17 状态未变（E3-013）。支付回调重复通知幂等、验签失败 M-28、金额不符 M-29、未知订单 M-30 在 S5 复跑通过（E3-004）。仍缺『独立模拟渠道服务实例与运行记录』及『真实 InnoDB 唯一键冲突实测』，二者统一归【环境/过程证据缺失】，不判定为代码缺陷（后者由 R-A2-04 单列）。"
+        },
+        {
+          "id": "R-A1-05",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-004",
+            "E3-013"
+          ],
+          "reason": "S4 全链路 11 步第三轮复跑通过：关闭后迟到支付 M-09 且不恢复订单、异常待处理数=1、客服核实/渠道失败 M-08/重试/退款成功、终态保持已关闭；异常记录无改写或删除入口。"
+        },
+        {
+          "id": "R-A1-06",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-004",
+            "E3-013"
+          ],
+          "reason": "S3 九步复跑售前整单退款：申请期间发货 M-22、客服同意写原因、渠道首次失败 M-08 保留待处理、重试、再次成功、重复退款通知幂等、终态已退款；S5-05/S5-06 退款与发货竞争只形成一种合法结果。"
+        },
+        {
+          "id": "R-A1-07",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-010",
+            "E3-011",
+            "E3-013"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】售前退款库存恢复逐单核查由 API-23 实现并实测：expected_restore_times / actual_restore_times / available_stock / occupied_stock / consistent=true / conclusion，只读不改订单与库存，按报告 R-A1-07 口径实现且未引入缓存组件（E3-011/013）。真实 MySQL 持久化下复核归【环境/过程证据缺失】，由 R-A2-01 单列，不判定为代码缺陷。"
+        },
+        {
+          "id": "R-A1-08",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-004",
+            "E3-012",
+            "E3-013"
+          ],
+          "reason": "S1-04 仓库角色 API-11 登记发货、S1-05 重复发货 M-19 复跑通过；V-05 发货清单与 V-06 发货登记页面本轮补齐并 HTTP 200（E3-012/013）。"
+        },
+        {
+          "id": "R-A1-09",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-004",
+            "E3-013",
+            "E3-025"
+          ],
+          "reason": "API-16 运营核查在 S1-06、S4-05、S5-09 复跑；API-23 只读核查不产生改写；payment 表只追加、无 UPDATE/DELETE 业务入口，异常记录不能通过改状态消失。持久化下的线上行为证据由 R-A2-01 单列。"
+        },
+        {
+          "id": "R-A1-10",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-003",
+            "E3-004",
+            "E3-013",
+            "E3-020"
+          ],
+          "reason": "第三轮在全新 go run main.go 进程从头复跑五组场景 40 步（E3-004），并在独立编译进程二次复跑（E3-013），起点→多角色→正常/异常分支→运营核查闭环成立。仍缺真实 MySQL 持久化下的结果复核、Apipost 第 2 轮运行导出、覆盖五组场景的讲解视频；三项均归【环境/过程证据缺失】，不判定为代码缺陷，视频另列【不可补的过程证据项】。"
+        }
+      ]
+    },
+    {
+      "category": "A2",
+      "max": "1.80",
+      "applicable_weight": "1.80",
+      "score": "1.05",
+      "score_exact": "21/20",
+      "checks": [
+        {
+          "id": "R-A2-01",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-007",
+            "E3-020",
+            "E3-025"
+          ],
+          "reason": "代码产物无缺陷：schema.sql 三表 ENGINE=InnoDB/utf8mb4、gorm_repository.go 事务与行锁、GVA_MYSQL_DSN 双模式初始化（E3-025）。第三轮环境核查 GVA_MYSQL_DSN=NOT_SET（E3-007），无真实实例、无初始化执行记录、无重启后业务结果仍可查询的实测。统一归【环境/过程证据缺失】，不判定为代码缺陷。"
+        },
+        {
+          "id": "R-A2-02",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-004",
+            "E3-007",
+            "E3-020"
+          ],
+          "reason": "7 个预置账号、服务端身份映射与越权实测通过（E3-004）。账号为 controller 内存映射、演示商品数据未落库；第二轮提及的账号表不在本轮用户授权的补齐范围，如实登记为【环境/过程证据缺失】（无真实 MySQL 实例，E3-007），不判定为代码缺陷。"
+        },
+        {
+          "id": "R-A2-03",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-004",
+            "E3-005",
+            "E3-006",
+            "E3-007"
+          ],
+          "reason": "金额整数分、数量 1~2、available_stock>=quantity 条件更新；S2-01 第三轮实测 20 次抢单成功 3/被拒 17，go test ./... 全通过（E3-004/005）。并发验证在演示内存仓储与 sqlmock 上执行，未在真实 InnoDB 行锁下验证；go test -race 因 CGO_ENABLED=0 且无 gcc/clang 未启动（E3-007）。均归【环境/过程证据缺失】，不判定为代码缺陷。"
+        },
+        {
+          "id": "R-A2-04",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-004",
+            "E3-007",
+            "E3-025"
+          ],
+          "reason": "dedup_key 与 (channel_trade_no,effective) 唯一键设计、重复支付/退款通知幂等（S5-01/S3-08）、API-22 重复超时通知幂等、重复取消/发货拒绝均实测。仅缺真实 MySQL 实例下唯一键冲突的实际运行结果，归【环境/过程证据缺失】，不可由内存仓储模拟替代。"
+        },
+        {
+          "id": "R-A2-05",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-003",
+            "E3-004",
+            "E3-013"
+          ],
+          "reason": "第三轮 /api/v1/me 返回服务端解析的 buyer01/user_id=1001；S5-07 buyer02 越权 M-20、S5-08 篡改请求用户编号 M-20；新增 API-21/API-23 越权亦返回 M-20（E3-013）。X-Role/X-User-Id 一律忽略，权限隔离在原有与新增接口上均成立。"
+        },
+        {
+          "id": "R-A2-06",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-004",
+            "E3-011",
+            "E3-013",
+            "E3-020"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】API-04/10/14 可控 HTTP 通知入口 + 新增 API-22 超时通知分支第三轮全部实测（E3-013）；接口清单 v1.1 明确不得宣称为真实第三方接入成果（E3-011）。仅缺独立模拟渠道服务实例及其启动运行记录，归【环境/过程证据缺失】，不判定为代码缺陷。"
+        }
+      ]
+    },
+    {
+      "category": "A3",
+      "max": "1.70",
+      "applicable_weight": "1.70",
+      "score": "0.68",
+      "score_exact": "17/25",
+      "checks": [
+        {
+          "id": "R-A3-01",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "17/50",
+          "points_exact": "17/100",
+          "loss_exact": "17/100",
+          "evidence": [
+            "E3-005",
+            "E3-017",
+            "E3-018",
+            "E3-020"
+          ],
+          "reason": "第三轮独立复跑 go test ./... -count=1：7 个包全部 ok exit=0（E3-005）；本批新增 extension_test.go、extension_gorm_test.go、extension_api_test.go、extension_router_test.go、static_router_test.go 共 5 个测试文件，含 API-21/22/23 与静态路由断言（E3-018）。仍为开发 Agent 会话草案、基于内存仓储与 sqlmock，非独立测试 Agent 会话产物；该会话历史不可事后补造，归【不可补的过程证据项】，不判定为代码缺陷。"
+        },
+        {
+          "id": "R-A3-02",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "17/50",
+          "points_exact": "17/100",
+          "loss_exact": "17/100",
+          "evidence": [
+            "E3-006",
+            "E3-017",
+            "E3-020"
+          ],
+          "reason": "第三轮用独立临时 profile 复跑：-coverpkg ./... 整体 87.4%、server/service 88.9%，均 ≥85%，未排除自编 DAO/HTTP 代码（E3-006），较第二轮 86.0%/87.7% 提升。仍缺独立测试 Agent 会话出具的正式覆盖率、覆盖率原件与发布提交哈希绑定，归【环境/过程证据缺失】；不判定为代码缺陷。"
+        },
+        {
+          "id": "R-A3-03",
+          "status": "unknown",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "17/50",
+          "points_exact": "0",
+          "loss_exact": "17/50",
+          "evidence": [
+            "E3-007",
+            "E3-014",
+            "E3-020"
+          ],
+          "reason": "【环境限制，不判定为代码缺陷】第三轮复跑 go test ./server/service/... -race -count=1 输出 go: -race requires cgo; enable cgo by setting CGO_ENABLED=1，exit=2；环境核查 CGO_ENABLED=0、gcc=NOT_FOUND、clang=NOT_FOUND（E3-007）。这不是单元测试失败、不是业务逻辑错误、不是数据竞争报告。按 rubric 第 41 行记 unknown（待补证，平台/权限阻塞），系数 0，报告标注『当前证据评分，待补证复核』；解除条件为在 CGO_ENABLED=1 + gcc/clang 环境执行并保存 race-output-raw.txt 且无数据竞争报告。CI 模板已写明该依赖（E3-014）。"
+        },
+        {
+          "id": "R-A3-04",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "17/50",
+          "points_exact": "17/50",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-005",
+            "E3-006",
+            "E3-017"
+          ],
+          "reason": "第三轮独立复跑：gofmt -l . 无输出 exit=0；go vet ./... exit=0；go build ./... exit=0；go test ./... -count=1 七个包全部 ok exit=0（E3-005）；覆盖率命令 exit=0（E3-006）。原始输出保存于 evidence/核查命令与输出.txt。"
+        },
+        {
+          "id": "R-A3-05",
+          "status": "fail",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "17/50",
+          "points_exact": "0",
+          "loss_exact": "17/50",
+          "evidence": [
+            "E3-020",
+            "E3-021",
+            "E3-022"
+          ],
+          "reason": "【环境/过程证据缺失，不判定为代码缺陷】全量清点：无独立测试 Agent 会话导出、无缺陷登记单与 fix 复测交接、无验收 Agent 验收报告本体、无 apipost-run-export.json（apipost-run-summary.md 自述『未运行，无通过/失败数』，E3-022）；evidence/ 四份说明文档自述不是交付物本体（E3-021）。第三轮复核仍在同一会话执行，不冒充独立测试/验收会话。相关历史过程另列【不可补的过程证据项】。"
+        }
+      ]
+    },
+    {
+      "category": "A4",
+      "max": "1.50",
+      "applicable_weight": "1.50",
+      "score": "0.75",
+      "score_exact": "3/4",
+      "checks": [
+        {
+          "id": "R-A4-01",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-003",
+            "E3-012",
+            "E3-013",
+            "E3-020"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】第三轮 go run main.go 直接启动成功，/health={\"mode\":\"demo-memory\",\"status\":\"ok\"}、GET / 返回 200（E3-003）；resource/static 下 index + V-01~V-08 共 9 个 HTML 及 app.css/app.js 全部 HTTP 200（E3-012/013）；API-01~20 原接口未回归（E3-013）。第二轮 html_count=0 的缺口已消除。独立 README/运行说明文件仍无（运行方式散在 docs/interface-list.md），归文档完备性过程项，于报告第 6 节列出，不在本原子项重复扣分。"
+        },
+        {
+          "id": "R-A4-02",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-004",
+            "E3-013",
+            "E3-020"
+          ],
+          "reason": "可控 HTTP 通知入口 API-04/10/14 与新增 API-22 超时通知第三轮在编译实例上实测可触发成功、失败、验签失败、金额不符、未知订单、重复通知与超时通知（E3-004/013）。仅缺独立模拟渠道服务实例与其启动记录，归【环境/过程证据缺失】；与 R-A2-06 属不同要求，引用同一事实但各自独立计分。"
+        },
+        {
+          "id": "R-A4-03",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-014",
+            "E3-020",
+            "E3-024"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】.github/workflows/ci.yml 已交付，纯注释模板、非注释行 0，写明 CGO/gcc、MySQL(InnoDB)、meegle、远端与平台权限依赖及应包含的门禁步骤，不触发流水线、不伪造可运行 CI（E3-014）。仍缺远端 CI 运行、部署地址、冒烟结果与回退说明，归【环境/过程证据缺失】，不判定为代码缺陷（E3-020/024）。"
+        },
+        {
+          "id": "R-A4-04",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "3/10",
+          "points_exact": "3/20",
+          "loss_exact": "3/20",
+          "evidence": [
+            "E3-002",
+            "E3-015",
+            "E3-020"
+          ],
+          "reason": "dev/01 现有 2 次真实提交，HEAD 6083edd06cb4b289ee251bbca28efcdd83e15d6c 有效、本次 [opt] [v1.1.0] 提交格式合规；工作区仅第三轮复核报告目录为未跟踪，学生业务代码未被复核行为修改（E3-002/015）。仍缺远端、PR 源提交、合并提交、CI 运行、制品登记与部署版本，归【环境/过程证据缺失】；版本链只到『本地源提交 → 本地运行实例』。"
+        },
+        {
+          "id": "R-A4-05",
+          "status": "fail",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "3/10",
+          "points_exact": "0",
+          "loss_exact": "3/10",
+          "evidence": [
+            "E3-020",
+            "E3-021"
+          ],
+          "reason": "【环境/过程证据缺失，不判定为代码缺陷】第三轮全量清点 video_files=0，无视频/图片/音频、无带时间点的讲解目录、无当日班级群提交凭据（E3-020）。共同要求 10 与题面『当日不计合格完成』条件未满足；无法播放视频，非仅内容存疑。当日群提交与讲解时间点属【不可补的过程证据项】，不事后补造。"
+        }
+      ]
+    },
+    {
+      "category": "B1",
+      "max": "0.60",
+      "applicable_weight": "0.60",
+      "score": "0.15",
+      "score_exact": "3/20",
+      "checks": [
+        {
+          "id": "R-B1-01",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/20",
+          "loss_exact": "1/20",
+          "evidence": [
+            "E3-019",
+            "E3-020",
+            "E3-021",
+            "E3-023"
+          ],
+          "reason": "需求/原型/任务规划 v1.1 三份文档齐备，三轮检查报告（3.23→5.38→本轮）构成可核查复检链（E3-023）。仍无会话导出与 events.jsonl，无法核实 AGENTS.md 在业务开发前实际加载、独立测试→独立验收→部署的阶段前置关系；首次提交一次性含全部文件，分阶段真实历史不可重建。归【不可补的过程证据项】，非代码缺陷。"
+        },
+        {
+          "id": "R-B1-02",
+          "status": "fail",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "1/10",
+          "points_exact": "0",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-017",
+            "E3-019",
+            "E3-021"
+          ],
+          "reason": "【环境/过程证据缺失，不判定为代码缺陷】test-report.md 自述『开发会话草稿，不是第 1 轮正式证据』；evidence/会话导出说明.md 自述独立测试 Agent 会话未建立。第三轮门禁复核仍在同一会话执行，不冒充独立测试会话。该会话历史不可事后补造，单列【不可补的过程证据项】。"
+        },
+        {
+          "id": "R-B1-03",
+          "status": "fail",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "1/10",
+          "points_exact": "0",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-008",
+            "E3-009",
+            "E3-021"
+          ],
+          "reason": "【环境/过程证据缺失，不判定为代码缺陷】验收检查 Skill 文件已补齐（E3-008/009），但 evidence/验收报告说明.md 明确声明非验收报告本体、不含通过/不通过结论；验收会话、逐项结论与证据位置、门禁核验清单仍不存在。Skill 文件不等于验收 Agent 独立会话成果，单列【不可补的过程证据项】。"
+        },
+        {
+          "id": "R-B1-04",
+          "status": "fail",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "1/10",
+          "points_exact": "0",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-002",
+            "E3-020",
+            "E3-021"
+          ],
+          "reason": "【环境权限 + 不可补的过程证据项】git remote -v 为空，无 GitHub MCP 建仓的工具名/请求/结果/时间/仓库 URL 记录（E3-002/020）；交付证据说明第 4 节如实写明无 MCP 记录。题面 8.1 未满足；平台权限未提供属环境阻塞，不写成已证实学生违规。"
+        },
+        {
+          "id": "R-B1-05",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/20",
+          "loss_exact": "1/20",
+          "evidence": [
+            "E3-002",
+            "E3-015",
+            "E3-020"
+          ],
+          "reason": "已完成：dev/01、rev-parse HEAD 有效、rev-list --count HEAD=2、本次提交格式合规、工作区仅复核产物未跟踪（E3-002/015）。首次提交格式偏差按 P-08 不 amend、永久保留在 git-提交指引 2.1 节；按需求/原型/计划/开发/测试/验收阶段保留的真实提交序列不可重建。归【不可补的过程证据项】，非代码缺陷。"
+        },
+        {
+          "id": "R-B1-06",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/20",
+          "loss_exact": "1/20",
+          "evidence": [
+            "E3-017",
+            "E3-019",
+            "E3-023"
+          ],
+          "reason": "三轮审计『第一轮发现问题 → 用户整改指令 → 第二轮复核 → 第三批逐条补齐 → 第三轮复核』构成可核查的检查/修正/复检链（E3-019/023）；本轮 verify-extension.ps1 复验原有接口与五组场景未回归。仍无 Bug 登记单、开发 Agent 的 fix 提交、测试 Agent 复测与验收 Agent 复核的正式交接链，复检仍在开发会话内。归【不可补的过程证据项】。"
+        }
+      ]
+    },
+    {
+      "category": "B2",
+      "max": "0.80",
+      "applicable_weight": "0.80",
+      "score": "0.40",
+      "score_exact": "2/5",
+      "checks": [
+        {
+          "id": "R-B2-01",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/5",
+          "points_exact": "1/10",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-019",
+            "E3-021",
+            "E3-023"
+          ],
+          "reason": "AGENTS.md 针对题目 01 含三 Agent 职责/修改范围/授权清单/Git 门禁/覆盖率/脱敏/失败复测，保留 AGENTS-v1.0.md 与 v1.1 变更原因，第三轮复核实际读取并据此判定（E3-023）。仍无独立『开发前实际加载记录』文件、v1.1 行注明『本轮不提交』、无提交哈希可证明开发前生效、无学生逐项确认记录。归【不可补的过程证据项】，非代码缺陷。"
+        },
+        {
+          "id": "R-B2-02",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/5",
+          "points_exact": "1/10",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-020",
+            "E3-021"
+          ],
+          "reason": "会话导出说明.md 与事件清单说明.md 给出三方会话命名、JSONL 字段规范与不得事后补造的约束，并如实说明上下文压缩后无法还原精确时间戳、未生成伪数据（E3-021）。全量清点 events.jsonl=False、无真实会话导出与工具调用索引（E3-020）。归【不可补的过程证据项】，说明文档不等于交付物本体。"
+        },
+        {
+          "id": "R-B2-03",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/5",
+          "points_exact": "1/10",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-020",
+            "E3-021"
+          ],
+          "reason": "evidence/AI使用说明.md 覆盖 AI 参与阶段、工具与 Skill、明确未做的事、三轮验证状态、学生核验责任与完成声明边界（E3-021）。仍无按任务编号展开的『提示→AI 行动→工具结果→学生判断→产物版本→验证』逐条链、无模型字段标注、无逐项不可获取清单。归【不可补的过程证据项】。"
+        },
+        {
+          "id": "R-B2-04",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/5",
+          "points_exact": "1/10",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-016",
+            "E3-017",
+            "E3-022",
+            "E3-024"
+          ],
+          "reason": "开发草稿主动标注不得冒充正式证据、race 未启动如实记录、覆盖率区分草稿/真实口径、提交格式偏差主动披露、CI 模板明示不可运行、Apipost 摘要自述未运行（E3-016/022/024）；第三轮复核未发现弱化断言、删除失败 case 或编造测试/部署结果。仍无学生逐项审核确认记录与可追溯索引。归【不可补的过程证据项】；未发现已证实的 AI 造假行为。"
+        }
+      ]
+    },
+    {
+      "category": "B3",
+      "max": "0.30",
+      "applicable_weight": "0.30",
+      "score": "0.25",
+      "score_exact": "1/4",
+      "checks": [
+        {
+          "id": "R-B3-01",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-008",
+            "E3-009",
+            "E3-020"
+          ],
+          "reason": "【第二轮代码/产物缺陷已补齐】.codebuddy/skills 现有 4 个自编 Skill（acceptance-check、gva-model-generate、unit-test-race、apipost-case-gen），新增 acceptance-check 的 SKILL.md 含 YAML 元数据、用途/触发/输入/步骤/输出/失败处理/完成标准、上层约束与三类问题分类，技术栈贴合 GVA+MySQL(InnoDB)（E3-008/020）。第二轮『无验收检查 Skill』缺口已消除；独立验收会话真实触发属过程证据，由 R-B3-02 单列。"
+        },
+        {
+          "id": "R-B3-02",
+          "status": "partial",
+          "mandatory": true,
+          "factor": "0.5",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/20",
+          "loss_exact": "1/20",
+          "evidence": [
+            "E3-009",
+            "E3-019"
+          ],
+          "reason": "skill-usage.md 第 3.1 节补齐 6 类说明、第 5 节新增调用记录、第 6 节登记 K-04 闭环、第 7 节如实写明『未通过工具加载、未由验收 Agent 独立会话执行』（E3-009）；第三轮复核真实加载 student-project-audit（E3-019）。仍缺验收 Agent 独立会话中的 Skill 真实触发与复检输入输出，归【不可补的过程证据项】，不编造闭环。"
+        },
+        {
+          "id": "R-B3-03",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-009",
+            "E3-020"
+          ],
+          "reason": "第三轮逐项核对 skill-usage.md：4 个自编 Skill 各含①技能用途②触发条件③输入④输出产物⑤验收检查点⑥禁用场景，并补齐名称/来源/版本、使用位置与原因、过程、实际帮助、证据及局限；第 3.1 节为新增 acceptance-check 的六类说明。六类说明要求对全部自编 Skill 均满足。"
+        }
+      ]
+    },
+    {
+      "category": "B4",
+      "max": "0.30",
+      "applicable_weight": "0.30",
+      "score": "0.10",
+      "score_exact": "1/10",
+      "checks": [
+        {
+          "id": "R-B4-01",
+          "status": "fail",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "1/10",
+          "points_exact": "0",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-002",
+            "E3-020",
+            "E3-021"
+          ],
+          "reason": "【环境权限 + 不可补的过程证据项】git remote -v 为空、无 GitHub MCP 建仓记录与仓库 URL、无 main 分支保护配置读取结果（E3-002/020/021）。题面 8.1、8.5 未满足；平台权限未提供属环境阻塞单列，不写成已证实学生违规。"
+        },
+        {
+          "id": "R-B4-02",
+          "status": "pass",
+          "mandatory": true,
+          "factor": "1",
+          "normalized_max_exact": "1/10",
+          "points_exact": "1/10",
+          "loss_exact": "0",
+          "evidence": [
+            "E3-002",
+            "E3-015",
+            "E3-020"
+          ],
+          "reason": "【第二轮规范偏差已按用户指令修正】本次整改提交 6083edd06… 的 message 为 `[opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物`，符合 `[类型] [版本号] 中文描述`；opt 类型版本号必填、编号可选，无需 meegle 编号核验（E3-002/015）。首次提交偏差不改写、永久保留在 git-提交指引 2.1 节，符合 P-08；dev/01 2 次提交、HEAD 有效。meegle 编号核验与 PR 环境缺失由 R-B4-03 单列，不重复扣分。"
+        },
+        {
+          "id": "R-B4-03",
+          "status": "unknown",
+          "mandatory": true,
+          "factor": "0",
+          "normalized_max_exact": "1/10",
+          "points_exact": "0",
+          "loss_exact": "1/10",
+          "evidence": [
+            "E3-007",
+            "E3-014",
+            "E3-020"
+          ],
+          "reason": "【平台/权限阻塞，待补证，不写成已证实违规】第三轮环境核查 meegle=NOT_FOUND、git remote -v 为空、无 PR/状态检查/合并记录与工作项索引（E3-007/020）；CI 模板已写明该依赖（E3-014）。按 rubric 第 41 行记 unknown，系数 0，单列阻塞归属；不得据此认定学生伪造核验或跳过门禁。解除条件：在具备 meegle CLI 与远端仓库的环境，于 feat/fix 提交前执行 meegle workitem get --work-item-id <编号> --project-key r17te9 并保存命令/时间/完整结果/退出码，再补 PR 与状态检查记录。"
+        }
+      ]
+    }
+  ]
+}

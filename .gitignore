@@ -1,0 +1,8 @@
+# Python 采集脚本的字节码缓存（不进入版本库）
+__pycache__/
+*.pyc
+
+# 本地编译产物与临时可执行文件
+/shop-trade
+/shop-trade.exe
+*.exe

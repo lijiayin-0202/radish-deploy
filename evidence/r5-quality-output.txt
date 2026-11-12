@@ -1,0 +1,26 @@
+# 第五轮质量门禁真实执行输出
+# EXECUTED_AT: 2026-11-12T16:26:15.233390+08:00
+# ENV: local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET)
+# BRANCH: dev/01
+=== go test ./... ===
+ok  	shop-trade	1.023s
+ok  	shop-trade/server/api/v1	1.023s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.047s
+ok  	shop-trade/server/model	0.685s
+ok  	shop-trade/server/router	0.960s
+ok  	shop-trade/server/service	0.840s
+go_test_exit=0
+
+=== gofmt -l . ===
+(无输出：全部文件已格式化)
+gofmt_exit=0
+
+=== go vet ./... ===
+(无输出：go vet 通过)
+go_vet_exit=0
+
+=== go test -race ./server/... (环境限制，如实记录) ===
+go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+go_race_exit=2
+说明：本机 CGO_ENABLED=0 且无 gcc/clang，-race 探针无法运行；该条维持 unknown，不冒充 race 通过，也不写成数据竞争报告。

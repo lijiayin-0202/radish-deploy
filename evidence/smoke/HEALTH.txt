@@ -1,0 +1,12 @@
+CASE_ID      : HEALTH
+TITLE        : 健康检查
+EXECUTED_AT  : 2026-11-12T14:58:11.633833+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : GET /health
+HEADERS      : X-Demo-Account=buyer01 (X-Role/X-User-Id ignored by server)
+BODY         : (none)
+EXPECTED     : HTTP200
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"mode":"demo-memory","status":"ok"}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。

@@ -1,0 +1,18 @@
+CASE_ID      : SKILL-unit-test-race
+TITLE        : unit-test-race SKILL.md 文件级独立冒烟核查
+EXECUTED_AT  : 2026-11-12T14:58:15.476485+08:00
+PATH         : d:\Desktop\shop\.codebuddy\skills\unit-test-race\SKILL.md
+EXISTS       : True
+CHECKS       :
+  - YAML_description = True
+  - YAML_name = True
+  - has_boundary = True
+  - has_completion = True
+  - has_failure_handling = True
+  - has_input = True
+  - has_output = True
+  - has_purpose = True
+  - has_trigger = True
+  - mysql_innodb = True
+ASSERTION    : PASS
+SCOPE_NOTE   : 文件结构与口径核查；不是工具加载记录、不是独立测试/验收会话调用证据。

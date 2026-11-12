@@ -1,0 +1,189 @@
+第四轮门禁复核：核查命令与原始输出
+日期：2026-11-12（Asia/Shanghai）  执行时间：2026-11-12 15:28:45
+工作区：D:\Desktop\shop
+说明：逐字保存本轮各命令真实 stdout/stderr 与退出码。全部核查为只读/隔离运行，
+      未修改学生业务代码；新增文件仅位于本次审计输出目录 20261112-04 及已登记的第四轮证据目录。
+      计分脚本只做数值校验，不判断业务真实性；race 探针的 exit=2 属环境限制，不写成测试失败。
+
+================================================================================
+[CMD-01] Git 版本链、工作区与远端（复核开始时执行）
+命令：git branch --show-current   （cwd=D:\Desktop\shop）
+输出：dev/01
+exitCode=0
+
+命令：git rev-parse HEAD   （cwd=D:\Desktop\shop）
+输出：6083edd06cb4b289ee251bbca28efcdd83e15d6c
+exitCode=0
+
+命令：git rev-list --count HEAD   （cwd=D:\Desktop\shop）
+输出：2
+exitCode=0
+
+命令：git log --pretty=format:%h | %s | %cI -2   （cwd=D:\Desktop\shop）
+输出：6083edd | [opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物 | 2026-11-12T14:07:29+08:00
+6cc6f13 | feat: 电商订单售前退款完整业务实现 | 2026-11-12T12:44:01+08:00
+exitCode=0
+
+命令：git status --porcelain   （cwd=D:\Desktop\shop）
+输出： M "docs/git-\346\217\220\344\272\244\346\214\207\345\274\225.md"
+ M docs/interface-list.md
+ M skill-usage.md
+?? "docs/commit-convention-\346\240\241\351\252\214\350\257\264\346\230\216.md"
+?? evidence/commit-message-check-output.txt
+?? evidence/html-check/
+?? evidence/manual/
+?? evidence/mock-channel-run.txt
+?? evidence/r4-mock-channel-output.txt
+?? evidence/r4-suite-output.txt
+?? evidence/smoke/
+?? "evidence/\347\254\254\345\233\233\350\275\256\350\257\201\346\215\256\346\270\205\345\215\225.md"
+?? "outputs/\345\215\225\351\242\230\346\243\200\346\237\245/shop-trade/01/20261112-03/"
+?? "outputs/\345\215\225\351\242\230\346\243\200\346\237\245/shop-trade/01/20261112-04/"
+?? scripts/check_commit_message.py
+?? scripts/mock_channel_service.py
+?? scripts/r4_evidence_suite.py
+?? scripts/r4_mock_channel_smoke.py
+?? server/service/r4_edge_test.go
+exitCode=0
+
+命令：git remote -v   （cwd=D:\Desktop\shop）
+输出：（无输出）
+exitCode=0
+
+================================================================================
+[CMD-02] gofmt -l .（格式检查）
+命令：D:\Go\bin\gofmt.EXE -l .   （cwd=D:\Desktop\shop）
+输出：
+exitCode=0
+
+================================================================================
+[CMD-03] go vet ./...（静态检查）
+命令：D:\Go\bin\go.EXE vet ./...   （cwd=D:\Desktop\shop）
+输出：
+exitCode=0
+
+================================================================================
+[CMD-04] go build ./...（构建）
+命令：D:\Go\bin\go.EXE build ./...   （cwd=D:\Desktop\shop）
+输出：
+exitCode=0
+
+================================================================================
+[CMD-05] go test ./... -count=1（全部单元测试）
+命令：D:\Go\bin\go.EXE test ./... -count=1   （cwd=D:\Desktop\shop）
+输出：
+ok  	shop-trade	0.980s
+ok  	shop-trade/server/api/v1	0.953s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.953s
+ok  	shop-trade/server/model	0.633s
+ok  	shop-trade/server/router	0.953s
+ok  	shop-trade/server/service	0.822s
+exitCode=0
+
+================================================================================
+[CMD-06] 覆盖率：-coverpkg ./... 整体 + server/service 单包
+命令：D:\Go\bin\go.EXE test -coverpkg ./... -coverprofile C:\Users\10990\AppData\Local\Temp\shop-r4-all.out ./...
+输出：ok  	shop-trade	(cached)	coverage: 5.7% of statements in ./...
+ok  	shop-trade/server/api/v1	(cached)	coverage: 63.5% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	(cached)	coverage: 4.7% of statements in ./...
+ok  	shop-trade/server/model	(cached)	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	(cached)	coverage: 2.6% of statements in ./...
+ok  	shop-trade/server/service	(cached)	coverage: 66.7% of statements in ./...
+exitCode=0
+命令：D:\Go\bin\go.EXE tool cover -func C:\Users\10990\AppData\Local\Temp\shop-r4-all.out → 提取 total 行
+输出：total:							(statements)				88.2%
+exitCode=0
+命令：D:\Go\bin\go.EXE test -cover ./server/service/...
+输出：ok  	shop-trade/server/service	(cached)	coverage: 90.3% of statements
+exitCode=0
+
+================================================================================
+[CMD-07] 环境事实、race 探针（环境限制，不判代码缺陷）
+命令：D:\Go\bin\go.EXE env CGO_ENABLED → 0（exitCode=0）
+命令：shutil.which(gcc) → NOT_FOUND
+命令：shutil.which(clang) → NOT_FOUND
+命令：shutil.which(meegle) → NOT_FOUND
+命令：$env:GVA_MYSQL_DSN → NOT_SET
+命令：D:\Go\bin\go.EXE test ./server/service/... -race -count=1
+输出：go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+exitCode=2   （-race requires cgo：环境探针，不是单元测试失败、不是数据竞争报告）
+
+================================================================================
+[CMD-08] 第四轮交付物全量清点（真实文件系统遍历）
+smoke 单用例独立冒烟文件数=38
+manual 异常场景手工记录文档数=5
+html-check 页面独立断言文档数=8
+resource/static HTML 页面数=9
+第四轮证据清单存在=True
+mock-channel-run.txt 存在=True
+r4-suite-output.txt 存在=True
+commit-message-check-output.txt 存在=True
+r4_edge_test.go 存在=True
+mock_channel_service.py 存在=True
+r4_evidence_suite.py 存在=True
+check_commit_message.py 存在=True
+events.jsonl 存在=False
+apipost-run-export.json 存在=False
+README.md 存在=False
+视频文件数（mp4/avi/mov/mkv/webm/wmv）=0
+ci.yml 非注释行数=0
+git remote 行数=0
+已跟踪文件数=114
+工作区变更/未跟踪条目数=19
+exitCode=0
+
+================================================================================
+[CMD-09] 提交消息格式真实校验脚本
+命令：D:\python\python.exe D:\Desktop\shop\scripts\check_commit_message.py   （cwd=D:\Desktop\shop）
+说明：仅做格式解析，不替代 meegle 编号核验
+输出：
+规范原文：commit-convention.md（题集随附副本，本脚本不改写）
+校验命令：python scripts/check_commit_message.py
+------------------------------------------------------------------------------
+[1] 6083edd06cb4 | [opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物
+     类型=opt 版本号=v1.1.0 编号=(无) 描述=补齐验收检查Skill与商品调价等交付产物
+     必填规则：版本号=True 编号=False
+     结论：PASS 符合规范
+[2] 6cc6f134ee07 | feat: 电商订单售前退款完整业务实现
+     结论：FAIL 不符合规范
+       - 不符合 `[类型] [版本号] [需求/Bug编号] 中文描述` 格式
+------------------------------------------------------------------------------
+合计 2 条，PASS 1 条，FAIL 1 条
+说明：格式合规不等于 meegle 编号核验通过；本机 meegle CLI 不可用，feat/fix 编号核验属环境/过程证据缺失，不得伪造。
+exitCode=0
+
+================================================================================
+[CMD-10] 按稳定 42 原子矩阵计分（score_audit.py）
+命令：D:\python\python.exe C:\Users\10990\.codebuddy\skills\student-project-audit\scripts\score_audit.py --input D:\Desktop\shop\outputs\单题检查\shop-trade\01\20261112-04\audit-input.json --output D:\Desktop\shop\outputs\单题检查\shop-trade\01\20261112-04\score.json   （cwd=C:\Users\10990\.codebuddy\skills\student-project-audit）
+说明：脚本只校验计分，不判断业务、真实性或全量覆盖
+输出：
+7.27/10 不合格；原始分 7.27
+exitCode=0
+
+================================================================================
+[CMD-11] 第三轮 / 第四轮状态统计与 pass 提升（读取两份 score.json）
+R3 final=6.08 raw=6.08 completion=5.18 process=0.90 pass=14 partial=20 fail=6 unknown=2 na=0 blockers=28
+R3 A1 max=3.00 score=2.70 checks=10
+R3 A2 max=1.80 score=1.05 checks=6
+R3 A3 max=1.70 score=0.68 checks=5
+R3 A4 max=1.50 score=0.75 checks=5
+R3 B1 max=0.60 score=0.15 checks=6
+R3 B2 max=0.80 score=0.40 checks=4
+R3 B3 max=0.30 score=0.25 checks=3
+R3 B4 max=0.30 score=0.10 checks=3
+R4 final=7.27 raw=7.27 completion=6.12 process=1.15 pass=23 partial=11 fail=6 unknown=2 na=0 blockers=19
+R4 A1 max=3.00 score=3.00 checks=10
+R4 A2 max=1.80 score=1.20 checks=6
+R4 A3 max=1.70 score=1.02 checks=5
+R4 A4 max=1.50 score=0.90 checks=5
+R4 B1 max=0.60 score=0.15 checks=6
+R4 B2 max=0.80 score=0.60 checks=4
+R4 B3 max=0.30 score=0.30 checks=3
+R4 B4 max=0.30 score=0.10 checks=3
+PASS_DELTA=9
+SCORE_DELTA=1.19
+BLOCKER_DELTA=-9
+exitCode=0
+

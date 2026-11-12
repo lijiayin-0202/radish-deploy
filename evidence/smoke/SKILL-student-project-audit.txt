@@ -1,0 +1,8 @@
+CASE_ID      : SKILL-student-project-audit
+TITLE        : 内置检查 Skill 文件级独立冒烟核查
+EXECUTED_AT  : 2026-11-12T14:58:15.478783+08:00
+PATH         : C:\Users\10990\.codebuddy\skills\student-project-audit\SKILL.md
+EXISTS       : True
+HAS_SCRIPT   : True
+ASSERTION    : PASS
+SCOPE_NOTE   : 第四轮复核真实加载该 Skill 并调用 score_audit.py；文件核查本身不等于调用记录。

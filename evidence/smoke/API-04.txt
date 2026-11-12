@@ -1,0 +1,12 @@
+CASE_ID      : API-04
+TITLE        : 模拟渠道支付成功
+EXECUTED_AT  : 2026-11-12T14:58:12.895284+08:00
+ENVIRONMENT  : local go build, mode=demo-memory (GVA_MYSQL_DSN NOT_SET), HEAD=6083edd06cb4b289ee251bbca28efcdd83e15d6c
+REQUEST      : POST /api/v1/payment/callback
+HEADERS      : X-Demo-Account=mock01 (X-Role/X-User-Id ignored by server)
+BODY         : {"order_no": "ORD-1794466692880853400-1001-1", "channel_trade_no": "R4-PAY-A2", "amount": 10000, "signature_valid": true}
+EXPECTED     : 0
+HTTP_STATUS  : 200
+RESPONSE_RAW : {"code":"0","message":"ok","data":{"amount":10000,"channel_trade_no":"R4-PAY-A2","effective":true,"event_id":2,"event_type":"支付成功","failure_code":"","failure_reason":"","id":2,"need_refund":false,"occurred_at":"2026-11-12T14:58:12.89451+08:00","order_id":1,"order_no":"ORD-1794466692880853400-1001-1","order_status_snapshot":"待发货","result":"已记款","signature_valid":true}}
+ASSERTION    : PASS
+SCOPE_NOTE   : 单用例独立冒烟记录；非独立测试 Agent 会话、非 Apipost 运行导出、非第 3 轮浏览器验收、非真实 MySQL / CI / race 证据。
