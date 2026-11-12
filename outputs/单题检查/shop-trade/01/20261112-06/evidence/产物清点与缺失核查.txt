@@ -1,0 +1,254 @@
+学生单题项目检查 · 产物清点与缺失核查
+题目 01「小型电商的订单交易、发货与售前退款」· 批次 20261112-06
+受检仓库：d:/Desktop/shop（本地工作副本）
+基准版本：82c4847（分支 dev/01）
+执行方式：检查者独立脚本 + 原始文件系统检索与 git 实测，不采信学生自述结论
+生成时间：2026-11-12（Asia/Shanghai）
+
+=== 0. 固定清单来源 ===
+profile 路径： C:\Users\10990\.codebuddy\skills\student-project-audit\references\profiles\01.json
+profile sha256： c6a50abdc8a08e07dddfaae7b84e78d59370e963dcae548cf7327a607de87d27
+清单要求项总数： 58 ；产物项总数： 23
+token_baselines： [] （空表示教师未发布本题 Token 基准）
+
+=== 1. 23 项必交产物逐项存在性核查 ===
+（判定口径：关键路径全部存在且含实体内容=present/valid；仅存在说明或空目录=占位；关键路径缺失=missing）
+
+[requirements] 需求分析及假设
+    - 题目01-小型电商订单交易发货与售前退款-需求文档.md  ->  FILE(65653B)
+    - docs/dev-assumptions.md  ->  FILE(5236B)
+    => present / valid
+
+[prototype] 可操作原型及状态
+    - 题目01-小型电商订单交易发货与售前退款-原型设计文档.md  ->  FILE(50317B)
+    - resource/static/index.html  ->  FILE(2430B)
+    - resource/static/v01-goods.html  ->  FILE(1991B)
+    - resource/static/v08-late-payment.html  ->  FILE(3506B)
+    => present / valid
+
+[plan] 需求对应任务计划
+    - 题目01-小型电商订单交易发货与售前退款-任务规划文档.md  ->  FILE(37062B)
+    => present / valid
+
+[source] Go源码、页面和接口
+    - main.go  ->  FILE(2421B)
+    - server  ->  DIR(40 entries)
+    - resource/static  ->  DIR(11 entries)
+    - docs/interface-list.md  ->  FILE(31716B)
+    => present / valid
+
+[runtime] 运行说明、初始化、演示数据及模拟服务
+    - schema.sql  ->  FILE(6357B)
+    - scripts/mock_channel_service.py  ->  FILE(4177B)
+    - scripts/r4_mock_channel_smoke.py  ->  FILE(6088B)
+    - docs/代码产物补齐说明.md  ->  FILE(6485B)
+    - evidence/schema.sql  ->  FILE(13046B)
+    - evidence/mysql核查记录.md  ->  FILE(12308B)
+    => present / valid
+
+[agent_rules] 自编Agent规范、历史及加载记录
+    - AGENTS.md  ->  FILE(23005B)
+    - AGENTS-v1.0.md  ->  FILE(22574B)
+    (佐证) evidence/agent-rules-load-log.md  ->  MISSING
+    => present / valid
+
+[business_skill] 自编业务Skill及调用
+    - .codebuddy/skills/gva-model-generate/SKILL.md  ->  FILE(10054B)
+    - .codebuddy/skills/unit-test-race/SKILL.md  ->  FILE(11489B)
+    - .codebuddy/skills/apipost-case-gen/SKILL.md  ->  FILE(12790B)
+    - evidence/smoke/SKILL-gva-model-generate.txt  ->  FILE(672B)
+    - evidence/smoke/SKILL-unit-test-race.txt  ->  FILE(660B)
+    - evidence/smoke/SKILL-apipost-case-gen.txt  ->  FILE(666B)
+    => present / valid
+
+[acceptance_skill] 自编验收Skill及调用
+    - .codebuddy/skills/acceptance-check/SKILL.md  ->  FILE(7400B)
+    - evidence/smoke/SKILL-acceptance-check.txt  ->  FILE(666B)
+    - evidence/acceptance-check-rerun.md  ->  FILE(6809B)
+    => present / placeholder（仅有说明性文件，无产物本体）
+
+[skill_usage] 全部Skill使用总结
+    - skill-usage.md  ->  FILE(29016B)
+    => present / valid
+
+[prompts] 全部可见提示词、回复、附件及事件清单
+    - evidence/sessions  ->  MISSING
+    - evidence/events.jsonl  ->  MISSING
+    - events.jsonl  ->  MISSING
+    (佐证) evidence/会话导出说明.md  ->  FILE(4004B)；文件自述「不是任何一方的会话导出本体」
+    (佐证) evidence/事件清单说明.md  ->  FILE(4377B)；文件自述「不是事件清单本体」，目标文件尚不存在
+    => missing（关键路径缺失：evidence/sessions、evidence/events.jsonl、events.jsonl）
+
+[ai_summary] AI与学生分工及审核说明
+    - evidence/AI使用说明.md  ->  FILE(4357B)
+    - skill-usage.md  ->  FILE(29016B)
+    - evidence/会话导出说明.md  ->  FILE(4004B)
+    => present / placeholder（仅有说明性文件，无产物本体）
+
+[unit_tests] 单元测试源码和真实执行输出
+    - server/service/r4_edge_test.go  ->  FILE(13563B)
+    - server/service/r5_edge_test.go  ->  FILE(19952B)
+    - server/service/r5_edge2_test.go  ->  FILE(32832B)
+    - evidence/r5-quality-output.txt  ->  FILE(926B)
+    - evidence/quality_gate_output.txt  ->  FILE(13415B)
+    => present / valid
+
+[coverage] 覆盖率原件及包范围
+    - coverage-r5.out  ->  FILE(349408B)
+    - coverage.out  ->  FILE(45693B)
+    - coverage-all.out  ->  FILE(349408B)
+    - evidence/r5-coverage-output.txt  ->  FILE(1741B)
+    - evidence/r5-coverage-func.txt  ->  FILE(11381B)
+    - evidence/coverage-gate.out  ->  FILE(349414B)
+    - evidence/coverage-gate-func.txt  ->  FILE(11271B)
+    - evidence/coverage-report.md  ->  FILE(3682B)
+    => present / valid
+
+[integration] 接口、数据库及适用并发验证
+    - evidence/smoke  ->  DIR(38 entries)
+    - evidence/manual  ->  DIR(5 entries)
+    - evidence/manual-round2  ->  DIR(5 entries)
+    - evidence/partial-closure  ->  DIR(11 entries)
+    - evidence/html-check  ->  DIR(8 entries)
+    - evidence/mysql_raw_05_app_persistence.txt  ->  FILE(7810B)
+    - evidence/api_validation_probe.txt  ->  FILE(7260B)
+    => present / valid
+
+[test_agent] 独立测试Agent报告和会话
+    - evidence/sessions/test-01.md  ->  MISSING
+    - evidence/test-agent-report.md  ->  MISSING
+    (佐证) test-report.md  ->  FILE(12598B)
+    => missing（关键路径缺失：evidence/sessions/test-01.md、evidence/test-agent-report.md）
+
+[accept_agent] 独立验收Agent报告和会话
+    - evidence/sessions/accept-01.md  ->  MISSING
+    - evidence/accept-agent-report.md  ->  MISSING
+    (佐证) evidence/验收报告说明.md  ->  FILE(4120B)；文件自述「非验收报告本体」，不含通过/不通过结论
+    => missing（关键路径缺失：evidence/sessions/accept-01.md、evidence/accept-agent-report.md）
+
+[git] MCP建仓、分支、提交、工作项、PR和保护记录
+    - .git  ->  DIR(228 entries)
+    - scripts/check_commit_message.py  ->  FILE(4654B)
+    - evidence/r5-post-commit-verification.txt  ->  FILE(5596B)
+    - evidence/r5-commit-message-check-output.txt  ->  FILE(2965B)
+    (佐证) evidence/commit-message-check-output.txt  ->  FILE(1232B)
+    => present / valid
+
+[pipeline] 流水线配置及实际运行
+    - .github/workflows/ci.yml  ->  FILE(2394B)
+    - evidence/ci.yml  ->  FILE(1357B)
+    - evidence/CI流水线说明.md  ->  FILE(3618B)
+    (佐证) evidence/门禁自查汇总.md  ->  FILE(7608B)；文件自述「由开发侧会话编制，属自检材料」
+    [流水线生效路径] .github/workflows/ci.yml： 总行数 31，非注释非空行 0，含 on=False，含 jobs=False
+    [流水线候选定义] evidence/ci.yml： 总行数 49，非注释非空行 37，含 on=True，含 jobs=True
+    => present / placeholder（生效路径 .github/workflows/ci.yml 为纯注释模板，非注释非空行 0，不触发任何流水线；evidence/ci.yml 为可执行定义但不在生效路径，且仓库无远端与任何运行记录）
+
+[deployment] 上线地址、版本、冒烟及回退
+    - docs/部署与冒烟说明.md  ->  MISSING
+    - evidence/deployment-smoke.txt  ->  MISSING
+    => missing（关键路径缺失：docs/部署与冒烟说明.md、evidence/deployment-smoke.txt）
+
+[video] 讲解效果视频及时间目录
+    - evidence/讲解视频.mp4  ->  MISSING
+    - evidence/视频时间目录.md  ->  MISSING
+    => missing（关键路径缺失：evidence/讲解视频.mp4、evidence/视频时间目录.md）
+
+[group] 当日班级群提交凭据
+    - evidence/班级群提交凭据.md  ->  MISSING
+    => missing（关键路径缺失：evidence/班级群提交凭据.md）
+
+[tokens] 全阶段原始Token用量和去重台账
+    - evidence/Token用量台账.md  ->  MISSING
+    - outputs/原始usage.json  ->  MISSING
+    => missing（关键路径缺失：evidence/Token用量台账.md、outputs/原始usage.json）
+
+[checkpoints] 阶段检查点及版本索引
+    - evidence/第五轮证据清单.md  ->  FILE(15528B)
+    - evidence/第四轮证据清单.md  ->  FILE(9941B)
+    - .agent/06-workflow-devflow.md  ->  FILE(9018B)
+    - docs/git-提交指引.md  ->  FILE(14164B)
+    => present / valid
+
+=== 2. 会话导出与结构化事件清单检索 ===
+检索目标：evidence/sessions/ 目录、events.jsonl（含任意子目录）、会话导出 Markdown
+  events.jsonl 命中： 0
+  evidence/sessions 存在： False
+  evidence/会话导出说明.md 存在： True （内容自述：平台侧无会话录制组件，仓库不存在 events.jsonl；等价证据不等同会话导出本体）
+  evidence/事件清单说明.md 存在： True （内容自述：正式事件清单「未生成」）
+
+=== 3. 讲解视频与时间目录检索 ===
+  视频文件命中： 0 
+  evidence/视频时间目录.md 存在： False
+
+=== 4. 当日班级群提交凭据检索 ===
+  文件名含群提交关键词的命中： 0
+  evidence/班级群提交凭据.md 存在： False
+
+=== 5. Token 用量台账检索 ===
+  文件名含 token/usage 的命中： ['skill-usage.md']
+  evidence/Token用量台账.md 存在： False
+  outputs/原始usage.json 存在： False
+
+=== 6. 流水线可执行性与运行记录实测 ===
+  .github/workflows/ci.yml：总行数 31，非注释且非空行 0，含 on=False，含 jobs=False
+    结论： 纯注释模板，不会触发任何流水线（占位）
+  evidence/ci.yml：总行数 49，非注释且非空行 37，含 on=True，含 jobs=True
+    结论： 存在可执行流水线定义
+  流水线实际运行记录：0（仓库无远端，无 .git/refs，无 run 记录）
+  部署门禁步骤：evidence/ci.yml 中未包含部署与上线冒烟作业
+
+=== 7. Git 远端、分支与 PR 实测 ===
+$ git branch -a
+* dev/01
+$ git remote -v
+（无输出：无远端仓库）
+$ git log --oneline -15
+82c4847 [docs] [v1.4.0] 新增工单表 ticket_no 唯一索引与持久化验证文档及真实执行原始输出
+03c4238 [docs] [v1.4.0] 新增订单表 order_no 唯一索引与持久化验证文档及真实执行原始输出
+85c4ae6 [test] [v1.3.0] 修正 mysql_raw_01_schema.txt 原始输出编码为 UTF-8
+e142649 [docs] [v1.3.0] 归档第五轮单题检查报告、评分明细与两份输入
+501136c [docs] [v1.3.0] 补充MySQL核查记录、会话导出与CI流水线说明、竞态检测说明及门禁自查汇总
+9c32eff [test] [v1.3.0] 补充真实MySQL环境建表脚本与InnoDB核查、竞态检测、覆盖率及接口入参巡检证据
+25aa8f1 [opt] [v1.3.0] 补全订单服务与GORM仓储层导出方法文档注释并修正go.mod直接依赖声明
+58719fb [test] [v1.2.0] 追加提交后门禁复核原始输出
+68801cb [docs] [v1.2.0] 回补版本链核查与第五轮提交记录
+537453c [docs] [v1.2.0] 补齐接口边界矩阵与第五轮证据闭环文档
+00520bd [test] [v1.2.0] 补充第五轮边界单测与证据采集产物
+018551c [opt] [v1.2.0] 补齐模拟支付渠道服务与第四轮冒烟产物
+6083edd [opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物
+6cc6f13 feat: 电商订单售前退款完整业务实现
+  远端 PR 记录：不可核验（无远端，无 .git/refs/pull，无 PR 导出）
+
+=== 8. AGENTS.md 实际加载记录检索 ===
+  evidence/agent-rules-load-log.md 存在： False
+  仓库内含「加载/生效记录」的文件：
+    - AGENTS.md：命中 4 行 ；示例：- **生效证据**：开发前会话中实际加载或读取本文件的记录、对应任务 `AGENT-01`、提交版本哈希。
+    - evidence/交付证据说明.md：命中 0 行 
+    - evidence/第五轮证据清单.md：命中 1 行 ；示例：| `R-B2-01` | 无 AGENTS.md 开发前加载记录文件 | `AGENTS.md` / `AGENTS-v1.0.md` 存在性与体量核查、摘录第 0 章与第 7 
+    - evidence/门禁自查汇总.md：命中 0 行 
+
+=== 9. 第 6 轮新增环境类证据抽查 ===
+  真实 MySQL 原始输出份数： 6
+  竞态检测原始输出： FILE(438B) （内容自述为 WSL Ubuntu Go 1.26.8 + gcc 15.2.0、CGO_ENABLED=1、race_exit=0）
+  接口非法入参巡检： FILE(7260B) （自述探针总数 57，不合规响应 0）
+  事务回滚原子性原始输出： FILE(2698B)
+  检查者本机可复现性：Windows 侧 CGO_ENABLED=0，where gcc/clang 无结果，无 MySQL 客户端，
+    上述环境类证据为第一方产物，未能在检查者环境内原样复跑（详见报告限制项）。
+
+=== 10. 就绪状态核查（规则发布 / 清单核准 / 评分校准）===
+  规则发布：题面与三份上游文档随附，学生侧可见 -> rules_published = True
+  清单核准：仓库内未找到教师对固定清单 references/profiles/01.json 的核准记录 -> profile_approved = False
+  评分校准：本班无该清单的已评分样本可作校准对照 -> calibrated = False
+  Token 基准：profile.token_baselines 为空 -> 教师未发布 -> Token 计分暂记 0 分、标 unknown
+
+=== 11. 核查结论 ===
+  1) 23 项必交产物中，8 项存在缺口：prompts、test_agent、accept_agent、deployment、
+     video、group、tokens 为关键路径缺失（missing）；pipeline 的生效路径仍为占位
+     （.github/workflows/ci.yml 非注释非空行 0），仅有不在生效路径的 evidence/ci.yml 可执行定义。
+  2) prompts / test_agent / accept_agent / deployment / video / group / pipeline 共 7 项
+     属学生可自行补齐且题面与 AGENTS.md 已列为 PR 门禁，归责 student。
+  3) tokens 一项因教师基准未发布而双向缺证，归责 teacher，暂记 0 分并标 unknown。
+  4) 第 5 轮登记的两项环境缺口（真实 MySQL 落库、go test -race）本轮已有第一方真实
+     执行原始输出，缺口状态由「环境缺失」转为「证据为第一方、检查者未能在同环境复跑」，
+     按证据充分度与可复现性分别判定，不再按环境缺失直接判部分完成。
+  5) 上述缺口与检查报告第 10 节门禁表、第 12 节限制项表逐条对应。

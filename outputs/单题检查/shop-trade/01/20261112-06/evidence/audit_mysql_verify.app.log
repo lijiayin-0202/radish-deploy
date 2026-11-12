@@ -1,0 +1,8 @@
+
+2026/11/12 21:51:02 [35md:/Desktop/shop/server/initialize/gorm.go:14
+[0m[31m[error] [0mfailed to initialize database, got error Error 1045 (28000): Access denied for user 'shoptrade'@'localhost' (using password: YES)
+2026/11/12 21:51:02 服务初始化失败：Error 1045 (28000): Access denied for user 'shoptrade'@'localhost' (using password: YES)
+
+2026/11/12 21:54:02 [35md:/Desktop/shop/server/initialize/gorm.go:14
+[0m[31m[error] [0mfailed to initialize database, got error Error 1045 (28000): Access denied for user 'audit_chk'@'localhost' (using password: YES)
+2026/11/12 21:54:02 服务初始化失败：Error 1045 (28000): Access denied for user 'audit_chk'@'localhost' (using password: YES)

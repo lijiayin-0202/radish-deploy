@@ -1,0 +1,2859 @@
+{
+  "schema_version": "3.0",
+  "student": "shop-trade",
+  "question": "01",
+  "revision": "82c4847（dev/01，2026-11-12）",
+  "profile_sha256": "c6a50abdc8a08e07dddfaae7b84e78d59370e963dcae548cf7327a607de87d27",
+  "audit_meta": {
+    "audit_id": "AUDIT-SHOP-TRADE-01-20261112-06",
+    "auditor": "CodeBuddy 检查会话（student-project-audit V3.0）；该会话与本题第 1~6 轮开发会话同源，存在利益相关风险，已在 limitations 与 score.json 的 audit_meta 中显式声明，复评应改由不同检查者执行",
+    "audit_date": "2026-11-12",
+    "environment": "Windows 11 + PowerShell；Go 官方工具链 go1.26.0 windows/amd64；本机 CGO_ENABLED=0、无 gcc/clang、无 MySQL 客户端、无远端仓库；检查者以独立二进制与独立端口 18097 运行服务，与学生脚本完全分离；MySQL 层通过连接同一 WSL 内 MySQL 8.4.11 实例独立复核",
+    "tool_versions": "go test / go vet / gofmt / go build（Go 官方工具链）；Python 3（学生采集脚本与检查者独立探测脚本 audit_probe.py、audit_inventory.py）；student-project-audit V3.0（references/profiles/01.json，rubric_version 3.0）",
+    "rubric_published_at": "仓库内可查的已发布规则为题集随附 .agent/ 六份约束集与根目录 commit-convention.md（其中 04-workflow-git.md 已把会话导出、Skill 记录、skill-usage.md 列为 PR 门禁项，06-workflow-devflow.md 已规定三 Agent 交接链）；V3.0 的 8 类别 58 原子项精确计分表与 23 项必交产物清单未随题集发布，本批次按题面与 .agent/ 约束集推导对应关系",
+    "publication_evidence": "E-14；仓库 .agent/04-workflow-git.md、.agent/06-workflow-devflow.md 与 commit-convention.md",
+    "profile_approved_by": "未找到教师对本题 profile 的核准记录；本批次由检查者按题面、.agent/ 约束集与仓库实际产物逐项核对后使用 references/profiles/01.json",
+    "profile_release_evidence": "E-14",
+    "batch": "20261112-06",
+    "calibration_id": "未校准：本批次为该 profile 在本班的第 6 次 V3.0 评分，前 5 批次可作纵向对照，但无教师核准的同批其它样本可作评分校准",
+    "calibration_evidence": "E-14",
+    "review_policy": "本报告由开发会话内检查者出具，结论以本批次独立探测与独立 MySQL 复核原始输出为依据；学生对任一结论有异议时，可要求由不同检查者按同一固定清单复评，复评须重新执行独立探测，不得直接采信本报告结论",
+    "supplement_deadline": "整改与补证期限由教师按班级统一规定；本报告不单设期限，也不因逾期自动改变结论",
+    "resubmission_policy": "补证后重新提交时须在 dev/01 以追加提交方式提交，不得 amend 或 rebase 改写既有历史；复评以新的提交哈希为对象，并重新执行受影响的门禁",
+    "appeal_channel": "由学生向教师提出申诉，由教师指定与本次不同的检查者复评；复评需附原始命令输出、证据位置与独立探测结果",
+    "mode": "recheck",
+    "previous_report": "outputs/单题检查/shop-trade/01/20261112-05/检查报告.md",
+    "previous_score": "5.93",
+    "change_summary": "第 5 轮后新增 7 次提交（25aa8f1 opt / 9c32eff test / 501136c docs / e142649 docs / 85c4ae6 test / 03c4238 docs / 82c4847 docs），业务代码仅 25aa8f1 的导出方法注释与 go.mod 直接依赖声明两处非功能性改动，无业务判定逻辑变更；本轮检查对象为 HEAD 82c4847。新增证据：evidence/mysql_raw_00_env.txt~mysql_raw_05_app_persistence.txt 与 mysql核查记录.md（真实 MySQL 8.4.11 InnoDB：建库建表、索引与唯一约束清单、数据库重启复查、三类唯一键 1062 冲突、应用进程重启后同一订单仍可查询且状态一致 8/8 断言、真实 InnoDB 行锁下 20 并发成功 3/失败 17 且 available+occupied=5 恒等、重复支付通知后有效收款笔数恒为 1）；evidence/db/order_table_verify_raw.txt 与 ticket_table_verify_raw.txt（事务回滚原子性：事务内 1 行、ROLLBACK 后 0 行）；evidence/race_raw_output.txt 与 race竞态检测说明.md（WSL Ubuntu gcc 15.2.0 + CGO_ENABLED=1 下 go test -race ./... -count=1，6 包 ok、exit=0、无 DATA RACE）；evidence/quality_gate_output.txt 与 coverage-gate.out/coverage-gate-func.txt/coverage-report.md（整体 94.2%、server/service 98.5%、server/api/v1 82.2%）；evidence/api_validation_probe.txt（57 条非法入参探针，0 条 500/0 条 INTERNAL_ERROR/0 条非 JSON）；evidence/ci.yml（48 行可执行工作流，覆盖 gofmt/vet/build/test/race/coverage）；evidence/会话导出说明.md、CI流水线说明.md、门禁自查汇总.md、acceptance-check-rerun.md 四份如实登记缺口与等效证据的说明性文档。检查者本批次的独立取证：120 条独立反例探测（119 PASS/1 环境限制 DIFF）、独立 MySQL 复核（引擎、字符集、唯一约束、1062 冲突、数据库重启后数据留存）、23 项必交产物清点、提交格式校验与 git 实测。",
+    "history_resolution": "第 5 轮报告按 V3.0 固定清单 58 个原子项给出判定分布 pass 32 / partial 10 / fail 15 / unknown 1，当前已核验得分 5.93/10（成果 5.42/7、过程 0.50/1.5、Token 0.00/1.5 unknown），状态待核定；旧报告与旧分数保留不覆盖，本轮不沿用旧成绩。第 5 轮登记的 7 项环境与质量缺口本轮逐项复核：(1) ISS-MYSQL-MISSING（无真实 MySQL 实例）——已闭环，本轮真实 MySQL 8.4.11 实测覆盖建表、重启、唯一键冲突、应用级落库与行锁并发，A3-05 与 A4-04 由 partial 升为 pass/excellent，A2-04 的状态与质量缺口同步闭环；(2) ISS-CONCURRENCY-ENV 与 ISS-CONCURRENCY-DB（无真实 InnoDB 行锁、事务语义仅由替身模拟）——已闭环，真实库并发不超卖与守恒、事务回滚原子性均有原始输出；(3) ISS-INTEGRATION-DEPTH（断言停留在黑盒层）——已闭环，断言下沉到订单行、库存列、payment 有效笔数与回滚行数；(4) ISS-RACE-UNRUN 与 ISS-RACE-DEPTH（race 探针未执行、幂等仅观测 HTTP 返回值）——已闭环，真实 CGO 工具链 race 输出无 DATA RACE，幂等已升级为表级断言；(5) ISS-PERSIST-DOC（缺 MySQL 模式启动与核对入口）——已闭环，mysql核查记录.md 第四节给出可复制命令；(6) ISS-CI-PLACEHOLDER（流水线为纯注释占位）——部分闭环，evidence/ci.yml 已是真实可执行定义，但生效路径仍为占位且从未运行，A4-05 由 fail 升为 partial/poor；(7) ISS-A1-13-CONCURRENCY-ENV（并发环境弱于真实 InnoDB）——收窄保留为 ISS-A1-13-SHIP-RACE，仅退款与发货互斥裁决未在真实行锁下复现。仍维持 fail 的项：缺独立测试会话（A3-07）、缺独立验收会话（B1-04）、五段前置链断裂（B1-02）、缺会话导出与原始提示（B2-03/04/05）、流水线实际执行与部署（A4-05 状态部分、A4-06、A4-07）、缺讲解视频（A4-08、A4-09）、缺班级群凭据（A4-10）、无 MCP 建仓与 PR（B4-01、B4-04、B4-05）。B1-01 因版本链仍无法证明阶段先后维持 unknown。Token 因教师基准未发布维持 unknown 与 0 分，归责 teacher。",
+    "readiness": {
+      "rules_published": true,
+      "profile_approved": false,
+      "calibrated": false,
+      "evidence": [
+        "E-14"
+      ]
+    },
+    "disputed": false,
+    "second_review": {
+      "completed": false,
+      "reviewer": "",
+      "evidence": [],
+      "conclusion": ""
+    }
+  },
+  "artifacts": [
+    {
+      "id": "requirements",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "需求文档 v1.0 结构完整：七类角色、题面八条业务规则、订单状态机、五组演示场景、AC-01~AC-25 验收条件与 A-01~A-25 假设清单齐备，与实现逐条对应。",
+      "location": "题目01-小型电商订单交易发货与售前退款-需求文档.md;docs/dev-assumptions.md",
+      "scenario": "检查者通读三份上游文档并与源码逐条比对：需求规则、状态机取值、错误码语义与实现一致；并核对 X-12 明确「客服工单系统」不在本题范围。",
+      "usage": "该文档是 A1-14 及全部业务规则评分项的直接依据，V1.0 全文 666 行，角色/规则/异常/假设/验收五要素齐备。",
+      "quality_summary": "需求文档完整支撑 A1-14 及 A1 业务规则共 16 项评分，判定 pass/excellent。",
+      "result_impact": "三份上游文档是全部业务规则评分的依据，其完整性与一致性直接决定 A1 类 13 项业务规则与场景判定的基础是否成立。",
+      "fix": "无需整改；后续迭代仅需在假设变更时补记版本与确认人。",
+      "evidence": [
+        "E-01"
+      ]
+    },
+    {
+      "id": "prototype",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "原型设计文档 v1.0 含 3.1 显隐矩阵与状态机，配套 9 个静态视图可实际访问；检查者独立探测 9 页全部 HTTP 200，A8~A12 契约断言全 PASS。",
+      "location": "题目01-…-原型设计文档.md;resource/static/v01-goods.html..v08-late-payment.html;resource/static/index.html",
+      "scenario": "检查者启动本地构建后逐一 GET /static/*.html，全部返回 200；并以源码断言核对接口路径、按钮绑定、失败原因编号、角色一致性与写操作口径。",
+      "usage": "原型不只是截图：9 个视图覆盖买家/运营/仓库/客服四类角色与成功/失败状态，可直接操作并调用真实接口。",
+      "quality_summary": "原型支撑 A1-15 与 A4-03 的可操作交付，判定 pass；未做浏览器端渲染实测已在 A1-15 质量轴单独扣分。",
+      "result_impact": "原型是 A1-15 与 A4-03 的直接交付物；其可操作性与失败状态可见性共同决定这两项的判定上限。",
+      "fix": "补一次浏览器端渲染与交互实测截图，作为 A1-15 质量项的整改依据。",
+      "evidence": [
+        "E-02",
+        "E-12"
+      ]
+    },
+    {
+      "id": "plan",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "任务规划文档 v1.1（285 行）将需求条目映射为 M0/M1 阶段任务，标注依赖关系、完成判定条件，并把五组演示场景绑定到具体任务与测试。",
+      "location": "题目01-…-任务规划文档.md",
+      "scenario": "检查者通读任务表与依赖列，比对仓库实际目录与文件，确认任务与产物一一可指认。",
+      "usage": "规划包含任务编号、依赖、输入输出、完成条件与场景映射五要素，可直接支撑任务级核验。",
+      "quality_summary": "规划支撑 A1-16 判定 pass/excellent，并作为 B1 阶段顺序比对的旁证（不单独构成顺序证据）。",
+      "result_impact": "规划是 A1-16 的直接交付物，同时是 B1 阶段顺序比对的旁证来源。",
+      "fix": "后续迭代在完成条件中补写对应提交哈希，使规划与版本链可自动核对。",
+      "evidence": [
+        "E-03"
+      ]
+    },
+    {
+      "id": "source",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "Go 源码 + 8 个静态视图 + 23 个接口契约构成完整可运行交付；检查者独立执行 go build、启动实例、/health 200 后完成 120 条业务断言。",
+      "location": "server/;main.go;resource/static/;docs/interface-list.md",
+      "scenario": "检查者用独立二进制与独立端口 18097 启动服务后执行全部探测，未复用学生任何测试脚本；并另行核对真实 MySQL 模式下源码的 gormRepository 条件更新与行锁路径。",
+      "usage": "源码覆盖题面八条规则的全部主路径与异常路径，接口契约与实现逐条一致，错误码 M-01~M-30 可追溯；两种仓储后端均已落地。",
+      "quality_summary": "源码支撑 A1 类 13 项与 A2 类 6 项、A4-02/03 判定，是本次计分的最大证据来源。",
+      "result_impact": "源码是 A1 类 13 项、A2 类 6 项与 A4-02、A4-03 的主体证据来源，其业务正确性决定成果分的主体部分。",
+      "fix": "无需整改；建议补充统一 README（另见 A4-01 质量轴）。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-13",
+        "E-15"
+      ]
+    },
+    {
+      "id": "runtime",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "运行交付含 schema.sql 与 evidence/schema.sql（引擎 InnoDB、字符集 utf8mb4、唯一键 uk_payment_dedup_key / uk_order_order_no / uk_goods_goods_no 等）、可控 HTTP 模拟支付渠道服务、运行说明，以及可复现的 MySQL 建库与启动步骤。",
+      "location": "schema.sql;evidence/schema.sql;scripts/mock_channel_service.py;scripts/r4_mock_channel_smoke.py;docs/代码产物补齐说明.md;evidence/mysql核查记录.md",
+      "scenario": "检查者独立读取建表语句摘录 ENGINE/CHARSET/唯一索引，独立拉起模拟渠道服务，并按 evidence/mysql核查记录.md 第四节复现命令核对真实 MySQL 启动与数据核对入口。",
+      "usage": "schema.sql、模拟渠道与运行说明三项齐备，第三方为可控 HTTP 模拟服务；本轮起 MySQL 模式的启动、建库、DDL 与核对步骤有可直接执行的命令。",
+      "quality_summary": "运行交付支撑 A4-01 判定 pass；缺统一入口 README 在 A4-01 质量轴扣分。",
+      "result_impact": "运行交付支撑 A4-01 与 A4-04；缺统一入口只影响 A4-01 的质量轴，不影响其通过判定。",
+      "fix": "补根目录 README.md 汇总环境前置、构建、启动、演示账号、模拟渠道与 MySQL 模式启动步骤。",
+      "evidence": [
+        "E-05",
+        "E-15"
+      ]
+    },
+    {
+      "id": "agent_rules",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "AGENTS.md v1.1 共 7 章 23KB：三角色职责与可改范围、Git 与提交规范、代码与质量约束、业务规则来源与边界、禁止行为、交接材料索引、版本变更记录；AGENTS-v1.0.md 历史版本保留。",
+      "location": "AGENTS.md;AGENTS-v1.0.md",
+      "scenario": "检查者通读全文并核对第 0 章生效证据要求与第 7 章变更记录表，确认覆盖题面共同要求的七阶段与角色范围。",
+      "usage": "约束文件按本题定制（非通用模板），明确三 Agent 会话隔离、可修改范围、提交格式与门禁、禁止项与证据索引。",
+      "quality_summary": "约束内容支撑 B2-01 判定 pass/excellent；实际加载记录的缺失在 B2-02 单独扣分。",
+      "result_impact": "约束文件是 B2-01 的直接交付物；加载记录的缺失由 B2-02 单独承载，不在此重复扣分。",
+      "fix": "新增 evidence/agent-rules-load-log.md，记录每次加载时间、版本、任务编号与提交哈希。",
+      "evidence": [
+        "E-06"
+      ]
+    },
+    {
+      "id": "business_skill",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "自编业务 Skill 三套：gva-model-generate（GVA GORM 模型与 InnoDB DDL）、unit-test-race（覆盖率与 race 门禁）、apipost-case-gen（接口用例生成），各有 SKILL.md、脚本与 references，并留有文件级冒烟输出。",
+      "location": ".codebuddy/skills/gva-model-generate/;.codebuddy/skills/unit-test-race/;.codebuddy/skills/apipost-case-gen/;evidence/smoke/SKILL-gva-model-generate.txt;evidence/smoke/SKILL-unit-test-race.txt;evidence/smoke/SKILL-apipost-case-gen.txt",
+      "scenario": "检查者逐个读取 SKILL.md 与脚本目录，核对输出物是否真实落库（model.go、schema.sql、用例 JSON），并比对冒烟输出；本轮另核对其产出的 schema.sql 已在真实 MySQL 8.4.11 执行成功。",
+      "usage": "三套 Skill 结构完整、脚本可执行、输出物与本题强相关，属真实自编而非改名套用；gva-model-generate 的 DDL 产出已被真实库执行验证。",
+      "quality_summary": "支撑 B3-01 判定 pass；Apipost 未在平台实跑部分在 B3-01 质量轴扣分。",
+      "result_impact": "业务 Skill 是 B3-01 的唯一直接依赖，其端到端验证缺失只影响该项质量轴。",
+      "fix": "在 Apipost 平台真实运行一次用例生成结果并保存导出，作为 B3-01 质量项整改。",
+      "evidence": [
+        "E-07",
+        "E-15"
+      ]
+    },
+    {
+      "id": "acceptance_skill",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "自编验收 Skill acceptance-check 具备完整 SKILL.md（5 步流程 + 必过门禁 + 证据位置要求），本轮新增 evidence/acceptance-check-rerun.md 按 G-01~G-24 逐项给出通过/待补证结论与未运行清单。",
+      "location": ".codebuddy/skills/acceptance-check/SKILL.md;evidence/smoke/SKILL-acceptance-check.txt;evidence/acceptance-check-rerun.md",
+      "scenario": "检查者读取 SKILL.md 全文核对门禁项与题面 PR 门禁表的一致性，并核对重跑记录的门禁项与实际产物是否逐条对应。",
+      "usage": "验收 Skill 依据原题逐项给结论与证据位置，方法论可用；重跑记录自述由开发侧同一会话执行，独立性未兑现。",
+      "quality_summary": "支撑 B3-02 判定 partial（Skill 存在且已实际调用，但未由独立验收会话执行）。",
+      "result_impact": "验收 Skill 是 B3-02 的唯一直接依赖，其独立性缺失是该项由通过降为部分完成的唯一原因。",
+      "fix": "由独立验收会话按该 Skill 实际执行一次并留档验收报告。",
+      "evidence": [
+        "E-07",
+        "E-18"
+      ]
+    },
+    {
+      "id": "skill_usage",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "skill-usage.md 共 10 节 29KB：逐 Skill 的复用位置、原因、输入输出、帮助与局限，第 10.3 节记录 6 条真实失败样例及处理方式，第 10.4 节明确闭环边界。",
+      "location": "skill-usage.md",
+      "scenario": "检查者通读并抽查其中引用的文件路径，核对每条 Skill 记录均能在仓库找到对应产物。",
+      "usage": "记录覆盖全部实际使用的 Skill，明确局限与不冒充边界，未出现虚构调用或夸大产出。",
+      "quality_summary": "支撑 B3-03 判定 pass/excellent。",
+      "result_impact": "Skill 总结是 B3-03 的唯一直接依赖，其完备性支撑该项满分。",
+      "fix": "无需整改。",
+      "evidence": [
+        "E-08"
+      ]
+    },
+    {
+      "id": "prompts",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "student",
+      "reason": "全仓查找 events.jsonl 命中 0；evidence/sessions/ 目录不存在；仓库内无任何原始提示、模型回复、工具结果与附件留档，提示到实现的链路无法追溯。",
+      "location": "（缺失）evidence/sessions/;events.jsonl",
+      "scenario": "检查者以全仓递归检索 events.jsonl，并对 evidence/sessions/ 做存在性核查，均无结果；本轮新增 evidence/会话导出说明.md 自述平台侧无会话录制组件且不以其替代会话导出本体。",
+      "usage": "此项为必交产物且完全缺失，直接导致 B2-03/B2-04/B2-05 三项提示链评分项失败。",
+      "quality_summary": "B2-03、B2-04、B2-05 三项依赖本产物，按缺失强制判 fail。",
+      "result_impact": "提示与事件产物是 B2-03、B2-04、B2-05 三项的共同必要依赖，缺失即三项强制判失败。",
+      "fix": "在具备平台会话导出能力的环境中导出完整会话为 evidence/sessions/*.md 与 events.jsonl（含时间戳、角色、任务号、提交哈希、证据路径）。",
+      "evidence": [
+        "E-14"
+      ]
+    },
+    {
+      "id": "ai_summary",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "evidence/AI使用说明.md 说明 AI 与学生分工、需求假设确认与审核方式；skill-usage.md 第 10.3 节留有 6 条真实纠错；evidence/会话导出说明.md 明确声明会话导出缺失原因、等效证据范围与不冒充边界。",
+      "location": "evidence/AI使用说明.md;skill-usage.md（第 10.3 节）;evidence/会话导出说明.md;evidence/门禁自查汇总.md",
+      "scenario": "检查者抽查第 10.3 节所述 6 条纠错，逐一核对仓库现状确认属实；并核对会话导出说明与门禁自查汇总的缺口陈述与实际文件系统状态一致，未发现以说明文档冒充产物本体。",
+      "usage": "未发现删除失败用例、弱化断言或为通过测试而修改生产代码；纠错过程可被仓库现状反向验证，缺口陈述与事实一致。",
+      "quality_summary": "支撑 B2-06 判定 pass；缺学生本人签审留痕在质量轴扣分。",
+      "result_impact": "AI 分工与审核说明是 B2-06 的唯一直接依赖，其签审留痕缺失只影响该项质量轴。",
+      "fix": "在 AI 使用说明中补学生本人逐项审核签审与日期。",
+      "evidence": [
+        "E-08",
+        "E-18"
+      ]
+    },
+    {
+      "id": "unit_tests",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "server/ 下 12 个 *_test.go，覆盖库存扣减、订单状态迁移、退款幂等与错误分支；evidence/quality_gate_output.txt 为本轮 gofmt/vet/build/test/coverage 的真实输出。",
+      "location": "server/service/r4_edge_test.go;server/service/r5_edge_test.go;server/service/r5_edge2_test.go;evidence/quality_gate_output.txt",
+      "scenario": "检查者独立执行 go test -count=1 ./...（七包全 ok），并单独读取 r4/r5 测试文件确认含真实业务断言与负向边界。",
+      "usage": "测试以注入仓储技术错误的方式覆盖错误分支与条件更新未命中，断言具体到错误码与留痕文案，非空跑。",
+      "quality_summary": "支撑 A3-01 判定 pass/excellent 与 A3-08 的复测链部分。",
+      "result_impact": "单元测试源码与执行输出是 A3-01 与 A3-08 的必要依赖，决定测试质量与复测链判定。",
+      "fix": "无需整改。",
+      "evidence": [
+        "E-09",
+        "E-13"
+      ]
+    },
+    {
+      "id": "coverage",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "覆盖率原件 evidence/coverage-gate.out（6049 行）绑定本轮门禁执行，整体 94.2%、server/service 98.5%、server/api/v1 82.2%；evidence/coverage-gate-func.txt 给出逐函数明细；无自编生产代码排除记录（coverpkg=./...）。",
+      "location": "evidence/coverage-gate.out;evidence/coverage-gate-func.txt;evidence/coverage-report.md;coverage-r5.out;coverage.out;coverage-all.out",
+      "scenario": "检查者独立执行 go test -coverpkg=./... 生成独立 profile 并取 overall=94.2%，按包拆出逐函数覆盖率区间；并核对四份覆盖率原件是否标注对应提交。",
+      "usage": "原始文件、可读报告与最终提交三者对应，覆盖率可被第三方复算；但仓库内并存四份原件且均无版本标注。",
+      "quality_summary": "支撑 A3-02/03/04 三项判定；多份原件未标版本在 A3-04 质量轴扣分。",
+      "result_impact": "覆盖率原件是 A3-02、A3-03、A3-04 三项的共同必要依赖，决定三项达标与均衡性判定。",
+      "fix": "为每份覆盖率原件加注对应提交哈希与生成时间，或只保留最终一份。",
+      "evidence": [
+        "E-09",
+        "E-13"
+      ]
+    },
+    {
+      "id": "integration",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "集成证据共 170 份：38 份接口冒烟、30 条参数级异常、28 条状态级异常、11 份 partial 独立闭环、8 份 A8~A12 增强断言、57 条非法入参探针，以及真实 MySQL 8.4.11 上的应用级持久化与 20 并发验证原始输出；检查者另在独立端口完成 120 条独立断言，119 PASS。",
+      "location": "evidence/smoke/;evidence/manual/;evidence/manual-round2/;evidence/partial-closure/;evidence/html-check/;evidence/api_validation_probe.txt;evidence/mysql_raw_05_app_persistence.txt",
+      "scenario": "检查者不采信学生结论，另起进程与端口用独立脚本复现全部核心路径、越权、幂等、并发守恒与终态保护，逐条留存请求与响应原文；并独立连接同一 MySQL 实例复核引擎、字符集、唯一约束与 1062 冲突。",
+      "usage": "证据密度充分且检查者独立复现高度一致；本轮起断言层级下沉到 SQL 层（订单行、库存列、payment 有效收款笔数、事务回滚行数）。",
+      "quality_summary": "支撑 A3-05/06 与 A1 类业务场景判定；应用级重启复核因学生口令临时文件失效未由检查者执行，单列为限制项。",
+      "result_impact": "集成证据是 A3-05、A3-06 与 A1 场景类判定的必要依赖，证据层级直接决定其质量档位。",
+      "fix": "在真实 MySQL 上补接口与持久化集成用例，并补 race 运行输出。",
+      "evidence": [
+        "E-10",
+        "E-12",
+        "E-13",
+        "E-15",
+        "E-16"
+      ]
+    },
+    {
+      "id": "test_agent",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "student",
+      "reason": "无独立测试 Agent 会话、测试报告与交接记录；仓库内全部测试均由开发会话内的脚本执行，不满足三方会话隔离要求。",
+      "location": "（缺失）evidence/sessions/test-01.md;evidence/test-agent-report.md",
+      "scenario": "检查者核查 evidence/sessions/ 不存在，并通读 evidence/ 全部文件确认无标注为独立测试会话的产物；evidence/acceptance-check-rerun.md 自述由开发侧同一会话执行。",
+      "usage": "此项为必交产物且完全缺失，直接导致 A3-07 失败。",
+      "quality_summary": "A3-07 依赖本产物，按缺失强制判 fail。",
+      "result_impact": "独立测试会话是 A3-07 的唯一必要依赖，缺失即该项强制判失败并进入必做门禁表。",
+      "fix": "新建独立测试 Agent 会话，读取原题与对应版本代码后执行，导出会话与报告。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ]
+    },
+    {
+      "id": "accept_agent",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "student",
+      "reason": "无独立验收 Agent 会话、验收报告与逐项结论；evidence/ 内的检查产物均为开发会话内的自检。",
+      "location": "（缺失）evidence/sessions/accept-01.md;evidence/accept-agent-report.md",
+      "scenario": "检查者核查 evidence/sessions/ 不存在，并核对 outputs/ 目录下各批次报告的产出方均为同一开发会话。",
+      "usage": "此项为必交产物且完全缺失，导致 B1-04 失败并使 A3-08 只能判部分完成。",
+      "quality_summary": "B1-04 依赖本产物，按缺失强制判 fail。",
+      "result_impact": "独立验收会话是 B1-04 的唯一必要依赖，缺失即该项强制判失败并使 A3-08 降为部分完成。",
+      "fix": "新建独立验收 Agent 会话，按题面逐项给通过/不通过与证据位置，导出验收报告。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ]
+    },
+    {
+      "id": "git",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "dev/01 分支共 15 次真实提交，提交说明格式校验 6 条中 5 条 PASS，首条基线 feat 提交不符原附件格式（已按 P-08 登记不改写）；本轮新增 7 次提交全部使用 opt/test/docs 类型且带版本号；工作区干净，无 main 分支、无远端。",
+      "location": "git log --oneline -15;evidence/r5-post-commit-verification.txt;scripts/check_commit_message.py",
+      "scenario": "检查者独立执行 git branch -a / git remote -v / git log / git status 与提交格式校验脚本，逐条比对结果。",
+      "usage": "提交历史真实、可追溯、类型分离清晰，证据与提交版本对应关系明确。",
+      "quality_summary": "支撑 B4-02/03 判定；无远端与 PR 使 B4-01/04/05 判 fail。",
+      "result_impact": "Git 证据是 B4 五项的共同必要依赖；无远端与 PR 使 B4-01、B4-04、B4-05 判失败。",
+      "fix": "按题面经 GitHub MCP 建仓并关联远端，补 PR、状态检查与工作项编号核验。",
+      "evidence": [
+        "E-11",
+        "E-13"
+      ]
+    },
+    {
+      "id": "pipeline",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "evidence/ci.yml 为真实可执行工作流定义（48 行，含 on: push/pull_request 与 jobs.quality-gate，7 个步骤覆盖 gofmt、go vet、go build、go test、CGO_ENABLED=1 go test -race、覆盖率统计与产物上传）；但生效路径 .github/workflows/ci.yml 仍为纯注释模板（非注释非空行 0），且仓库无远端、无任何流水线运行记录，配置中也未定义部署与上线冒烟门禁作业。",
+      "location": "evidence/ci.yml;.github/workflows/ci.yml;evidence/CI流水线说明.md",
+      "scenario": "检查者逐行统计两个文件的有效行与 on/jobs 键，并核对 git remote -v 与全仓 run 记录；确认 evidence/ci.yml 内容为可执行 YAML 而非占位。",
+      "usage": "配置本身是真实可交付物，不再是空壳；但未落到生效路径、从未运行，门禁覆盖止于构建与测试，缺部署门禁。",
+      "quality_summary": "支撑 A4-05 判部分完成：配置部分已交付，实际执行与部署门禁部分缺失。",
+      "result_impact": "流水线产物是 A4-05 的唯一必要依赖：配置已真实可执行使该项由失败升为部分完成，但生效与运行仍缺失。",
+      "fix": "把 evidence/ci.yml 复制到 .github/workflows/ci.yml，补充覆盖率 ≥85% 阈值判定与部署冒烟作业，关联远端后由真实 PR 触发并保存 run 记录与日志。",
+      "evidence": [
+        "E-13",
+        "E-14",
+        "E-18"
+      ]
+    },
+    {
+      "id": "deployment",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "student",
+      "reason": "无远端、无 main 分支、无制品登记、无上线地址、无健康与业务冒烟记录、无回退说明；全部运行证据来自本地 demo-memory 实例与本地 MySQL 实例。",
+      "location": "（缺失）docs/部署与冒烟说明.md;evidence/deployment-smoke.txt",
+      "scenario": "检查者核对 git branch -a（仅本地 dev/01）、git remote -v（空），并全仓检索部署地址、制品与冒烟产物，均无结果。",
+      "usage": "此项为必交产物且完全缺失，导致 A4-06 与 A4-07 判 fail。",
+      "quality_summary": "A4-06、A4-07 两项依赖本产物，按缺失强制判 fail。",
+      "result_impact": "部署产物是 A4-06 与 A4-07 的共同必要依赖，缺失即两项强制判失败。",
+      "fix": "建仓后走 PR 合并到 main，触发部署流水线，保存上线地址、版本、冒烟结果与可执行回退步骤。",
+      "evidence": [
+        "E-14"
+      ]
+    },
+    {
+      "id": "video",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "student",
+      "reason": "全仓无任何视频文件（mp4/mov/avi/mkv/webm/flv 均 0 命中），无讲解稿或时间目录，无法核验学生讲解与五组场景的真实演示。",
+      "location": "（缺失）evidence/讲解视频.mp4;evidence/视频时间目录.md",
+      "scenario": "检查者按扩展名全仓递归检索视频文件，命中数为 0。",
+      "usage": "此项为必交产物且完全缺失，导致 A4-08 与 A4-09 判 fail。",
+      "quality_summary": "A4-08、A4-09 两项依赖本产物，按缺失强制判 fail。",
+      "result_impact": "讲解视频是 A4-08 与 A4-09 的共同必要依赖，缺失即两项强制判失败。",
+      "fix": "录制覆盖业务、流程、约束、Skill 与质量证据的讲解视频，真实演示五组场景及异常结果并给出时间目录。",
+      "evidence": [
+        "E-14"
+      ]
+    },
+    {
+      "id": "group",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "student",
+      "reason": "无当日班级群提交凭据（截图、群消息记录或提交索引），无法定位提交日期与版本。",
+      "location": "（缺失）evidence/班级群提交凭据.md",
+      "scenario": "检查者全仓检索群提交相关文档与图片资源，未发现任何提交凭据文件。",
+      "usage": "此项为必交产物且完全缺失，导致 A4-10 判 fail。",
+      "quality_summary": "A4-10 依赖本产物，按缺失强制判 fail。",
+      "result_impact": "群交凭据是 A4-10 的唯一必要依赖，缺失即该项强制判失败。",
+      "fix": "提交当日群消息截图与链接索引，注明提交日期、仓库链接与视频链接。",
+      "evidence": [
+        "E-14"
+      ]
+    },
+    {
+      "id": "tokens",
+      "presence": "missing",
+      "validity": "empty",
+      "owner": "teacher",
+      "reason": "教师未发布 Token 基准（profile token_baselines 为空），学生亦未提交任何阶段原始 Token 用量或去重台账，两侧证据皆缺。",
+      "location": "（缺失）evidence/Token用量台账.md;outputs/原始usage.json",
+      "scenario": "检查者读取 profile 01.json 确认 token_baselines=[]，并全仓检索 Token 台账与 usage 原件，均无结果。",
+      "usage": "基准与台账双缺，无法计算可比 Token 消耗。",
+      "quality_summary": "Token 一项按待核定处理（暂 0 分，最终待核定），不计为学生代码或成果失败。",
+      "result_impact": "Token 一项暂记 0 分并标为待核定，不影响成果分与过程分的判读。",
+      "fix": "教师发布本题 Token 基准后，由学生补交分阶段原始 usage 与去重台账，再据实计分。",
+      "evidence": [
+        "E-14"
+      ]
+    },
+    {
+      "id": "checkpoints",
+      "presence": "present",
+      "validity": "valid",
+      "owner": "student",
+      "reason": "阶段留证含 evidence/第五轮证据清单.md、第四轮证据清单.md、evidence/门禁自查汇总.md、evidence/acceptance-check-rerun.md 与 .agent/06-workflow-devflow.md、docs/git-提交指引.md，可定位到提交哈希；不存在独立的七阶段交接检查点目录与冻结快照。",
+      "location": "evidence/第五轮证据清单.md;evidence/第四轮证据清单.md;evidence/门禁自查汇总.md;evidence/acceptance-check-rerun.md;.agent/06-workflow-devflow.md;docs/git-提交指引.md",
+      "scenario": "检查者核查 git log 15 次提交与四份留证文件，确认阶段产物版本可追溯，但未见按七阶段冻结的交接检查点文件。",
+      "usage": "产物版本可追溯，原始事件与交接检查点缺失。",
+      "quality_summary": "支撑 B1-01（判 unknown）、B1-02（判 fail）、B1-03（判 partial）三项差异化判定。",
+      "result_impact": "阶段留证支撑 B1-01、B1-02、B1-03 三项差异化判定；其缺失维度决定顺序类评分的上限。",
+      "fix": "建立 evidence/checkpoints/，每阶段冻结产物哈希、时间、交接双方与会话导出位置。",
+      "evidence": [
+        "E-10",
+        "E-11",
+        "E-14",
+        "E-18"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "01-A1-01",
+      "category": "A1",
+      "title": "买家只能购买在售且数量足够的商品。订单保存下单时的商品与价格，后续上下架和价格调整不改变已有订单金额；创建订单后的可售数量须能反映已占用数量。",
+      "source": "assignment.md:209",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立复现：运营调价 10000→12000 后，原订单 unit_price 仍为 10000、新订单为 12000；下单 quantity=2 后商品可售=3、占用=2；运营越权下单返回 M-20。规则与实现完全一致。",
+      "fix": "无需整改。",
+      "quality_basis": "正反两侧均有断言：金额快照隔离（M-12）与可售/占用双向反映，且含越权负向；结论由检查者独立二进制实测得出。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-02",
+      "category": "A1",
+      "title": "待付款订单保留 10 分钟。买家主动取消或超时关闭后释放占用，重复关闭不多释放；超时判断采用服务端时间。",
+      "source": "assignment.md:210",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者在独立进程单独验证：下单 quantity=2 → 演示时钟推进 11 分钟 → close-expired 返回 closed_count=1 → 可售回到 5、占用归零；再次关单占用不再变化；时钟 offset 越界返回 PARAM_ERROR。服务端时间判定成立。",
+      "fix": "无需整改。",
+      "quality_basis": "关闭次数、释放数量、重复关闭与时钟越界四个维度均有独立断言，避免了多订单并发关闭造成的释放量混淆。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-03",
+      "category": "A1",
+      "title": "有效支付通知须通过鉴权、匹配订单及金额。重复通知不能重复记款；同一渠道交易号不得归属于两个订单。金额不符、未知订单、验签失败须能查询处理结果。",
+      "source": "assignment.md:211",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：金额不符→M-29、验签失败→M-28、未知订单→M-30；同一 channel_trade_no 重复通知返回 0 且留痕「重复支付通知已幂等处理，未重复记款」；同一交易号归属另一订单→M-27。鉴权、匹配、金额、幂等、唯一性五项全覆盖。",
+      "fix": "无需整改。",
+      "quality_basis": "四类错误分支与两类重复语义均被独立触发，幂等以留痕字段而非返回值断言，证据精确。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-15"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-04",
+      "category": "A1",
+      "title": "服务端在订单有效期内收到并校验通过的付款通知可使订单进入待发货；超时关闭后收到成功支付通知，不能恢复订单或重新占用库存，应进入异常支付待处理列表，由客服核实后发起退款。",
+      "source": "assignment.md:212",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：有效期内支付→待发货；超时关闭后支付→M-09，订单状态不变、占用不变；客服核实→发起退款→渠道成功→订单仍为已关闭终态，且库存未被二次恢复（M-26）。",
+      "fix": "无需整改。",
+      "quality_basis": "迟到支付的四个禁止项（不改状态、不重占库存、不二次释放、可核实可退款）逐一断言，证据完整。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-05",
+      "category": "A1",
+      "title": "买家对已付款但未发货订单可申请整单退款，申请期间暂停发货。客服可同意或拒绝并写明原因；拒绝后允许继续发货。退款与发货同时发生时，只能形成一种合法业务结果。",
+      "source": "assignment.md:213",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测全链：申请整单退款成功 → 期间发货被拒 M-22 → 客服拒绝并写明原因（退款状态留痕「已拒绝」）→ 订单恢复「待发货」→ 允许继续发货成功 → 终态「已发货」。",
+      "fix": "无需整改。",
+      "quality_basis": "同意与拒绝两条分支均覆盖，拒绝后恢复发货的路径被单独实测，补齐了学生证据中的空白。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-06",
+      "category": "A1",
+      "title": "退款经模拟渠道确认成功后，买家能看到退款结果，正常售前退款恢复相应可售数量；渠道明确失败时保留待处理记录，由客服重试。迟到支付对应的退款不得再次恢复此前已释放的数量。",
+      "source": "assignment.md:214",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：渠道明确失败→M-08 且订单停在「退款处理中」→ 客服登记重试→渠道再次成功→「已退款」且 stock_restored=true；逐单核查 expected_restore_times=1、actual_restore_times=1、consistent=true；重复退款通知后恢复次数仍为 1。",
+      "fix": "无需整改。",
+      "quality_basis": "失败留痕、重试、恢复次数守恒与重复通知幂等四类要点均有独立断言，数量一致性用核查接口交叉验证。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-07",
+      "category": "A1",
+      "title": "仓库只能为合法待发货订单登记一次发货。已发货订单不受理本题售前退款；本题不实现签收、退货及售后物流。",
+      "source": "assignment.md:215",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：登记发货成功；重复发货→M-19；空承运方→M-23；已发货订单申请售前退款→M-11。源码中不存在签收、退货与售后物流实现，符合本题边界。",
+      "fix": "无需整改。",
+      "quality_basis": "发货唯一性、参数校验与已发货不受理退款三处均有断言，边界（不实现签收/退货）经源码核查确认。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-08",
+      "category": "A1",
+      "title": "运营可按订单查询收款、退款、发货和异常处理记录，并查看商品可售数量、已收款及已退款汇总。异常记录不能通过直接修改订单状态消失。",
+      "source": "assignment.md:216",
+      "kind": "business_rule",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：运营角色可查 /api/v1/ops/summary 并可按订单查询收款、退款、发货与异常记录；买家访问同一接口→M-20。源码无任何改写订单状态或删除业务记录的入口，异常记录只能追加。",
+      "fix": "无需整改。",
+      "quality_basis": "汇总可查与越权被拒两侧断言齐备，异常只追加通过源码入口核查与留痕机制实现双向确认。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-09",
+      "category": "A1",
+      "title": "活动正常成交：运营上架 → 买家购买付款 → 仓库发货 → 买家查询运单 → 运营核查收款与库存。",
+      "source": "assignment.md:220",
+      "kind": "scenario",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立走通场景 S1：运营调价 → 买家下单付款 → 仓库登记发货 → 买家查询运单 → 运营核查收款与库存，每步响应均核对状态与金额。",
+      "fix": "无需整改。",
+      "quality_basis": "五个环节连续实测且顺序与题面一致，跨角色调用真实贯通。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-10",
+      "category": "A1",
+      "title": "缺货与弃单：20 个并发下单请求争抢有限数量 → 部分订单未付款关闭 → 其他买家购买释放的商品。",
+      "source": "assignment.md:221",
+      "kind": "scenario",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.16",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测 20 并发下单：成功 5 + M-02 15 = 20，可售=0、占用=5 守恒；另在独立进程验证关闭后可售回到 5，释放后另一买家可再次下单成功。争抢、弃单释放、他人接手三段闭环。",
+      "fix": "无需整改。",
+      "quality_basis": "并发守恒与释放后可再下单分进程验证，避免了前序占用污染计数，证据可复算；本轮起同一断言另有真实 InnoDB 行锁下的实测佐证（成功 3、失败 17、available+occupied=5）。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-15"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-11",
+      "category": "A1",
+      "title": "售前退款：买家付款后申请 → 仓库尝试发货受限 → 客服批准 → 首次退款失败、再次成功 → 订单与数量恢复一致。",
+      "source": "assignment.md:222",
+      "kind": "scenario",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.15",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：付款后申请退款 → 发货被拒 M-22 → 客服同意 → 渠道首次失败 M-08 → 登记重试 → 渠道再次成功 → 订单「已退款」且可售恢复、逐单核查一致。",
+      "fix": "无需整改。",
+      "quality_basis": "题面要求的失败—重试—成功三段与最终数量恢复全部被独立触发，与 S5 互斥裁决互相印证。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-12",
+      "category": "A1",
+      "title": "迟到支付：订单先关闭 → 支付成功通知到达 → 客服从异常列表发现 → 发起退款 → 运营确认无重复释放和重复退款。",
+      "source": "assignment.md:223",
+      "kind": "scenario",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.15",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：订单关闭 → 支付成功通知到达返回 M-09 → 异常事件带 event_id → 客服核实 → 发起迟到支付退款 → 渠道回调成功 → 订单仍为「已关闭」终态且库存占用未二次恢复。",
+      "fix": "无需整改。",
+      "quality_basis": "关闭、异常发现、核实、发起退款、渠道成功、终态与数量守恒七段连续实测。",
+      "evidence": [
+        "E-04",
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-13",
+      "category": "A1",
+      "title": "操作竞争：退款申请与发货并发、重复支付和退款通知、越权查看或处理他人订单，均须有明确结果。",
+      "source": "assignment.md:224",
+      "kind": "scenario",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.15",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "检查者独立实测场景 S5：退款申请与发货并发 3 轮，结果恒为 refund=0 且 ship=M-22（订单落在「退款审核中」），只形成一种合法结果；重复支付与退款通知幂等；越权查单、取消、审核、调价、核查、汇总均被 M-20 拒绝。本轮学生补充了真实 InnoDB 下的 20 并发下单与表级幂等（有效收款笔数恒为 1）证据，但退款与发货互斥裁决的并发断言仍只在 demo-memory 进程内互斥锁下成立。",
+      "fix": "在真实 MySQL 模式下以同一订单发起「申请退款」与「登记发货」的并发断言，保存表级快照，使互斥裁决结论不再只依赖内存互斥锁。",
+      "quality_basis": "并发裁决结果明确且可重复，幂等已升级为表级断言；但退款/发货互斥这一核心竞争分支未在真实 InnoDB 行锁下复现，质量降一档。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-15"
+      ],
+      "issue_ids": [
+        "ISS-A1-13-SHIP-RACE"
+      ]
+    },
+    {
+      "id": "01-A1-14",
+      "category": "A1",
+      "title": "需求准确覆盖本题全部角色、起点、规则、异常、假设和验收条件",
+      "source": "assignment.md:185",
+      "kind": "analysis",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "requirements"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.15",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "需求文档 v1.0 共 666 行，含七类角色、题面八条业务规则逐条展开、订单状态机、五组演示场景、AC-01~AC-25 验收条件与 A-01~A-25 假设清单；检查者逐条比对源码后确认与实现一致。",
+      "fix": "无需整改。",
+      "quality_basis": "角色、起点、规则、异常、假设与验收六要素齐备且与实现可对照，非空泛描述。",
+      "evidence": [
+        "E-01"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A1-15",
+      "category": "A1",
+      "title": "原型可操作，覆盖本题角色、关键结果及失败状态",
+      "source": "assignment.md:185",
+      "kind": "prototype",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "prototype"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.15",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "原型设计文档含 3.1 显隐矩阵与状态机；配套 9 个视图（V01~V-08 + index）覆盖买家/运营/仓库/客服与成功/失败状态，检查者实测 9 页全部 HTTP 200，A8~A12 契约断言全 PASS。",
+      "fix": "补一次浏览器端渲染与交互实测（含失败态提示），留存截图。",
+      "quality_basis": "可操作性与契约一致性达标，但为静态 HTML + 公共 app.js 组合，缺浏览器端渲染与真实交互的实测证据。",
+      "evidence": [
+        "E-02",
+        "E-12"
+      ],
+      "issue_ids": [
+        "ISS-PROTO-BROWSER"
+      ]
+    },
+    {
+      "id": "01-A1-16",
+      "category": "A1",
+      "title": "计划映射需求、任务依赖、测试验收和完成条件",
+      "source": "assignment.md:29",
+      "kind": "plan",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "plan"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.15",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "任务规划文档 v1.1 共 285 行，将需求条目映射为 M0/M1 阶段任务，逐条标注依赖关系、输入输出、完成判定条件，并把五组演示场景绑定到具体任务与验证方式。",
+      "fix": "无需整改。",
+      "quality_basis": "需求、依赖、测试验收与完成条件四要素齐备，任务与仓库实际产物一一可指认。",
+      "evidence": [
+        "E-03"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A2-01",
+      "category": "A2",
+      "title": "服务端可信身份、角色和对象归属，拒绝越权",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.30",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：5 个预置账号身份解析正确（买家/运营/仓库/客服/模拟渠道），未知身份→PARAM_ERROR，伪造 X-Role、X-User-Id 请求头一律被忽略；买家越权查单、取消、审核、调价、库存核查、运营汇总全部返回 M-20。本轮 57 条非法入参巡检亦未出现越权放行。",
+      "fix": "无需整改。",
+      "quality_basis": "身份真实性（服务端映射而非信任请求头）与对象归属两侧均有负向断言，越权入口覆盖全部写接口。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-10"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A2-02",
+      "category": "A2",
+      "title": "状态迁移、终态和非法输入处理正确",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.30",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "检查者独立实测状态机：待支付→待发货→退款审核中→退款处理中→已退款、待发货→已发货、待支付→已取消/已关闭；终态保护生效（已发货不受理退款 M-11、已取消/已退款再申请被拒、重复取消 M-10、重复发货 M-19）；源码对条件更新 rows!=1 有专门保护并有单测覆盖。本轮 57 条非法入参巡检实际只触发 M-03、M-04、M-14、M-20、M-23、M-30 六个业务错误码。",
+      "fix": "补一组表驱动用例，对 M-01~M-30 每个码构造至少一条触发路径并断言返回码。",
+      "quality_basis": "状态迁移与终态保护实测充分且负向分支覆盖到位；但非法输入到错误码的映射仍未逐条穷举，30 个错误码中仅 6 个被巡检触发，质量降一档。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-10"
+      ],
+      "issue_ids": [
+        "ISS-ERRCODE-ENUM"
+      ]
+    },
+    {
+      "id": "01-A2-03",
+      "category": "A2",
+      "title": "金额数量精度、边界及资源守恒符合本题",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.30",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立实测：quantity=2 下单 total_amount=20000（单价 10000×2，金额全程整数分无浮点）；调价后新单单价 12000 且旧单保持 10000；并发后商品可售 0 + 占用 5 == 初始可售 5，资源守恒成立。真实 MySQL 侧金额列均为 BIGINT，无 FLOAT/DOUBLE/DECIMAL。",
+      "fix": "无需整改。",
+      "quality_basis": "金额精度、快照隔离与资源守恒三个维度同时以正反断言覆盖，守恒用并发后快照交叉验证；真实库列类型亦经 information_schema 核对。",
+      "evidence": [
+        "E-04",
+        "E-12",
+        "E-15"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A2-04",
+      "category": "A2",
+      "title": "事务、幂等、并发和失败恢复符合本题",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.30",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "事务、幂等与并发语义本轮获真实环境证实：检查者独立连接同一 MySQL 8.4.11 实例，复核三张业务表均为 InnoDB+utf8mb4，uk_order_order_no / uk_goods_goods_no / uk_payment_dedup_key / uk_payment_channel_effective 四类唯一约束存在且重复插入实测报 1062；学生侧输出给出条件更新+行锁下 20 并发下单成功 3、失败 17（M-02）、available+occupied=5 恒等，以及事务内可见 1 行、ROLLBACK 后 0 行的原子性验证；幂等在表层表现为重复支付通知后有效收款笔数恒为 1。",
+      "fix": "无需整改。",
+      "quality_basis": "唯一约束、1062 冲突、行锁守恒、事务回滚与幂等五类语义均有数据库级证据，且数据库层由检查者独立复核、并发层由同一实例的原始输出佐证。",
+      "evidence": [
+        "E-04",
+        "E-13",
+        "E-15",
+        "E-16"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A2-05",
+      "category": "A2",
+      "title": "Go格式与vet通过，错误处理、资源释放可维护",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.30",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立执行：gofmt -l . 无输出（全部已格式化）、go vet ./... 通过（exit=0）、go build 成功；错误处理统一为 BizError（Code+Message），事务失败回滚并关闭响应体资源。",
+      "fix": "无需整改。",
+      "quality_basis": "格式与静态检查由检查者独立复跑而非采信学生输出；错误处理风格统一且有单测覆盖错误分支。",
+      "evidence": [
+        "E-13"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A2-06",
+      "category": "A2",
+      "title": "参数化数据访问、敏感信息保护，无危险输入拼接",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.30",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者核查：全部数据库访问经 GORM 参数化查询，无字符串拼接 SQL；仓库内无密钥、令牌、口令与个人敏感信息；角色常量集中定义于 server/service/types.go；本轮 MySQL 应用账号口令随机生成且仅存 WSL /tmp（600），未写入仓库、日志与文档。",
+      "fix": "无需整改。",
+      "quality_basis": "参数化访问与敏感信息两项均经源码全量核查确认，且新增的数据库账号口令处置符合脱敏要求，无危险输入拼接路径。",
+      "evidence": [
+        "E-04",
+        "E-15"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A3-01",
+      "category": "A3",
+      "title": "单元测试有真实业务断言及负向边界",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "unit_tests"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.18",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立执行 go test -count=1 ./... 七包全 ok；读取 server/service 下 12 个 *_test.go，确认以注入仓储技术错误的方式覆盖库存扣减失败、订单状态迁移、退款幂等与各类错误分支，断言具体到错误码与留痕文案，非空跑。",
+      "fix": "无需整改。",
+      "quality_basis": "负向边界不是靠调参构造，而是靠可注入的技术故障点触发，断言粒度到错误码与留痕字段。",
+      "evidence": [
+        "E-09",
+        "E-13"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A3-02",
+      "category": "A3",
+      "title": "全部自编生产代码整体单元语句覆盖率≥85%",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "coverage"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.18",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立执行 go test -coverpkg=./... -coverprofile=<独立文件> ./... 并取 overall=94.2%，≥85% 达标；使用全量 coverpkg，未排除任何自编生产代码。",
+      "fix": "无需整改。",
+      "quality_basis": "覆盖率由检查者用独立 profile 复算得出，且明确未排除自编代码，可被第三方原样复现。",
+      "evidence": [
+        "E-09",
+        "E-13"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A3-03",
+      "category": "A3",
+      "title": "各核心业务包单元语句覆盖率分别≥85%",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "coverage"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.18",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "核心业务包 server/service 包级语句覆盖率实测 98.5%（学生输出与检查者独立复跑一致），≥85% 达标；但按包拆解时 server/api/v1 逐函数覆盖率最低仅 57.1%，接入层覆盖不均，学生自测亦承认 api/v1 为 82.2%。",
+      "fix": "为 server/api/v1 的未覆盖处理器补负向用例（越权、参数缺失、未知订单），把接入层逐函数覆盖也拉到 85% 以上。",
+      "quality_basis": "核心业务包达标可判定通过；接入层 api/v1 的逐函数覆盖明显偏低，使覆盖均衡性不足，质量降一档。",
+      "evidence": [
+        "E-09",
+        "E-13"
+      ],
+      "issue_ids": [
+        "ISS-API-COVERAGE"
+      ]
+    },
+    {
+      "id": "01-A3-04",
+      "category": "A3",
+      "title": "覆盖范围完整，排除项有事前依据，报告绑定最终版本",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "coverage"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.18",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "覆盖率原始文件 evidence/coverage-gate.out 存在且与本轮门禁执行对应，报告可读且可复算；全量 coverpkg 表明无自编生产代码被排除，排除项为零。但仓库内 coverage.out、coverage-all.out、coverage-r5.out 与 evidence/coverage-gate.out 四份原件并存，文件内均未标注对应提交哈希与生成时间。",
+      "fix": "为每份覆盖率原件加注对应提交哈希与生成时间，或只保留最终一份并归档历史到 docs。",
+      "quality_basis": "报告与最终版本的绑定关系成立，排除项有据；四份并存且无版本标注会造成取用混淆，质量降一档。",
+      "evidence": [
+        "E-09",
+        "E-11"
+      ],
+      "issue_ids": [
+        "ISS-COV-MULTI"
+      ]
+    },
+    {
+      "id": "01-A3-05",
+      "category": "A3",
+      "title": "接口和持久化验证真实执行",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "integration"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.17",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "接口验证真实执行：学生 38 份冒烟 + 58 条手工异常记录 + 57 条非法入参探针（0 条 500、0 条 INTERNAL_ERROR、0 条非 JSON），检查者另做 120 条独立断言（119 PASS）。持久化验证本轮在真实 MySQL 8.4.11 上完成：应用以 mysql-innodb 模式启动，下单→支付→落库行与库存列核对→终止进程→重启→同一订单仍可查询且状态一致（学生侧 8/8 断言 PASS），检查者另行独立复核该实例的引擎、字符集、唯一约束与 1062 冲突。断言层级已下沉到 SQL 层。",
+      "fix": "无需整改。",
+      "quality_basis": "接口层与数据库层均真实执行且互为印证，唯一键冲突与重启可查不再是文件级推断，验证深度达标。",
+      "evidence": [
+        "E-10",
+        "E-12",
+        "E-13",
+        "E-15",
+        "E-16"
+      ],
+      "issue_ids": [
+        "ISS-TICKET-SCOPE",
+        "ISS-DB-SCREENSHOT-UNTRACKED"
+      ]
+    },
+    {
+      "id": "01-A3-06",
+      "category": "A3",
+      "title": "适用并发/竞争检测及重复操作有可重复验证",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "integration"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.17",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "适用并发与重复操作具备可重复验证：检查者独立重跑 20 并发下单，恒为成功 5 + M-02 15、库存守恒；学生补充真实 InnoDB 下 20 并发成功 3、失败 17、available+occupied=5 恒等不超卖；重复支付/退款通知幂等已升级为表级断言（有效收款笔数恒为 1）。竞态探针方面，学生在 WSL Ubuntu 的真实 gcc 15.2.0 + CGO_ENABLED=1 工具链下执行 go test -race ./... -count=1，6 个测试包全部 ok、exit=0、输出无 WARNING: DATA RACE。但检查者本机 CGO_ENABLED=0 且无 gcc/clang，无法在同环境复跑该探针，竞态结论仍为第一方产出。",
+      "fix": "在可复用的 CI 环境（evidence/ci.yml 的竞态步骤）触发一次真实流水线并留存 race 原始输出，使竞态结论可由第三方复核。",
+      "quality_basis": "并发守恒与重复操作已有数据库级证据且竞态探针有真实工具链输出；但探针为第一方产出、检查者未能在同环境复跑，质量降一档。",
+      "evidence": [
+        "E-09",
+        "E-12",
+        "E-13",
+        "E-15",
+        "E-17"
+      ],
+      "issue_ids": [
+        "ISS-RACE-FIRSTPARTY"
+      ]
+    },
+    {
+      "id": "01-A3-07",
+      "category": "A3",
+      "title": "测试Agent使用独立上下文、读取原题及对应代码",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "test_agent"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.17",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "无独立测试 Agent 会话、测试报告与交接记录。仓库内全部测试（12 个 _test.go、170 份集成证据、5 个采集脚本）均由开发会话内的 AI 执行，不满足 AGENTS.md 1.1 三方会话隔离与「测试 Agent 必须读取原始题面与对应版本代码」的要求；evidence/acceptance-check-rerun.md 亦自述为开发侧同一会话执行。",
+      "fix": "新建独立测试 Agent 会话，读取原始题面与对应版本代码后独立执行 TST-01~08 与 TST-S1~S5，导出会话与报告到 evidence/sessions/。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-TEST-AGENT"
+      ]
+    },
+    {
+      "id": "01-A3-08",
+      "category": "A3",
+      "title": "缺陷有修复复测，验收后变更有受影响回归",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "unit_tests"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.17",
+      "status": "partial",
+      "quality": "good",
+      "owner": "student",
+      "reason": "缺陷修复与复测链真实存在：第 1~6 轮检查结论逐条整改，本轮新增 evidence/acceptance-check-rerun.md 对 G-01~G-24 逐项给结论并区分代码缺陷/环境缺失/过程证据缺失，三类问题分类与实际产物状态一致，检查者独立复跑七包全 ok。但验收后变更的受影响回归缺失——无独立验收会话，也就没有验收结论触发的回归范围。",
+      "fix": "建立独立验收会话；对验收提出的每条问题执行受影响范围回归并留档，将回归命令与输出绑定到对应提交。",
+      "quality_basis": "开发期缺陷的修复—复测闭环可追溯且可复算；验收后回归因无独立验收而完全缺失，故判部分完成。",
+      "evidence": [
+        "E-09",
+        "E-10",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-INDEP-ACCEPT",
+        "ISS-RETEST-ISOLATION"
+      ]
+    },
+    {
+      "id": "01-A4-01",
+      "category": "A4",
+      "title": "说明与初始化可在指定干净环境复现",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "runtime"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "检查者按 docs/interface-list.md 第 4 节、docs/代码产物补齐说明.md 与 evidence/mysql核查记录.md 从干净构建到启动成功，/health 返回 200，schema.sql 提供建表与演示数据，MySQL 模式给出可复制的建库、DDL 执行、账号准备与数据核对命令。",
+      "fix": "补一份根目录 README.md，汇总环境前置、构建、启动、演示账号、模拟渠道启动、MySQL 模式与五组场景操作步骤。",
+      "quality_basis": "按现有分散文档确可复现，本轮 MySQL 模式缺口已闭合；但运行说明仍分散在四个文档且无统一入口，第三方按单点执行易漏步骤，质量降一档。",
+      "evidence": [
+        "E-05",
+        "E-12",
+        "E-15"
+      ],
+      "issue_ids": [
+        "ISS-RUN-DOC-SCATTER"
+      ]
+    },
+    {
+      "id": "01-A4-02",
+      "category": "A4",
+      "title": "源码可构建并实际启动",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者独立执行 go build -o <独立路径> . 成功（exit=0），以独立端口 18097 拉起实例并 GET /health 返回 200，随后完成 120 条业务断言；另核对真实 MySQL 模式下同一二进制可启动并读写业务表。源码可构建并实际启动。",
+      "fix": "无需整改。",
+      "quality_basis": "构建与启动由检查者在独立二进制与独立端口上完成，未复用学生进程或脚本，证据为第一手。",
+      "evidence": [
+        "E-12",
+        "E-13",
+        "E-15"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A4-03",
+      "category": "A4",
+      "title": "完整正常和异常业务可在服务上操作",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "source"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "检查者在运行中的服务上完成 120 条独立断言（119 PASS，唯一 1 条 DIFF 为 demo-memory 无持久化的环境限制）：下单支付取消发货退款全链、越权、幂等、并发守恒、迟到支付、渠道超时通知、库存核查与 9 个页面访问均可操作。",
+      "fix": "无需整改。",
+      "quality_basis": "正常与异常业务均可在服务上真实操作，且断言由检查者独立发起而非引用学生用例。",
+      "evidence": [
+        "E-12"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A4-04",
+      "category": "A4",
+      "title": "核心数据落库且重启可查询",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "runtime"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "核心数据落库且重启可查询本轮获真实实例证实：检查者独立在 MySQL 8.4.11 上执行 service mysql restart 后 mysqld alive、三表索引与唯一约束不变、数据留存（goods_rows=2 / order_rows=1 / payment_rows=4）；学生侧进一步给出应用级复核——mysql-innodb 模式启动、下单支付落库、终止进程后重启、同一订单仍可查询且状态一致，断言 8/8 PASS，商品可售 3、占用 2 跨重启保持。",
+      "fix": "无需整改。",
+      "quality_basis": "数据库层重启复查由检查者独立执行，应用层重启可查由第一方原始输出补充，两者共同构成完整持久化证据链。",
+      "evidence": [
+        "E-05",
+        "E-13",
+        "E-15"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-A4-05",
+      "category": "A4",
+      "title": "实际流水线执行质量、覆盖率、构建和部署门禁",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "pipeline"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "pass",
+      "quality": "poor",
+      "owner": "student",
+      "reason": "流水线部分交付：evidence/ci.yml 为真实可执行工作流（on: push/pull_request + jobs.quality-gate，7 步覆盖 gofmt、go vet、go build、go test、CGO_ENABLED=1 go test -race、覆盖率统计与产物上传），已不是空壳。未完成部分为：生效路径 .github/workflows/ci.yml 仍为纯注释模板（非注释非空行 0），仓库无远端故该定义从未被触发，流水线实际运行记录为 0，且配置未定义部署与上线冒烟门禁作业、覆盖率步骤只统计与上传而无 ≥85% 阈值判定。",
+      "fix": "把 evidence/ci.yml 落地到 .github/workflows/ci.yml，补充覆盖率 ≥85% 阈值判定与部署冒烟作业，关联远端后由真实 PR 触发并保存 run URL、run id 与日志原文。",
+      "quality_basis": "配置真实可用但未生效、从未运行，且门禁覆盖止于构建与测试：既缺实际执行证据，也缺覆盖率阈值与部署门禁两道关键判定，质量判为 poor。",
+      "evidence": [
+        "E-13",
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-CI-NOT-EFFECTIVE",
+        "ISS-CI-NO-THRESHOLD"
+      ]
+    },
+    {
+      "id": "01-A4-06",
+      "category": "A4",
+      "title": "主分支制品和上线版本对应，健康与业务冒烟成功",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "deployment"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "无远端仓库、无 main 分支、无制品登记、无上线地址、无健康与业务冒烟结果。全部运行证据来自本地 demo-memory 实例与本地 MySQL 实例，无法把主分支制品与上线版本对应起来。",
+      "fix": "建仓后经 PR 合并 main 并触发部署，保存部署地址、制品版本号、健康检查与业务冒烟原始响应。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-DEPLOY"
+      ]
+    },
+    {
+      "id": "01-A4-07",
+      "category": "A4",
+      "title": "首次发布撤销或上一可用版本恢复方法可执行",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "deployment"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "因无部署与无上线版本，不存在可执行的首次发布撤销步骤或上一可用版本恢复方法，仓库内也无回退说明文档。",
+      "fix": "在部署说明中写明可执行的回退步骤（回滚到上一提交、关闭服务并保留数据卷、恢复验证方式），并与部署版本号绑定。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-ROLLBACK"
+      ]
+    },
+    {
+      "id": "01-A4-08",
+      "category": "A4",
+      "title": "学生讲解覆盖业务、流程、约束、Skill及质量证据",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "video"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "无讲解视频，也无讲解稿或时间目录，无法核验学生是否讲解业务、流程、约束、Skill 与质量证据。",
+      "fix": "录制不少于覆盖五组场景与异常结果的讲解视频，并提供带时间点的目录稿。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-VIDEO"
+      ]
+    },
+    {
+      "id": "01-A4-09",
+      "category": "A4",
+      "title": "视频真实演示本题五组场景及异常结果",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "video"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "全仓按 mp4/mov/avi/mkv/webm/flv 检索视频文件命中数为 0，无任何视频可核验五组场景与异常结果的真实演示。",
+      "fix": "在讲解视频中真实演示 S1 活动成交、S2 缺货与弃单、S3 售前退款、S4 迟到支付、S5 操作竞争，并展示异常提示与最终数据。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-VIDEO"
+      ]
+    },
+    {
+      "id": "01-A4-10",
+      "category": "A4",
+      "title": "当日在群交完整链接与视频，日期版本可定位",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "group"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.13",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "无当日班级群提交凭据（群消息截图、提交索引或链接记录），无法定位提交日期与对应版本。",
+      "fix": "在班级群提交完整仓库链接与视频链接，并留存消息截图与提交日期索引。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-GROUP"
+      ]
+    },
+    {
+      "id": "01-B1-01",
+      "category": "B1",
+      "title": "需求先于原型，原型先于计划，计划先于首次业务开发",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "checkpoints"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "unknown",
+      "quality": "unassessed",
+      "owner": "unresolved",
+      "reason": "版本链为一次性基线提交 6cc6f13（含生产代码、测试、文档、Skill 与全部证据）加 14 次后续证据补齐提交，无法从 Git 历史证明「需求先于原型、原型先于计划、计划先于首次业务开发」。三份上游文档的内容顺序与自述一致，但属 statement 级材料，不构成独立时序证据。",
+      "fix": "后续迭代按阶段提交，并在 evidence/checkpoints/ 冻结每阶段产物哈希与时间，使顺序可由版本链复核。",
+      "quality_basis": "材料不足以判定时序既成立也不倒序，按证据不足判 unknown 并归 unresolved，不以文件时间或自述推定结论。",
+      "evidence": [
+        "E-11",
+        "E-14"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-B1-02",
+      "category": "B1",
+      "title": "开发、独立测试、独立验收、PR及部署前置成立",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "checkpoints"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "fail",
+      "quality": "poor",
+      "owner": "student",
+      "reason": "题面要求「开发、独立测试、独立验收、PR 及部署」前置成立，本题仅存在开发环节：独立测试会话、独立验收会话、远端仓库、PR 与部署均无任何产物，evidence/ 内 170 份测试与检查证据全部出自开发会话内的 AI 脚本；evidence/会话导出说明.md 亦如实登记该缺失。",
+      "fix": "补齐独立测试会话、独立验收会话与 PR/部署环节，形成开发→测试→验收→PR→部署的完整前置链。",
+      "quality_basis": "四个关键前置环节全部缺失，仅开发环节成立，属实质性流程断裂。",
+      "evidence": [
+        "E-10",
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-PRECONDITIONS"
+      ]
+    },
+    {
+      "id": "01-B1-03",
+      "category": "B1",
+      "title": "阶段有产物版本、原始事件和交接检查点",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "checkpoints"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "partial",
+      "quality": "basic",
+      "owner": "student",
+      "reason": "阶段产物版本可追溯：15 次提交哈希、evidence/第五轮证据清单.md、第四轮证据清单.md、门禁自查汇总.md 与 .agent/06-workflow-devflow.md 均可定位到具体产物。但原始事件（events.jsonl、会话导出）缺失，也没有按七阶段冻结的交接检查点文件，现有留证是事后整理的证据清单而非当时冻结的阶段快照。",
+      "fix": "建立 evidence/checkpoints/ 目录，每阶段冻结产物哈希、时间、交接双方与会话导出位置；events.jsonl 与会话导出补齐后一并归档。",
+      "quality_basis": "产物版本维度成立，但原始事件与交接检查点两个维度缺失，留证形态偏事后整理，质量偏弱。",
+      "evidence": [
+        "E-10",
+        "E-11",
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-CHECKPOINT",
+        "ISS-CHECKPOINT-SNAPSHOT"
+      ]
+    },
+    {
+      "id": "01-B1-04",
+      "category": "B1",
+      "title": "合理返工可追溯，变更后重测验收，无事后伪造",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "accept_agent"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "返工链在 outputs/单题检查/ 下第 03~05 批次与 evidence/ 整改记录中可追溯，未发现伪造痕迹；但独立验收会话不存在，evidence/acceptance-check-rerun.md 明确自述「由开发侧同一会话执行，属自检性质，不构成独立验收会话结论」，因此「变更后重测验收」环节缺失，验收侧的复核与受影响回归均无产物。",
+      "fix": "建立独立验收会话并导出逐项结论与证据位置；对验收后每次业务代码变更执行受影响范围回归并留档。",
+      "quality_basis": "按必交产物缺失强制判失败；开发期返工可追溯不能替代独立验收后的复验。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-INDEP-ACCEPT"
+      ]
+    },
+    {
+      "id": "01-B2-01",
+      "category": "B2",
+      "title": "开发前自行编写本题Agent约束，覆盖角色范围和七阶段",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "agent_rules"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "AGENTS.md v1.1 共 7 章 23KB，覆盖题面共同要求的七阶段与角色范围：第 0 章生效说明、1 三角色职责与可改范围、2 Git 与提交规范、3 代码与质量约束、4 业务规则来源与边界、5 禁止行为、6 交接材料与证据索引、7 版本变更记录；内容按本题定制而非通用模板，并明确三 Agent 会话隔离与 P-01~P-08 禁止项。",
+      "fix": "无需整改。",
+      "quality_basis": "七阶段与角色范围逐项落表且可对照题面，配套版本记录与证据索引机制，约束本身完备。",
+      "evidence": [
+        "E-06"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-B2-02",
+      "category": "B2",
+      "title": "约束实际加载使用，变化有原因和版本",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "agent_rules"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "partial",
+      "quality": "good",
+      "owner": "student",
+      "reason": "版本演进留痕成立：AGENTS.md v1.1 与 AGENTS-v1.0.md 两版并存，第 7 章逐行记录「调整内容、调整原因、触发任务、确认人、证据」。但仍没有任何「本次业务任务实际加载了哪一版约束」的记录文件；检查者全仓检索未发现 evidence/agent-rules-load-log.md，加载生效只能由文件自述推断。",
+      "fix": "新增 evidence/agent-rules-load-log.md，在每个业务任务开始处记录加载时间、采用版本、任务编号与对应提交哈希。",
+      "quality_basis": "版本与原因维度成立；实际加载与版本绑定维度缺失，故判部分完成。",
+      "evidence": [
+        "E-06",
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-AGENT-LOAD",
+        "ISS-AGENT-LOAD-BIND"
+      ]
+    },
+    {
+      "id": "01-B2-03",
+      "category": "B2",
+      "title": "全量会话、回复、工具结果、失败及附件可追溯",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "prompts"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "全仓无 events.jsonl、无 evidence/sessions/ 目录，无原始提示、模型回复、工具结果、失败记录与附件留档。evidence/会话导出说明.md 如实说明该产物属平台侧录制产物、本仓库未生成也未伪造，但其自身不构成会话导出本体。全量会话仍不可追溯。",
+      "fix": "在具备平台会话导出能力的环境中导出全部开发会话为 events.jsonl（含时间戳、角色、任务号、提交哈希、动作与证据路径）与 evidence/sessions/*.md。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-EVENTS"
+      ]
+    },
+    {
+      "id": "01-B2-04",
+      "category": "B2",
+      "title": "每项任务及全部分支有提示到实现验证的完整步骤",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "prompts"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "缺少原始提示记录，题目 01 的每项任务与全部分支无法建立「提示→实现→验证」的完整步骤链，只能从提交与文档反推作者意图。",
+      "fix": "补齐 events.jsonl 与会话导出后，为每项任务标注对应提示、实现提交与验证证据。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-EVENTS"
+      ]
+    },
+    {
+      "id": "01-B2-05",
+      "category": "B2",
+      "title": "提示有必要上下文、目标、边界和完成条件",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "prompts"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "缺少原始提示记录，无法核验每条提示是否包含必要上下文、目标、边界与完成条件。",
+      "fix": "补齐 events.jsonl 与会话导出，使每条提示的上下文、目标、边界、完成条件四要素可逐条核验。",
+      "quality_basis": "无产物可评，质量不可评；按必交产物缺失强制判失败。",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-EVENTS"
+      ]
+    },
+    {
+      "id": "01-B2-06",
+      "category": "B2",
+      "title": "学生实际审核纠错，不接受虚构通过、不弱化测试",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "ai_summary"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.10",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "evidence/AI使用说明.md 记录 AI 与学生分工及假设确认方式；skill-usage.md 第 10.3 节留有 6 条真实纠错（noopPayment 幂等留痕语义误判、常量误用、gofmt 未格式化、单文件超限拆分、A8/A10 断言口径修正），检查者逐一核对仓库现状确认属实；evidence/会话导出说明.md 与门禁自查汇总.md 均如实登记未产出项并明确「不冒充产物本体」。全仓未发现删除失败用例、弱化断言或为通过测试而修改生产代码。",
+      "fix": "在 AI 使用说明中补学生本人对上述纠错的逐项签审、日期与结论。",
+      "quality_basis": "纠错链真实可被仓库现状反向验证，无虚构通过迹象；但「学生实际审核」的证据仍以 AI 自述为主，缺本人签审，质量降一档。",
+      "evidence": [
+        "E-08",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-STUDENT-SIGN"
+      ]
+    },
+    {
+      "id": "01-B3-01",
+      "category": "B3",
+      "title": "自编业务Skill结构完整、针对本题、真实调用",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "business_skill"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.09",
+      "status": "pass",
+      "quality": "good",
+      "owner": "student",
+      "reason": "三套自编业务 Skill 结构完整：gva-model-generate 含 SKILL.md、scripts 与 references，输出 GVA GORM model.go 与 InnoDB DDL（evidence/schema.sql 已落库并在真实 MySQL 8.4.11 上执行成功）；unit-test-race 输出覆盖率与门禁结论；apipost-case-gen 输出覆盖五组演示场景与异常路径的接口用例。evidence/smoke/SKILL-*.txt 留有真实调用输出。",
+      "fix": "在 Apipost 平台真实运行一次生成的用例并保存运行导出。",
+      "quality_basis": "Skill 针对本题、脚本可执行、产物真实落库且 DDL 已被真实库验证，判定通过；但真实调用停在文件级冒烟，Apipost 用例未在平台实际运行，质量降一档。",
+      "evidence": [
+        "E-07",
+        "E-15"
+      ],
+      "issue_ids": [
+        "ISS-APIPOST-NOT-RUN"
+      ]
+    },
+    {
+      "id": "01-B3-02",
+      "category": "B3",
+      "title": "自编验收Skill依据原题、真实独立核验及复检",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "acceptance_skill"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.08",
+      "status": "partial",
+      "quality": "good",
+      "owner": "student",
+      "reason": "自编验收 Skill acceptance-check 的 SKILL.md 结构完整，含 5 步验收流程、必过门禁清单与证据位置要求，方法论与题面 PR 门禁表一致；本轮新增 evidence/acceptance-check-rerun.md 按 G-01~G-24 逐项给出通过/待补证结论、问题三分类与「未运行/未访问/未播放清单」，并明确标注由开发侧同一会话执行、不构成独立验收结论。但该 Skill 仍从未由独立验收 Agent 会话执行，缺少独立核验记录与复检闭环。",
+      "fix": "由独立验收 Agent 会话按该 Skill 实际执行一次，产出逐项通过/不通过结论、证据位置与复检记录。",
+      "quality_basis": "Skill 存在且本轮有真实调用产物，判定部分完成；其核心承诺（独立核验与复检）未被兑现，质量降一档。",
+      "evidence": [
+        "E-07",
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-ACCEPT-SKILL-UNUSED",
+        "ISS-ACCEPT-SKILL-NORECORD"
+      ]
+    },
+    {
+      "id": "01-B3-03",
+      "category": "B3",
+      "title": "总结全部实际使用Skill的位置、原因、输入输出、帮助及局限",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "skill_usage"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.08",
+      "status": "pass",
+      "quality": "excellent",
+      "owner": "student",
+      "reason": "skill-usage.md 共 10 节 29KB，逐个记录四套 Skill 的复用位置、复用原因、输入输出、帮助信息与局限；第 10.3 节记录 6 条真实失败样例及处理方式，第 10.4 节明确不冒充边界；检查者抽查其中引用的文件路径全部存在。",
+      "fix": "无需整改。",
+      "quality_basis": "覆盖全部实际使用 Skill 且含失败样例与局限，路径可核验，无夸大产出。",
+      "evidence": [
+        "E-08"
+      ],
+      "issue_ids": []
+    },
+    {
+      "id": "01-B4-01",
+      "category": "B4",
+      "title": "业务开发前GitHub MCP创建每人每题独立仓库",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "git"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.05",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "git remote -v 实测为空，无远端仓库，亦无任何 GitHub MCP 建仓的调用名称、请求、结果、时间与仓库 URL 记录。题面要求业务开发前经 GitHub MCP 创建每人每题独立仓库，此环节无证据。",
+      "fix": "经 GitHub MCP 创建本题独立仓库并留存工具名称、请求、结果、时间与仓库 URL，随后关联远端。",
+      "quality_basis": "无产物可评，质量不可评；按缺失强制判失败。",
+      "evidence": [
+        "E-13",
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-MCP-REPO"
+      ]
+    },
+    {
+      "id": "01-B4-02",
+      "category": "B4",
+      "title": "初始化后所有变更仅在dev/<题号>提交并保留阶段历史",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "git"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.05",
+      "status": "partial",
+      "quality": "good",
+      "owner": "student",
+      "reason": "全部 15 次变更确实只在 dev/01 提交（git branch -a 仅本地 dev/01，无 main 分支，越权推送不可能），提交说明 6 条中 5 条格式 PASS，本轮新增 7 次提交均按 opt/test/docs 分类型且带版本号。但阶段历史不完整：首次基线提交一次性纳入生产代码、测试、文档、Skill 与全部证据，后续 14 次均属证据补齐轮次而非真实开发阶段序列。",
+      "fix": "后续迭代严格按阶段提交（需求/原型/计划/开发/测试/验收分别留痕），不得再出现一次性基线提交。",
+      "quality_basis": "分支纪律成立且可验证；阶段历史维度缺失，故判部分完成。",
+      "evidence": [
+        "E-11",
+        "E-13"
+      ],
+      "issue_ids": [
+        "ISS-ONE-SHOT-COMMIT",
+        "ISS-STAGE-HISTORY"
+      ]
+    },
+    {
+      "id": "01-B4-03",
+      "category": "B4",
+      "title": "提交消息符合原附件且feat/fix核验真实相关工作项",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "git"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.05",
+      "status": "partial",
+      "quality": "good",
+      "owner": "student",
+      "reason": "提交说明格式校验 6 条中 5 条 PASS，本轮新增 7 次提交全部符合 [类型] [版本号] 描述；首条基线提交 6cc6f13 使用 feat: 电商订单售前退款完整业务实现，不符合原附件 [类型] [版本号] [编号] 描述格式，且未携带任何工作项编号；本机 meegle CLI 不可用，仓库内也无任何编号核验输出，但本轮已在门禁自查汇总与验收重跑记录中如实登记 CLI 不可用这一事实，并主动不使用 feat/fix 类型以规避无编号提交。",
+      "fix": "提交前用 meegle workitem get --work-item-id <编号> --project-key r17te9 核验 feat/fix 工作项编号并留存原始输出；后续提交一律按原附件格式。",
+      "quality_basis": "格式合规为主且后续提交已达标；历史基线偏差按 P-08 保留不改写，编号核验仍无一次真实输出，质量降一档。",
+      "evidence": [
+        "E-11",
+        "E-13",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-BASE-COMMIT-FMT",
+        "ISS-NO-MEEGLE"
+      ]
+    },
+    {
+      "id": "01-B4-04",
+      "category": "B4",
+      "title": "保护main，测试验收后PR，状态检查后合并",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "git"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.05",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "仓库无 main 分支、无远端、无 PR、无状态检查记录，因此「保护 main、测试验收后发起 PR、状态检查通过后合并」三个动作全部没有发生；evidence/ci.yml 中的 pull_request 触发条件也因此从未被触发。",
+      "fix": "建仓并保护 main 后，从 dev/01 发起 PR，附编号、变更说明、测试结果、覆盖率与验收报告，待状态检查通过再合并。",
+      "quality_basis": "无产物可评，质量不可评；按缺失强制判失败。",
+      "evidence": [
+        "E-13",
+        "E-14",
+        "E-18"
+      ],
+      "issue_ids": [
+        "ISS-NO-PR"
+      ]
+    },
+    {
+      "id": "01-B4-05",
+      "category": "B4",
+      "title": "源提交、PR、合并版本、主分支复验及发布可关联",
+      "source": "assignment.md:共同要求；references/checklist.md；references/fairness.md",
+      "kind": "common",
+      "condition": "always",
+      "mandatory": true,
+      "required_artifact_ids": [
+        "git"
+      ],
+      "gate": "mandatory",
+      "max_points": "0.05",
+      "status": "fail",
+      "quality": "unusable",
+      "owner": "student",
+      "reason": "不存在源提交、PR、合并版本、主分支复验与发布之间的关联记录，无任何可追溯的发布版本号。",
+      "fix": "记录 PR 源提交哈希与合并提交哈希的对应关系，并对主分支发布提交重新执行门禁与部署登记。",
+      "quality_basis": "无产物可评，质量不可评；按缺失强制判失败。",
+      "evidence": [
+        "E-13",
+        "E-14"
+      ],
+      "issue_ids": [
+        "ISS-NO-PR"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "id": "ISS-NO-TEST-AGENT",
+      "root_cause": "缺少独立测试 Agent 会话与报告，测试全部由开发会话内的 AI 脚本执行",
+      "fact": "evidence/sessions/ 目录不存在，全仓无标注为独立测试会话的测试报告；仓库内 12 个 *_test.go 与 170 份集成证据均由开发会话内的采集脚本生成；evidence/acceptance-check-rerun.md 自述「由开发侧同一会话执行，属自检性质」。",
+      "source": "检查者全仓检索 evidence/sessions/ 与独立测试会话产物，命中数为 0；核对 outputs/ 各批次检查报告的产出方均为同一开发会话。",
+      "impact": "题面与 .agent/04-workflow-git.md 均把独立测试 Agent 会话列为必交与门禁项，缺失使测试结论无法与开发上下文隔离，测试可信度不可核验。",
+      "fix": "新建独立测试 Agent 会话，读取原始题面与对应版本代码后独立执行，导出会话与测试报告到 evidence/sessions/。",
+      "retest": "复评时由检查者核对独立会话导出中的阶段、模型、关联提交哈希与原始输出，并抽查至少一组用例的独立执行留档。",
+      "history": "本问题在第 4、5 轮已登记为 partial 缺口，第 6 轮复核仍无产物，状态维持；本轮新增的会话导出说明与验收重跑记录均如实登记该缺失，未出现以说明文档冒充会话本体的情形。",
+      "deduction_basis": "A3-07 依赖 test_agent 必交产物缺失，按规则强制判 fail 并单独扣状态分，不与其它提示链问题重复计。",
+      "deduplication": "与 ISS-NO-INDEP-ACCEPT 分属测试与验收两个不同环节，各自独立，不重复计同一事实。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-07",
+          "axis": "status",
+          "independent_impact": "测试环节缺失独立上下文，A3-07 无产物可评，状态直接归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-INDEP-ACCEPT",
+      "root_cause": "缺少独立验收 Agent 会话与逐项结论，验收后受影响回归无从谈起",
+      "fact": "evidence/sessions/ 下无独立验收会话与验收报告；仓库内检查产物均由开发会话内的自检脚本产出，本轮 acceptance-check-rerun.md 明确标注为开发侧自检。",
+      "source": "检查者检索 evidence/sessions/ 与验收报告类文件均无结果；核对 outputs/单题检查/ 各批次报告的作者同一。",
+      "impact": "题面把独立验收列为必交与门禁项，缺失使「变更后重测验收」与「验收结论」两条链同时落空，B1-04 直接失败并把 A3-08 拉为部分完成。",
+      "fix": "新建独立验收 Agent 会话，按题面逐项给出通过/不通过与证据位置，导出验收报告与复检记录。",
+      "retest": "复评时核对独立验收报告的结论项与证据位置是否可复算，并对验收后的每次业务代码变更执行受影响范围回归。",
+      "history": "本问题在第 4、5 轮已登记，本轮复核仍无产物，状态维持。",
+      "deduction_basis": "B1-04 依赖 accept_agent 必交产物缺失，按规则强制判 fail；A3-08 另因缺少验收后回归判部分完成，二者扣分依据为不同维度。",
+      "deduplication": "与 ISS-NO-TEST-AGENT、ISS-NO-PRECONDITIONS 分属验收、测试、整体流程三处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B1-04",
+          "axis": "status",
+          "independent_impact": "验收环节不存在，B1-04 判失败且门禁项归零。"
+        },
+        {
+          "check_id": "01-A3-08",
+          "axis": "status",
+          "independent_impact": "验收后受影响回归缺失，A3-08 的后半段要求无法满足。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-PRECONDITIONS",
+      "root_cause": "题面要求的开发、独立测试、独立验收、PR 与部署五段前置链只完成了开发一段",
+      "fact": "独立测试会话、独立验收会话、远端仓库、PR 与部署均无产物；evidence/ 内 170 份测试与检查证据全部出自开发会话内的 AI 脚本。",
+      "source": "检查者核对 evidence/sessions/ 不存在、git remote -v 为空、outputs/ 各批次报告作者同一，确认四段前置均缺失。",
+      "impact": "阶段前置不成立使 B1-02 判失败，并使 A3-07、B1-04 因同一根因而失败（该两项已单独登记，不再重复扣分）。",
+      "fix": "建立独立测试与独立验收会话，经 PR 合并 main 并完成部署，形成完整前置链。",
+      "retest": "复评时检查者核对三份独立会话导出与 PR、部署记录的时间顺序。",
+      "history": "本问题在第 4、5 轮已登记，本轮复核维持。",
+      "deduction_basis": "B1-02 关联整体前置链；具体缺测试与缺验收两项已在 A3-07、B1-04 单独扣分，此处不再重复计分。",
+      "deduplication": "与 ISS-NO-TEST-AGENT、ISS-NO-INDEP-ACCEPT 分属流程整体、测试、验收三处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B1-02",
+          "axis": "status",
+          "independent_impact": "五段前置链只完成一段，阶段顺序判失败。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-CHECKPOINT",
+      "root_cause": "无按七阶段冻结的交接检查点与原始事件，阶段留证只到提交哈希层面",
+      "fact": "仓库内无 evidence/checkpoints/ 目录；evidence/ 内留证为事后整理的证据清单（第四轮、第五轮证据清单、门禁自查汇总）而非当时冻结的阶段快照。",
+      "source": "检查者检索 evidence/checkpoints/ 无结果，并核对各份证据清单的生成方式为整轮结束后统一整理。",
+      "impact": "阶段留证的交接维度缺失，B1-03 只能判部分完成。",
+      "fix": "建立 evidence/checkpoints/，每阶段冻结产物哈希、时间、交接双方与会话导出位置。",
+      "retest": "复评时核对每个检查点都能定位到具体提交与对应会话导出。",
+      "history": "本问题在第 4 轮已登记为 R-B1-01，第 5、6 轮复核维持。",
+      "deduction_basis": "B1-03 状态轴的独立根因是交接检查点文件缺失。",
+      "deduplication": "与 ISS-CHECKPOINT-SNAPSHOT 区分：前者为检查点文件缺失（状态），后者为留证形态偏事后整理（质量）。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-10",
+        "E-14"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B1-03",
+          "axis": "status",
+          "independent_impact": "交接检查点缺失，阶段留证不完整。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-CHECKPOINT-SNAPSHOT",
+      "root_cause": "阶段留证以整轮结束后统一整理的证据清单为主，缺少开发当时即冻结的每阶段产物快照",
+      "fact": "evidence/第五轮证据清单.md、第四轮证据清单.md 与门禁自查汇总.md 均以叙述方式总结整轮工作，无逐阶段冻结快照文件。",
+      "source": "检查者读取四份留证文件与 git log 15 次提交的结构，确认其汇总形式与非快照形式。",
+      "impact": "事后整理的留证无法还原当时的真实状态，B1-03 的留证质量受限。",
+      "fix": "补建逐阶段冻结快照：每阶段记录开始与结束时间、产物文件哈希清单、当时运行的命令与输出。",
+      "retest": "复评时核对快照时间与对应提交时间一致且未后期编辑。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持；本轮新增的门禁自查汇总同样属事后整理形态，缺口未变。",
+      "deduction_basis": "B1-03 质量轴的独立根因是留证形态为事后汇总而非当时冻结。",
+      "deduplication": "与 ISS-NO-CHECKPOINT 为同一维度的两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-10",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B1-03",
+          "axis": "quality",
+          "independent_impact": "留证形态为事后汇总而非当时冻结，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-AGENT-LOAD",
+      "root_cause": "无 AGENTS.md 的实际加载记录文件，约束是否在业务开发前生效只能由文件自述推断",
+      "fact": "仓库内无加载记录文件（evidence/agent-rules-load-log.md 不存在）；AGENTS.md 第 0 章自述「开发前会话中实际加载或读取本文件的记录、对应任务 AGENT-01、提交版本哈希」，但该记录本身不存在。",
+      "source": "检查者核查第 0 章的证据要求与第 7 章的版本记录，并全仓检索加载记录文件，确认版本与原因齐备但加载记录缺失。",
+      "impact": "B2-02 的实际加载维度不成立，只能判部分完成。",
+      "fix": "新增 evidence/agent-rules-load-log.md，在每个业务任务开始处记录加载时间、采用版本、任务编号与提交哈希。",
+      "retest": "复评时核对日志条目与实际提交时间的先后关系。",
+      "history": "本问题在第 4 轮已登记为 R-B2-01，第 5、6 轮复核维持。",
+      "deduction_basis": "B2-02 状态轴的独立根因是加载记录完全缺失。",
+      "deduplication": "与 ISS-AGENT-LOAD-BIND 区分：前者为加载记录完全缺失（状态），后者为版本绑定证据不足（质量）。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-06",
+        "E-14"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B2-02",
+          "axis": "status",
+          "independent_impact": "加载记录缺失，约束实际生效不可证。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-AGENT-LOAD-BIND",
+      "root_cause": "历史版本 v1.0 与 v1.1 均保留，但缺少「本次业务任务实际采用哪一版约束」的绑定证据",
+      "fact": "两版文件并存且第 7 章记录了调整内容与原因，但没有任何条目把某次业务任务绑定到具体版本；门禁自查汇总第 5 节亦未登记约束加载。",
+      "source": "检查者通读第 7 章变更表并检索仓库内版本引用，确认无版本绑定记录。",
+      "impact": "约束版本演进可追溯，但与具体任务的绑定不可核验，B2-02 的质量降一档。",
+      "fix": "在加载记录中同时写明任务编号与所采用的约束版本号，并保留版本切换的触发任务。",
+      "retest": "复评时抽查两条任务，确认其加载记录与所采用的版本自洽。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持。",
+      "deduction_basis": "B2-02 质量轴的独立根因是版本与任务绑定不可核验。",
+      "deduplication": "与 ISS-NO-AGENT-LOAD 为同一维度两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-06"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B2-02",
+          "axis": "quality",
+          "independent_impact": "版本与任务绑定不可核验，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-EVENTS",
+      "root_cause": "无原始会话导出与 events.jsonl，全量提示、回复、工具结果与附件不可追溯",
+      "fact": "全仓检索 events.jsonl 命中 0；evidence/sessions/ 目录不存在；仓库内无任何原始提示或工具结果留档；evidence/会话导出说明.md 自述该产物为平台侧录制、本仓库未生成也未伪造。",
+      "source": "检查者以全仓递归检索 events.jsonl 并核查 evidence/sessions/ 存在性，均无结果。",
+      "impact": "题集随附 .agent/04-workflow-git.md 已把「会话导出」列为 PR 门禁与必交项，缺失使 B2-03、B2-04、B2-05 三项提示链评分项全部失败。",
+      "fix": "在具备平台会话导出能力的环境中导出全部开发会话为 events.jsonl（时间戳、角色、任务号、提交哈希、动作、证据路径）与 evidence/sessions/*.md，并使每项任务可追溯到提示、实现与验证。",
+      "retest": "复评时检查者随机抽取三条提示，核对其是否能定位到实现提交与对应验证证据。",
+      "history": "本问题在第 4 轮已登记为 R-B1-01 与 R-B2-02，第 5 轮复核维持；第 6 轮学生新增会话导出说明如实登记缺口并给出补齐路径，但产物本体仍缺，状态不变。",
+      "deduction_basis": "三项提示链评分项依赖同一必交产物缺失，按规则各自强制判 fail，不再另行拆分为更多问题。",
+      "deduplication": "三项要求共享同一缺失产物，合并为一个问题登记，不按问题个数重复拆分扣分。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B2-03",
+          "axis": "status",
+          "independent_impact": "全量会话不可追溯，B2-03 无产物可评，状态归零。"
+        },
+        {
+          "check_id": "01-B2-04",
+          "axis": "status",
+          "independent_impact": "提示到实现的步骤链不可建立，B2-04 无产物可评，状态归零。"
+        },
+        {
+          "check_id": "01-B2-05",
+          "axis": "status",
+          "independent_impact": "提示四要素不可核验，B2-05 无产物可评，状态归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-STUDENT-SIGN",
+      "root_cause": "AI 与学生分工及审核结论以 AI 自述为主，缺学生本人逐项签审留痕",
+      "fact": "evidence/AI使用说明.md 记录了分工与假设确认方式，门禁自查汇总第 5 节标注「由开发侧会话编制，属自检材料」，但无学生签审栏、日期或逐项确认记录。",
+      "source": "检查者通读 evidence/AI使用说明.md、skill-usage.md 第 10.3 节与门禁自查汇总，确认 6 条纠错属实但均无学生本人签审。",
+      "impact": "纠错真实性可由仓库现状反向验证，但「学生实际审核」这一要求缺少本人签审的直接证据，B2-06 质量降一档。",
+      "fix": "在 AI 使用说明中补学生本人对每条纠错的签审、日期与确认结论，并附本人确认声明。",
+      "retest": "复评时核对签审条目与第 10.3 节 6 条纠错一一对应。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持；本轮新增说明文档同样由开发侧编制，未补签审。",
+      "deduction_basis": "B2-06 质量轴的独立根因是缺学生本人签审，与提示链缺失不重叠。",
+      "deduplication": "与 ISS-NO-EVENTS 区分：本项为签审留痕形式问题，不与提示链缺失重复描述。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-08",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B2-06",
+          "axis": "quality",
+          "independent_impact": "缺学生本人签审，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-ACCEPT-SKILL-UNUSED",
+      "root_cause": "自编验收 Skill 从未由独立验收会话执行，其独立核验与复检承诺未被兑现",
+      "fact": "acceptance-check 的 SKILL.md 完整存在，本轮新增 acceptance-check-rerun.md 对 G-01~G-24 逐项给出结论与未运行清单，但该记录首行自述「由开发侧同一会话执行，属自检性质，不构成独立验收会话结论」；仓库内无任何独立验收会话按该 Skill 执行并产出结论的记录。",
+      "source": "检查者读取 SKILL.md 全文核对流程与门禁清单，读取 acceptance-check-rerun.md 核对其执行方声明，并检索 evidence/ 内独立验收产物，结果为 0。",
+      "impact": "Skill 存在且已被真实调用不等于独立核验承诺兑现，B3-02 只能判部分完成。",
+      "fix": "由独立验收 Agent 会话按该 Skill 的 5 步流程实际执行一次，产出逐项通过/不通过、证据位置与复检记录。",
+      "retest": "复评时核对验收报告是否逐项对应 SKILL.md 定义的检查项与必过门禁。",
+      "history": "本问题在第 4 轮已登记，第 5、6 轮复核维持；第 6 轮新增重跑记录但执行方仍为开发侧会话，缺口未消除。",
+      "deduction_basis": "B3-02 状态轴的独立根因是验收 Skill 未由独立会话执行。",
+      "deduplication": "与 ISS-ACCEPT-SKILL-NORECORD 区分：前者为 Skill 未由独立会话执行（状态），后者为无独立核验记录可查（质量）。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-07",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B3-02",
+          "axis": "status",
+          "independent_impact": "验收 Skill 未被独立会话执行，B3-02 判部分完成。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-ACCEPT-SKILL-NORECORD",
+      "root_cause": "验收 Skill 的必过门禁清单仍只由开发侧会话自检，未产出独立核验记录",
+      "fact": "SKILL.md 定义的必过门禁（单测、覆盖率、race、gofmt/vet、五组场景、Agent 验收、Git 流程、AI 与 Skill 记录）在本轮虽有 acceptance-check-rerun.md 逐项对照，但其执行方与被检查方同源，不构成独立核验；G-16~G-22、G-24 共 9 项仍为「待补证」。",
+      "source": "检查者把 SKILL.md 的门禁项与实际产物逐一对照，确认除本批次检查与开发侧自检记录外无第二份独立核验记录。",
+      "impact": "验收环节的可核验性不足，B3-02 的质量降一档。",
+      "fix": "在独立验收会话中按门禁清单逐项给出通过/不通过与证据位置，形成可复核的门禁核验清单。",
+      "retest": "复评时核对门禁清单每一项都有独立结论与证据位置。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持；新增重跑记录提高了清单完整度但未改变独立性缺失这一事实。",
+      "deduction_basis": "B3-02 质量轴的独立根因是门禁清单无独立核验结论。",
+      "deduplication": "与 ISS-ACCEPT-SKILL-UNUSED 为同一维度两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-07",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B3-02",
+          "axis": "quality",
+          "independent_impact": "门禁清单无独立核验结论，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-APIPOST-NOT-RUN",
+      "root_cause": "Apipost 用例仅生成到文件层，未在 Apipost 平台实际运行与导出",
+      "fact": "apipost-case-gen 的输出为接口用例 JSON 与 evidence/smoke/SKILL-apipost-case-gen.txt 文件级冒烟记录；本轮重建为 5 组场景 48 个用例但状态仍标注「未运行」，无平台运行结果或导出报告。",
+      "source": "检查者读取该 Skill 的输出物与冒烟记录，确认其中不含任何平台 run id、集合标识或导出报告。",
+      "impact": "用例生成能力未被端到端验证，B3-01 的质量降一档。",
+      "fix": "在 Apipost 平台导入生成的用例集并执行一次，保存运行结果与导出文件。",
+      "retest": "复评时核对平台运行记录与用例集标识。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持。",
+      "deduction_basis": "B3-01 唯一关联问题，Skill 调用停在文件级导致端到端验证缺失。",
+      "deduplication": "与其它 Skill 问题不重叠，单独计分。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-07"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B3-01",
+          "axis": "quality",
+          "independent_impact": "Skill 调用停在文件级，端到端验证缺失，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-MCP-REPO",
+      "root_cause": "业务开发前未经 GitHub MCP 创建本题独立仓库，无建仓调用与结果记录",
+      "fact": "git remote -v 实测为空；仓库内无 GitHub MCP 的调用名称、请求、结果、时间与仓库 URL 记录；.agent/04-workflow-git.md 已把「GitHub MCP 建仓」列为要求。",
+      "source": "检查者执行 git remote -v 并全仓检索 MCP 与仓库 URL 类记录，均无结果。",
+      "impact": "每人每题独立仓库这一前置缺失，B4-01 判失败并使 PR、发布关联链无从建立。",
+      "fix": "经 GitHub MCP 创建本题独立仓库，留存工具名称、请求、结果、时间与仓库 URL，关联远端后继续后续 PR 与部署流程。",
+      "retest": "复评时核对 MCP 调用记录与仓库实际远端地址一致。",
+      "history": "本问题在第 4 轮已登记，第 5、6 轮复核维持；本轮 ci.yml 的 pull_request 触发条件也因此从未生效。",
+      "deduction_basis": "B4-01 唯一关联问题；PR 缺失问题另行登记，不重复计分。",
+      "deduplication": "与 ISS-NO-PR 分属建仓与合并两个环节，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-13",
+        "E-14"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B4-01",
+          "axis": "status",
+          "independent_impact": "无 MCP 建仓证据，B4-01 无产物可评，状态归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-ONE-SHOT-COMMIT",
+      "root_cause": "首次基线提交一次性纳入全部文件，需求/原型/计划/开发/测试/验收的阶段历史不可重建",
+      "fact": "基线提交 6cc6f13 一次性包含生产代码、12 个测试文件、三份上游文档、AGENTS.md、四套 Skill 与全部 evidence；其后 14 次提交均为证据补齐与文档轮次。",
+      "source": "检查者执行 git log --stat 与按路径追溯，确认任一产物路径的首次出现均落在同一提交。",
+      "impact": "阶段历史维度缺失，B4-02 只能判部分完成，并使 B1-01 的时序无法从版本链证明。",
+      "fix": "后续迭代严格按阶段提交，禁止一次性基线提交；对本轮既有历史按 P-08 保留不改写。",
+      "retest": "复评时核对新提交是否按阶段划分并各带完成条件。",
+      "history": "第 4 轮已登记，第 5、6 轮复核维持；本轮新增 7 次提交仍属证据与文档轮次。",
+      "deduction_basis": "B4-02 状态扣分；与 B1-01 的时序不可核实分属不同评分项与不同维度。",
+      "deduplication": "与 ISS-STAGE-HISTORY 为同一维度两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-11"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B4-02",
+          "axis": "status",
+          "independent_impact": "阶段历史不可重建，分支纪律维度只部分成立。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-STAGE-HISTORY",
+      "root_cause": "后续提交虽已分类型，但均属证据补齐轮次，未形成真实的开发阶段序列",
+      "fact": "本轮新增 25aa8f1 opt、9c32eff test、501136c docs、e142649 docs、85c4ae6 test、03c4238 docs、82c4847 docs，全部围绕证据、文档与注释，无一次对应新的业务实现阶段。",
+      "source": "检查者逐条读取 14 次后续提交的说明与文件清单，确认无一次对应新的业务实现阶段。",
+      "impact": "分支纪律可验证但阶段序列仍不完整，B4-02 的质量降一档。",
+      "fix": "在后续迭代中为需求、原型、计划、开发、测试、验收各留至少一次可识别提交。",
+      "retest": "复评时核对提交序列能否按阶段归类。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持。",
+      "deduction_basis": "B4-02 质量轴的独立根因是提交序列非真实阶段序列。",
+      "deduplication": "与 ISS-ONE-SHOT-COMMIT 为同一维度两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-11"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B4-02",
+          "axis": "quality",
+          "independent_impact": "提交序列非真实阶段序列，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-BASE-COMMIT-FMT",
+      "root_cause": "首次基线 feat 提交不符合原附件提交消息格式，且未携带任何工作项编号",
+      "fact": "基线提交 6cc6f13 的说明为 feat: 电商订单售前退款完整业务实现，不含版本号与编号；提交格式校验对 6 条提交判定 5 条 PASS、1 条 FAIL。",
+      "source": "检查者独立执行提交格式校验脚本并逐条读取提交说明原文。",
+      "impact": "B4-03 判部分完成：格式合规为主，但 feat 类提交缺编号核验这一硬要求未满足。",
+      "fix": "后续 feat/fix 提交一律按 [类型] [版本号] [#编号] 描述；既有基线提交按 P-08 保留历史不改写，并在提交说明文档中登记该偏差。",
+      "retest": "复评时执行提交格式校验脚本，要求全部提交 PASS。",
+      "history": "第 4 轮已登记为 R-B1-05，第 5、6 轮复核维持；历史不可改写，按 P-08 处理。",
+      "deduction_basis": "B4-03 状态扣分；编号核验缺失另由 ISS-NO-MEEGLE 承载质量扣分。",
+      "deduplication": "与 ISS-NO-MEEGLE 为同一维度两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-11",
+        "E-13"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B4-03",
+          "axis": "status",
+          "independent_impact": "feat 提交缺版本号与编号核验，提交消息规范只部分满足。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-MEEGLE",
+      "root_cause": "本机无 meegle CLI 可用，工作项编号核验始终没有一次真实输出",
+      "fact": "本机 where meegle 无结果；仓库内无 meegle workitem get 的执行输出；本轮门禁自查汇总第三节与 acceptance-check-rerun.md G-22 已如实登记「当前环境无 meegle CLI」，并据此主动不使用 feat/fix 类型提交。",
+      "source": "检查者执行 where meegle 并全仓检索 meegle 核验输出与工作项编号，均无结果；核对本轮 7 次新增提交的类型与说明，均无 feat/fix。",
+      "impact": "AGENTS.md 2.4 要求 feat/fix 提交前完成编号核验并保留实际输出；缺失使 B4-03 质量降一档，编号与工作项的对应关系至今无任何可核验实例。",
+      "fix": "安装或配置 meegle CLI，对每个 feat/fix 工作项执行 workitem get 并保存原始输出；在环境恢复前维持不使用 feat/fix 类型提交。",
+      "retest": "复评时抽查一条编号核验输出，核对工作项归属与提交对应关系。",
+      "history": "第 4 轮已登记为 R-B4-03，第 5、6 轮复核维持；本轮已补记 CLI 不可用事实，但真实核验输出仍为零，故根因未消除。",
+      "deduction_basis": "B4-03 质量轴的独立根因是无编号核验输出可查。",
+      "deduplication": "与 ISS-BASE-COMMIT-FMT 为同一维度两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-13",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B4-03",
+          "axis": "quality",
+          "independent_impact": "无编号核验输出可查，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-PR",
+      "root_cause": "无 main 分支、无 PR、无状态检查与合并记录，保护 main 与合并流程从未执行",
+      "fact": "git branch -a 仅本地 dev/01；git remote -v 为空；仓库内无 PR 编号、状态检查结果、合并提交哈希或发布登记；evidence/ci.yml 的 pull_request 触发条件从未生效。",
+      "source": "检查者执行 git branch -a 与 git remote -v，并全仓检索 PR 与合并记录，均无结果。",
+      "impact": "B4-04 与 B4-05 判失败，主分支保护、发布版本对应关系与源提交可追溯链全部缺失。",
+      "fix": "建仓后保护 main，从 dev/01 发起 PR 并附编号、变更说明、测试结果、覆盖率与验收报告，状态检查通过后合并，并记录合并提交与源提交的对应关系。",
+      "retest": "复评时核对 PR 页面、状态检查结论与合并提交哈希，并确认合并后对 main 重新执行了门禁。",
+      "history": "第 4 轮已登记为 R-A4-04 与 R-B4-01，第 5、6 轮复核维持；本轮新增可执行 CI 定义但无远端仍无法触发 PR 流程。",
+      "deduction_basis": "B4-04 与 B4-05 关联同一缺失事实，但属两个不同评分要求（合并流程与发布关联），各自独立扣状态分。",
+      "deduplication": "与 ISS-NO-MCP-REPO、ISS-NO-DEPLOY 分属建仓、合并、部署三处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-13",
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-B4-04",
+          "axis": "status",
+          "independent_impact": "PR 与状态检查未发生，保护 main 要求判失败。"
+        },
+        {
+          "check_id": "01-B4-05",
+          "axis": "status",
+          "independent_impact": "源提交到发布的关联链缺失，版本可追溯判失败。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-DEPLOY",
+      "root_cause": "无远端、无 main 分支、无制品与上线地址，主分支制品与上线版本无法对应",
+      "fact": "git branch -a 仅显示本地 dev/01；git remote -v 为空；全仓无部署地址、制品版本号或冒烟结果记录。",
+      "source": "检查者执行 git branch -a 与 git remote -v 并全仓检索部署类产物，均无结果。",
+      "impact": "题面共同要求的主分支制品与上线版本对应、健康与业务冒烟完全缺失，A4-06 判失败。",
+      "fix": "建仓后经 PR 合并 main 并触发部署，保存部署地址、制品版本号、健康检查与业务冒烟的原始响应。",
+      "retest": "复评时由检查者访问部署地址独立执行健康与一条核心业务冒烟。",
+      "history": "第 4 轮已登记，第 5、6 轮复核维持。",
+      "deduction_basis": "A4-06 唯一关联问题，与 A4-07 的回退方法缺失分属部署本身与回退方案两处。",
+      "deduplication": "与 ISS-NO-ROLLBACK、ISS-NO-PR 分属部署、回退、合并三处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-13",
+        "E-14"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-06",
+          "axis": "status",
+          "independent_impact": "制品与上线版本无对应关系，A4-06 无产物可评，状态归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-ROLLBACK",
+      "root_cause": "无部署即无可执行的发布撤销或上一可用版本恢复方法",
+      "fact": "仓库内无部署说明文档、无回退脚本、无版本回滚记录；本地演示也未记录可回退的上一可用版本。",
+      "source": "检查者全仓检索回退/撤销/回滚关键词与部署文档，无结果。",
+      "impact": "题面共同要求的回退方法缺失，A4-07 判失败。",
+      "fix": "在部署说明中写明可执行步骤：回滚到上一可用提交、停止服务并保留数据卷、恢复后复跑健康检查，并绑定具体版本号。",
+      "retest": "复评时检查者按文档实际执行一次回退并记录结果。",
+      "history": "本问题在第 4 轮已登记，第 5、6 轮复核维持。",
+      "deduction_basis": "A4-07 唯一关联问题。",
+      "deduplication": "与 ISS-NO-DEPLOY 分属回退方案与部署本身两处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-07",
+          "axis": "status",
+          "independent_impact": "无可执行回退方法，A4-07 无产物可评，状态归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-VIDEO",
+      "root_cause": "无讲解视频，学生讲解与五组场景的真实演示均无法核验",
+      "fact": "全仓按 mp4/mov/avi/mkv/webm/flv 检索命中数为 0；无讲解稿与时间目录；evidence/会话导出说明.md 第 5 项亦自述「待人工录制，尚未产出」。",
+      "source": "检查者按扩展名全仓递归检索视频文件，结果为 0。",
+      "impact": "题面共同要求的学生讲解与五组场景演示两项均无证据，A4-08 与 A4-09 判失败。",
+      "fix": "录制讲解视频，覆盖业务、流程、约束、Skill 与质量证据，并真实演示 S1~S5 五组场景与异常提示，附时间目录。",
+      "retest": "复评时检查者抽看时间目录对应片段，核对画面中的订单号、状态与错误码是否与接口响应一致。",
+      "history": "本问题在第 4 轮已登记，第 5、6 轮复核维持。",
+      "deduction_basis": "A4-08 与 A4-09 关联同一缺失产物，但属讲解内容与场景演示两个不同要求，各扣一次不属重复描述。",
+      "deduplication": "与 ISS-NO-GROUP 分属视频与群提交两处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-08",
+          "axis": "status",
+          "independent_impact": "无讲解产物，A4-08 无产物可评，状态归零。"
+        },
+        {
+          "check_id": "01-A4-09",
+          "axis": "status",
+          "independent_impact": "无场景演示产物，A4-09 无产物可评，状态归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-NO-GROUP",
+      "root_cause": "无当日班级群提交凭据，提交日期与版本无法定位",
+      "fact": "仓库内无群消息截图、提交索引或链接记录类文件。",
+      "source": "检查者全仓检索群提交相关文档与图片资源，无任何结果。",
+      "impact": "题面共同要求的当日群交缺失，A4-10 判失败。",
+      "fix": "提交当日群消息截图与仓库、视频链接，并在 evidence/ 内登记提交日期与对应提交哈希。",
+      "retest": "复评时核对群交日期与仓库提交日期一致、链接可打开。",
+      "history": "本问题在第 4 轮已登记，第 5、6 轮复核维持。",
+      "deduction_basis": "A4-10 唯一关联问题。",
+      "deduplication": "与 ISS-NO-VIDEO 分属群提交与视频两处，各自独立。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-14"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-10",
+          "axis": "status",
+          "independent_impact": "无群交凭据，A4-10 无产物可评，状态归零。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-CI-NOT-EFFECTIVE",
+      "root_cause": "可执行流水线定义未落到生效路径，且流水线从未被实际触发运行",
+      "fact": ".github/workflows/ci.yml 仍为 31 行纯注释模板（非注释且非空行实测为 0，无 on/jobs 键）；可执行定义 evidence/ci.yml 共 48 行、含 on 与 jobs 与 7 个步骤，但不在生效路径；git remote -v 为空，无远端即无法由 PR 触发；全仓无任何流水线 run 记录、run id 或日志。",
+      "source": "检查者逐行统计两个 YAML 文件的有效行数与 on/jobs 键，核对 git remote -v 与全仓 run 记录，并在 evidence/产物清点与缺失核查.txt 第 6 节留存实测输出。",
+      "impact": "题面共同要求「实际流水线执行质量、覆盖率、构建和部署门禁」，本项的执行部分为零：配置虽已真实可执行，但从未生效、从未运行，交付门禁在流水线层面从未被执行过。",
+      "fix": "把 evidence/ci.yml 复制到 .github/workflows/ci.yml，经 GitHub MCP 建仓并关联远端后由真实 PR 触发，保存 run URL、run id、状态与日志原文。",
+      "retest": "复评时核对 run 记录状态为 success，日志中 gofmt、vet、build、test、race 各步骤均为通过。",
+      "history": "第 5 轮该项为 ISS-CI-PLACEHOLDER（配置为纯注释模板，判失败）；第 6 轮配置本身已转为真实可执行定义，缺口由「无有效配置」缩小为「未落地生效且未运行」，判定由失败升为部分完成。",
+      "deduction_basis": "A4-05 状态轴的独立根因是配置未生效与零运行记录；与同项的质量根因（缺覆盖率阈值与部署门禁作业）分属两个不同事实，不重复计分。",
+      "deduplication": "与 ISS-CI-NO-THRESHOLD 为同一评分项两个独立根因，分别对应状态与质量扣分轴。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-13",
+        "E-14",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-05",
+          "axis": "status",
+          "independent_impact": "流水线从未在真实环境生效与运行，A4-05 只完成配置交付部分。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-CI-NO-THRESHOLD",
+      "root_cause": "流水线定义缺少覆盖率阈值判定与部署冒烟门禁作业，门禁只到构建与测试为止",
+      "fact": "evidence/ci.yml 的覆盖率步骤为 go test -coverpkg=./... -coverprofile 与 go tool cover -func，产物上传结束，全文无 ≥85% 阈值的判定步骤，也无覆盖率不达标即失败的分支；全文亦无任何部署、上线冒烟或回滚校验作业（全文 48 行，grep deploy/release 无命中）。",
+      "source": "检查者逐行读取 evidence/ci.yml 并对 85/threshold/cov/deploy/release 做关键字检索，确认缺阈值判定与部署作业；并与 AGENTS.md Q-02（覆盖率 ≥85%）及题面「质量、覆盖率、构建和部署门禁」逐项对照。",
+      "impact": "即使流水线被触发，也只会输出覆盖率数值而不会因覆盖率不足而失败，且完全不含部署门禁，A4-05 的门禁覆盖度不足，质量降一档。",
+      "fix": "在 workflow 中新增覆盖率阈值判定步骤（整体与核心包分别 ≥85%，不达标 exit 1），并补充部署与上线冒烟作业及其回滚校验。",
+      "retest": "复评时核对 workflow 中存在阈值判定步骤，且人为降低覆盖率时流水线确实失败。",
+      "history": "第 6 轮随 evidence/ci.yml 交付首次登记该质量根因。",
+      "deduction_basis": "A4-05 质量轴的独立根因是门禁定义缺覆盖率阈值判定与部署冒烟作业。",
+      "deduplication": "与 ISS-CI-NOT-EFFECTIVE 为同一评分项两个独立根因，分别对应状态与质量扣分轴，根因描述不重叠。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-05",
+          "axis": "quality",
+          "independent_impact": "门禁定义只覆盖构建与测试，缺覆盖率阈值与部署冒烟，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-A1-13-SHIP-RACE",
+      "root_cause": "退款与发货的互斥裁决未在真实 InnoDB 行锁下复现，核心竞争分支仍只在内存互斥锁下成立",
+      "fact": "本轮新增的真实 InnoDB 并发证据覆盖的是 20 并发下单（成功 3、失败 17、available+occupied=5 恒等）；退款申请与发货并发的 3 轮互斥裁决仅见于 demo-memory 后端的探测输出（恒为 refund=0 且 ship=M-22），gormRepository 下的同组并发断言无任何原始输出。",
+      "source": "检查者比对 evidence/mysql_raw_05_app_persistence.txt 与本批次独立反例探测输出，确认 InnoDB 侧无退款/发货并发用例；并核对源码中 UpdateOrderStatus 条件更新与 LockOrder 行锁路径存在但未被该场景触发。",
+      "impact": "A1-13 是题面「操作竞争」场景的独立评分项，退款与发货互斥是其核心竞争分支；该分支缺真实行锁下的实测证据，结论可靠性弱于其它已由 InnoDB 佐证的分支，质量降一档。",
+      "fix": "在真实 MySQL 模式下以同一订单并发发起「申请整单退款」与「登记发货」，保存双方响应与订单行、库存列的表级快照。",
+      "retest": "复评时核对真实库下的并发结果恒为单一合法结果，且订单行与库存列同时一致。",
+      "history": "第 5 轮登记为 ISS-A1-13-CONCURRENCY-ENV（并发环境整体弱于真实 InnoDB）；第 6 轮并发环境缺口已由真实 MySQL 证据部分闭合，但本项所述退款/发货互斥分支的 InnoDB 复现仍缺，故保留并收窄为本根因。",
+      "deduction_basis": "A1-13 质量轴的独立根因是核心竞争分支缺真实行锁下证据。",
+      "deduplication": "与已闭环的 ISS-CONCURRENCY-ENV 区分：本项只指向退款/发货互斥这一具体并发分支，不重复描述环境缺失。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-12",
+        "E-15"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A1-13",
+          "axis": "quality",
+          "independent_impact": "核心竞争分支缺真实行锁下证据，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-PROTO-BROWSER",
+      "root_cause": "原型为静态 HTML 加公共 app.js，缺浏览器端渲染与真实交互的实测证据",
+      "fact": "9 个视图源码经静态断言核对，但检查者仅以 HTTP GET 确认可达，未在浏览器中渲染与点击；无截图。",
+      "source": "检查者执行 9 次 HTTP GET 与源码级 A8~A12 断言，未使用浏览器自动化工具。",
+      "impact": "页面可访问性与契约一致性成立，渲染与交互实测缺失，A1-15 的质量降一档。",
+      "fix": "用浏览器自动化打开 9 个视图，逐页执行一次成功路径与一次失败路径并截图存档。",
+      "retest": "复评时核对截图中的错误码与接口返回一致。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持。",
+      "deduction_basis": "A1-15 唯一关联问题，缺浏览器端渲染与真实交互的实测证据。",
+      "deduplication": "与其它原型问题不重叠，单独计分。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-02",
+        "E-12"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A1-15",
+          "axis": "quality",
+          "independent_impact": "缺浏览器端实测证据，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-ERRCODE-ENUM",
+      "root_cause": "非法输入到错误码的映射仍未逐条穷举触发",
+      "fact": "M-01~M-30 以常量表定义并在服务层集中判断；本轮 57 条非法入参巡检实际只命中 M-03、M-04、M-14、M-20、M-23、M-30 六个业务错误码，其余错误码未构造触发路径。",
+      "source": "检查者对 evidence/api_validation_probe.txt 全文抽取错误码并去重统计，得到 6 个 M-xx 码加 PARAM_ERROR；并核对 server/service/types.go 中 30 个错误码定义与实际被触达的数量差。",
+      "impact": "错误码到触发条件的对应关系不能被第三方直接复算，A2-02 的质量降一档。",
+      "fix": "补一组表驱动用例，对 M-01~M-30 每个码构造至少一条触发路径并断言返回码。",
+      "retest": "复评时核对测试报告中 30 个错误码全部被触达。",
+      "history": "第 5 轮首次单独登记该质量根因；第 6 轮新增的 57 条巡检把覆盖面从 4 类扩到 6 类，但仍未穷举，缺口未消除。",
+      "deduction_basis": "A2-02 唯一关联问题，非法输入到错误码的映射未逐条穷举。",
+      "deduplication": "与状态机相关问题不重叠，单独计分。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-09",
+        "E-10"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A2-02",
+          "axis": "quality",
+          "independent_impact": "错误码映射不可逐一复算，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-API-COVERAGE",
+      "root_cause": "接入层 server/api/v1 逐函数覆盖率偏低，核心包达标但整体覆盖不均衡",
+      "fact": "检查者按包拆解逐函数覆盖率：server/service 包级 98.5%、逐函数最低 85.7%，而 server/api/v1 最低 57.1%；学生本轮自测亦报 api/v1 为 82.2%，均低于 85%。",
+      "source": "检查者用独立 profile 按包与函数输出覆盖率明细，逐包记录最低值；并与 evidence/coverage-gate-func.txt 的学生口径交叉核对。",
+      "impact": "核心业务包达标可判通过，但接入层未覆盖处理器的行为缺回归保护，A3-03 的质量降一档。",
+      "fix": "为 api/v1 中未覆盖的处理器补越权、参数缺失与未知订单三类负向用例。",
+      "retest": "复评时核对 api/v1 逐函数覆盖率不低于 85%。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持；本轮新增的外部巡检脚本不计入 Go 单元测试覆盖率，接入层覆盖未提升。",
+      "deduction_basis": "A3-03 唯一关联问题，接入层 api/v1 逐函数覆盖偏低。",
+      "deduplication": "与覆盖率原件版本标注问题分属覆盖均衡性与可追溯性两个维度。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-09",
+        "E-13"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-03",
+          "axis": "quality",
+          "independent_impact": "接入层覆盖不均衡，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-COV-MULTI",
+      "root_cause": "coverage.out、coverage-all.out、coverage-r5.out 与 evidence/coverage-gate.out 四份覆盖率原件并存且均未标注对应提交与生成时间",
+      "fact": "四份文件同时存在于仓库，大小分别为 45693、349408、349408 与 6049 行，文件内均无版本或时间注释。",
+      "source": "检查者逐份读取首行与文件元数据，确认无任何版本标注。",
+      "impact": "取用时无法快速判定哪一份对应最终提交，覆盖率报告与最终版本的绑定需靠文档转述，A3-04 的质量降一档。",
+      "fix": "为每份原件加注对应提交哈希与生成时间，或只保留最终一份并将历史归档到 docs。",
+      "retest": "复评时核对文件名或文件头即可判定其对应提交。",
+      "history": "第 5 轮首次登记该质量根因；第 6 轮新增 evidence/coverage-gate.out 后原件增至四份，问题未消除且略有扩大。",
+      "deduction_basis": "A3-04 唯一关联问题，覆盖率原件无版本标注。",
+      "deduplication": "与覆盖均衡性问题不重叠，单独计分。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-09",
+        "E-11"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-04",
+          "axis": "quality",
+          "independent_impact": "覆盖率原件无版本标注，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-RUN-DOC-SCATTER",
+      "root_cause": "运行说明分散在多个文档且无统一入口，第三方按单点执行易漏步骤",
+      "fact": "运行方式写在 docs/interface-list.md 第 4 节、docs/代码产物补齐说明.md、docs/git-提交指引.md 与 evidence/mysql核查记录.md 第四节，仓库根目录无 README.md。",
+      "source": "检查者按四个文档逐一执行初始化与启动，确认可行但需跨文档拼装。",
+      "impact": "复现可行，A4-01 判通过；缺统一入口使复现成本偏高，质量降一档。",
+      "fix": "补根目录 README.md，汇总环境前置、构建、启动、演示账号、模拟渠道启动、MySQL 模式与五组场景操作步骤。",
+      "retest": "复评时检查者只读 README.md 即可完整复现。",
+      "history": "第 5 轮首次单独登记该质量根因；第 6 轮新增的 MySQL 核查记录补上了 MySQL 模式的执行入口，但统一入口仍缺，故维持。",
+      "deduction_basis": "A4-01 唯一关联问题，运行说明分散且无统一入口。",
+      "deduplication": "与其它运行类问题不重叠，单独计分。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-05",
+        "E-15"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A4-01",
+          "axis": "quality",
+          "independent_impact": "运行说明分散，复现成本偏高，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-RETEST-ISOLATION",
+      "root_cause": "复测由开发会话自行执行，缺少与开发上下文隔离的独立复测记录",
+      "fact": "r4 与 r5 边界测试、evidence/acceptance-check-rerun.md 及其复跑输出均由开发会话内的 AI 生成与执行；仓库内无第三方或独立会话的复测记录。",
+      "source": "检查者核对测试文件的生成注释与 evidence/ 内的复跑输出，全部指向同一开发会话。",
+      "impact": "复测的独立性不足，A3-08 的质量降一档。",
+      "fix": "由独立测试或验收会话执行复测并单独留档，与开发会话的执行结果分开存放。",
+      "retest": "复评时核对复测输出文件的产出方标注。",
+      "history": "第 5 轮首次单独登记该质量根因，第 6 轮维持；本轮新增的验收重跑记录仍由开发侧会话执行。",
+      "deduction_basis": "A3-08 质量轴的独立根因是复测未与开发上下文隔离。",
+      "deduplication": "与 ISS-NO-INDEP-ACCEPT 区分：后者为验收环节不存在（状态），本项为复测独立性不足（质量）。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-09",
+        "E-18"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-08",
+          "axis": "quality",
+          "independent_impact": "复测未与开发上下文隔离，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-RACE-FIRSTPARTY",
+      "root_cause": "竞态检测结论为第一方产出，检查者未能在同环境复跑该探针",
+      "fact": "evidence/race_raw_output.txt 显示 Go 1.26.8 linux/amd64、gcc (Ubuntu 15.2.0)、CGO_ENABLED=1、6 包 ok、race_exit=0，输出无 WARNING: DATA RACE，执行方式为 WSL 内的 evidence/wsl_race_run.sh。检查者本机为 Windows，CGO_ENABLED=0，where gcc 与 where clang 均无结果，无法在检查者环境复现同一探针。",
+      "source": "检查者执行 go env CGO_ENABLED、where gcc、where clang 实测记录于本批次独立反例探测输出第 0 节；并逐行核对 race_raw_output.txt 的包列表与仓库实际包结构一致。",
+      "impact": "竞态探针是 Q-03 与 A3-06 的关键证据，当前只有第一方记录可依赖，第三方复现路径依赖 WSL 环境而未被 CI 固化，质量降一档。",
+      "fix": "把竞态步骤固化进可运行的 CI（evidence/ci.yml 已有该步骤），在真实流水线中触发一次并上传 race 原始输出，使结论可由第三方复核。",
+      "retest": "复评时核对流水线 run 日志中的 race 步骤输出与本仓库提交对应且无 DATA RACE。",
+      "history": "第 5 轮 ISS-RACE-UNRUN（探针未执行）已在本轮闭环为真实执行；本项为新增的证据来源可核验性问题，不重复扣前项的分。",
+      "deduction_basis": "A3-06 质量轴的独立根因是竞态结论为第一方产出且检查者无法同环境复跑。",
+      "deduplication": "与已闭环的 ISS-RACE-UNRUN、ISS-RACE-DEPTH 区分：本项只针对证据来源的独立性，不再重复描述探针缺失或断言层级不足。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-17",
+        "E-13"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-06",
+          "axis": "quality",
+          "independent_impact": "竞态结论为第一方产出且检查者无法同环境复跑，质量降一档。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-TICKET-SCOPE",
+      "root_cause": "新增的 ticket 验证辅助表采用了题面未涉及的客服工单语义，且文档尾部预留了继续扩展 faq/notice 表的格式说明",
+      "fact": "evidence/db/ticket_schema.sql 与 docs/db/ticket_table_verify.md 建立的 ticket 表含 ticket_no/user_id/content/status（pending/processing/closed），示例内容为「订单 ORD001 未收到货，请协助核查」；需求文档第 8 章 X-12 明确「商品评价、客服工单系统、在线聊天、站内 IM」属题面未涉及范围，AGENTS.md E-03 亦将客服工单列为禁止项。核查确认：该表未进入根目录 schema.sql 的三张业务表，server/ 无任何代码引用，验证数据已在步骤 6 清理。",
+      "source": "检查者核对根目录 schema.sql 仅含 goods/order/payment 三表且均为 InnoDB，检索 server/ 目录中 ticket/Ticket 命中数为 0，读取 evidence/db/ticket_table_verify_raw.txt 确认 steps_after_cleanup=0，并读取需求文档 X-12 条目。",
+      "impact": "该表仅作为数据库层验证辅助物，未污染业务表与业务代码，未改变任何业务判定，因此不影响 A3-05 的成立；但其语义模型与题面边界存在偏离，且文档 HTML 注释写明「后续 faq 表、公告（notice）表的验证文档继续复用本文件格式」，构成继续扩大非题面表范围的明确意向。",
+      "fix": "不另扣分（建议项）。若后续确需保留该表，应在文档中明确其为验证辅助物且不得进入业务 schema 与业务代码；若不再需要，直接移除相关脚本与文档。",
+      "retest": "复评时核对根目录 schema.sql 仍只有三张业务表、server/ 无 ticket 引用，且未新增 faq/notice 等非题面表。",
+      "history": "第 6 轮随 82c4847 提交首次登记；此前 5 轮均未涉及该表。",
+      "deduction_basis": "本项为建议项（advisory），不产生数值扣分，仅作边界提示。",
+      "deduplication": "与已闭环的 ISS-MYSQL-MISSING 等问题不重叠；其数据库层原子性证据价值已计入 A2-04、A3-05、A4-04 的通过判定，不再另扣。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-16",
+        "E-05"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-05",
+          "axis": "advisory",
+          "independent_impact": "建议项：验证辅助表语义与题面边界偏离，不另扣分，仅作边界提示。"
+        }
+      ]
+    },
+    {
+      "id": "ISS-DB-SCREENSHOT-UNTRACKED",
+      "root_cause": "数据库验证的截图证据仅存在于工作区，未纳入版本库，文档亦未引用",
+      "fact": "evidence/db/screenshots/ 下有 7 张 PNG：order_insert_success、order_select_check、order_select_result、order_unique_dup_error、ticket_create_table_ok、ticket_python_conn_refuse、ticket_python_traceback；git log --all -- evidence/db/screenshots 跟踪提交数为 0；全仓文档对 screenshots 的引用数为 0。截图内容为 Navicat Premium 执行 INSERT INTO `order` 返回 1062 - Duplicate entry 'ORD001' for key 'order.uk_order_order_no' 的原始界面，以及 WSL 中 python ticket_verify.py 抛出 pymysql (1698, \"Access denied for user 'root'@'localhost'\") 的排查过程。",
+      "source": "检查者读取工作区该目录的全部 PNG，并以 git log --all 核实未被任何提交跟踪；全仓检索 screenshots 引用数为 0。",
+      "impact": "两项作用：其一，截图可佐证 E-16 的唯一索引 1062 冲突确为真实执行，且 ticket_python_traceback 记录了学生用 root@localhost 触发 1698 权限失败后改用 mysql_prepare_user.sh 建应用账号的真实排查过程，与 mysql_raw_00_env.txt 的账号准备叙述一致，属诚实的过程留痕；其二，截图未入库使克隆仓库的复核者无法看到，证据可及性受限。因属佐证性补充且无文档引用，不影响 A3-05 的判定，不扣分。",
+      "fix": "把 7 张截图纳入版本库，并在 docs/db/order_table_verify.md 与 docs/db/ticket_table_verify.md 中按步骤引用；同时把 .idea/ 等本地临时目录加入 .gitignore，避免工作区长期存在未跟踪文件。",
+      "retest": "复评时核对 git log 能查到该目录的提交，且文档引用路径可打开。",
+      "history": "第 6 轮随学生数据库验证产物核查首次登记；该批截图由学生在第 6 轮数据库验证中产出但未提交。",
+      "deduction_basis": "本项为建议项（advisory），不产生数值扣分，仅提示证据可及性与工作区整洁性问题。",
+      "deduplication": "与 A3-05 的其它扣分项及已闭环的环境缺口不重叠；其佐证价值已计入 A2-04、A3-05、A4-04 的通过判定，不再另扣。",
+      "certainty": "confirmed",
+      "owner": "student",
+      "evidence": [
+        "E-16",
+        "E-13"
+      ],
+      "deductions": [
+        {
+          "check_id": "01-A3-05",
+          "axis": "advisory",
+          "independent_impact": "建议项：验证截图未纳入版本库，不另扣分，仅提示证据可及性。"
+        }
+      ]
+    }
+  ],
+  "token_usage": {
+    "verified": false,
+    "complete": false,
+    "baseline_comparable": false,
+    "total_tokens": null,
+    "baseline_tokens": null,
+    "requests": [],
+    "waste": [],
+    "owner": "teacher",
+    "reason": "教师未发布本题 Token 基准（profile 01.json 的 token_baselines 为空），学生亦未提交分阶段原始 usage 与去重台账；两侧证据皆缺，无法计算可比消耗，也不判额外超耗罚分。按规则暂记 0 分，最终待核定。",
+    "evidence": [
+      "E-14"
+    ]
+  }
+}

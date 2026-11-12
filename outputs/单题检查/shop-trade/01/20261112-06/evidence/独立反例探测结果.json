@@ -1,0 +1,842 @@
+[
+  {
+    "case": "gofmt -l . 无输出",
+    "expected": "",
+    "actual": "",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "go vet 通过",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "go build 成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "go test -count=1 ./... 全部通过",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "健康检查 200",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": "{\"mode\":\"demo-memory\",\"status\":\"ok\"}"
+  },
+  {
+    "case": "身份解析 buyer01→买家",
+    "expected": "买家",
+    "actual": "买家",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"account\":\"buyer01\",\"mode\":\"demo-memory\",\"rol"
+  },
+  {
+    "case": "身份解析 ops01→运营",
+    "expected": "运营",
+    "actual": "运营",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"account\":\"ops01\",\"mode\":\"demo-memory\",\"role\""
+  },
+  {
+    "case": "身份解析 warehouse01→仓库",
+    "expected": "仓库",
+    "actual": "仓库",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"account\":\"warehouse01\",\"mode\":\"demo-memory\","
+  },
+  {
+    "case": "身份解析 cs01→客服",
+    "expected": "客服",
+    "actual": "客服",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"account\":\"cs01\",\"mode\":\"demo-memory\",\"role\":"
+  },
+  {
+    "case": "身份解析 mock01→模拟渠道",
+    "expected": "模拟渠道",
+    "actual": "模拟渠道",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"account\":\"mock01\",\"mode\":\"demo-memory\",\"role"
+  },
+  {
+    "case": "未知身份被拒",
+    "expected": "PARAM_ERROR",
+    "actual": "PARAM_ERROR",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"PARAM_ERROR\",\"message\":\"缺少或未知 X-Demo-Account；身份由服务端预置账号解析，X-Role / X-Us"
+  },
+  {
+    "case": "下单成功(quantity=2)",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "下单金额=单价×数量",
+    "expected": "20000",
+    "actual": "20000",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "下单后可售=3",
+    "expected": "3",
+    "actual": "3",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 3, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 2, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "下单后占用=2",
+    "expected": "2",
+    "actual": "2",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 3, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 2, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "运营越权下单被拒",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "运营调价成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"goods_id\":1,\"goods_no\":\"GOODS-ACT-001\",\"goods_name\":\"活动商品\",\"old_unit_price\":10000,\"n"
+  },
+  {
+    "case": "调价 old_unit_price=10000",
+    "expected": "10000",
+    "actual": "10000",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "调价 new_unit_price=12000",
+    "expected": "12000",
+    "actual": "12000",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "调价后旧单单价快照不变(M-12)",
+    "expected": "10000",
+    "actual": "10000",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "调价后新单按新价",
+    "expected": "12000",
+    "actual": "12000",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "买家越权调价被拒",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "支付金额不符被拒",
+    "expected": "M-29",
+    "actual": "M-29",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-29\",\"message\":\"支付通知金额与订单不符，订单状态不变\",\"data\":{\"amount\":999,\"channel_trade_no\":\"AUD-TR-1\",\"ef"
+  },
+  {
+    "case": "支付验签失败被拒",
+    "expected": "M-28",
+    "actual": "M-28",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-28\",\"message\":\"支付通知验签失败，订单状态不变\",\"data\":{\"amount\":20000,\"channel_trade_no\":\"AUD-TR-1\",\"eff"
+  },
+  {
+    "case": "支付未知订单被拒",
+    "expected": "M-30",
+    "actual": "M-30",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-30\",\"message\":\"支付通知指向未知订单，订单状态不变\",\"data\":{\"amount\":100,\"channel_trade_no\":\"AUD-TR-0\",\"eff"
+  },
+  {
+    "case": "支付成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":20000,\"channel_trade_no\":\"AUD-TR-1\",\"effective\":true,\"event_id\":10,\"event_ty"
+  },
+  {
+    "case": "支付后订单转待发货",
+    "expected": "待发货",
+    "actual": "待发货",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "重复支付通知幂等返回0",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":20000,\"channel_trade_no\":\"AUD-TR-1\",\"effective\":null,\"event_id\":11,\"event_ty"
+  },
+  {
+    "case": "重复通知留痕 event_type=重复支付通知",
+    "expected": "重复支付通知",
+    "actual": "重复支付通知",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":20000,\"channel_trade_no\":\"AUD-TR-1\",\"effective\":null,\"event_id\":11,\"event_type\":\"重复支付通知\",\"failure_code\":\"M-25\",\"fail"
+  },
+  {
+    "case": "重复通知留痕 result=幂等未重复记款",
+    "expected": "重复支付通知已幂等处理，未重复记款",
+    "actual": "重复支付通知已幂等处理，未重复记款",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":20000,\"channel_trade_no\":\"AUD-TR-1\",\"effective\":null,\"event_id\":11,\"event_type\":\"重复支付通知\",\"failure_code\":\"M-25\",\"fail"
+  },
+  {
+    "case": "同一渠道交易号不得归属两单",
+    "expected": "M-27",
+    "actual": "M-27",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-27\",\"message\":\"同一渠道交易号已归属其他订单，本次关联被拒\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-TR-1\",\"effective\":null,\""
+  },
+  {
+    "case": "越权查询他人订单被拒",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "越权取消他人订单被拒",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "登记发货成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":0,\"channel_trade_no\":\"SHIP:ORD-1794491098068008700-1001-1\",\"effective\":true,"
+  },
+  {
+    "case": "重复发货被拒(M-19)",
+    "expected": "M-19",
+    "actual": "M-19",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-19\",\"message\":\"该订单已登记发货，不能重复登记\",\"data\":{\"amount\":0,\"channel_trade_no\":\"SHIP:ORD-179449109"
+  },
+  {
+    "case": "空承运方发货被拒(M-23)",
+    "expected": "M-23",
+    "actual": "M-23",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-23\",\"message\":\"承运方或运单号未填写，不能登记发货\",\"data\":{\"amount\":0,\"channel_trade_no\":\"SHIP:ORD-1794491"
+  },
+  {
+    "case": "已发货订单不受理售前退款(M-11)",
+    "expected": "M-11",
+    "actual": "M-11",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-11\",\"message\":\"已发货订单不受理本题售前退款\",\"data\":null}"
+  },
+  {
+    "case": "发货后订单终态=已发货",
+    "expected": "已发货",
+    "actual": "已发货",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "申请整单退款成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1003,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "退款申请期间发货被拒(M-22)",
+    "expected": "M-22",
+    "actual": "M-22",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-22\",\"message\":\"退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果\",\"data\":{\"amount\":0,\"channel_trade_no\""
+  },
+  {
+    "case": "客服同意缺原因被拒(M-24)",
+    "expected": "M-24",
+    "actual": "M-24",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-24\",\"message\":\"审核退款 / 核实异常必须写明原因\",\"data\":null}"
+  },
+  {
+    "case": "买家越权审核被拒(M-20)",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "客服同意退款成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1003,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "渠道退款首次失败(M-08)",
+    "expected": "M-08",
+    "actual": "M-08",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-08\",\"message\":\"渠道退款失败，已保留待处理记录，请客服重试\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-RF-1\",\"effective\":null,\""
+  },
+  {
+    "case": "渠道失败后仍在退款流程",
+    "expected": "退款处理中",
+    "actual": "退款处理中",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1003,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "客服登记重试成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1003,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "渠道退款再次成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-RF-2\",\"effective\":true,\"event_id\":29,\"event_ty"
+  },
+  {
+    "case": "退款成功后订单=已退款",
+    "expected": "已退款",
+    "actual": "已退款",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1003,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "退款后库存恢复标记",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1003,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:54:5"
+  },
+  {
+    "case": "逐单核查 期望恢复次数=1",
+    "expected": "1",
+    "actual": "1",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"order_no\":\"ORD-1794491098255488700-1003-4\",\"order_status\":\"已退款\",\"refund_kind\":\"正常售前退"
+  },
+  {
+    "case": "逐单核查 实际恢复次数=1",
+    "expected": "1",
+    "actual": "1",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"order_no\":\"ORD-1794491098255488700-1003-4\",\"order_status\":\"已退款\",\"refund_kind\":\"正常售前退"
+  },
+  {
+    "case": "逐单核查 一致",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"order_no\":\"ORD-1794491098255488700-1003-4\",\"order_status\":\"已退款\",\"refund_kind\":\"正常售前退"
+  },
+  {
+    "case": "重复退款通知幂等",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-RF-2\",\"effective\":null,\"event_id\":30,\"event_ty"
+  },
+  {
+    "case": "重复退款通知后恢复次数仍=1",
+    "expected": "1",
+    "actual": "1",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"order_no\":\"ORD-1794491098255488700-1003-4\",\"order_status\":\"已退款\",\"refund_kind\":\"正常售前退"
+  },
+  {
+    "case": "买家无权做库存核查(M-20)",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "已退款订单再申请被拒(M-11)",
+    "expected": "M-11",
+    "actual": "M-11",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-11\",\"message\":\"已发货订单不受理本题售前退款\",\"data\":null}"
+  },
+  {
+    "case": "演示时钟推进 11 分钟",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"clock_offset_minutes\":11,\"server_time\":\"2026-11-12T21:55:58.2647326+08:00\"}}"
+  },
+  {
+    "case": "超时关单执行成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"clock_offset_minutes\":11,\"closed_count\":3}}"
+  },
+  {
+    "case": "超时订单=已关闭",
+    "expected": "已关闭",
+    "actual": "已关闭",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":\"2026-11-12T21:55:58.2652446+08:00\",\""
+  },
+  {
+    "case": "重复关单不多释放(占用不变)",
+    "expected": "2",
+    "actual": "2",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "演示时钟越界被拒",
+    "expected": "PARAM_ERROR",
+    "actual": "PARAM_ERROR",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"PARAM_ERROR\",\"message\":\"offset_minutes 必须在 0~1440 之间\",\"data\":null}"
+  },
+  {
+    "case": "迟到支付返回 M-09",
+    "expected": "M-09",
+    "actual": "M-09",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-09\",\"message\":\"迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-LATE-"
+  },
+  {
+    "case": "迟到支付不改订单状态",
+    "expected": "已关闭",
+    "actual": "已关闭",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":\"2026-11-12T21:55:58.2652446+08:00\",\""
+  },
+  {
+    "case": "迟到支付不重新占用库存",
+    "expected": "2",
+    "actual": "2",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "客服核实迟到支付异常",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"LATE_VERIFY:AUD-LATE-1\",\"effective\":null,\"event_id"
+  },
+  {
+    "case": "发起迟到支付退款",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-LATE-RF\",\"effective\":null,\"event_id\":38,\"event"
+  },
+  {
+    "case": "迟到支付退款渠道成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":10000,\"channel_trade_no\":\"AUD-LATE-RF\",\"effective\":true,\"event_id\":39,\"event_type\":\"迟到支付退款成功\",\"failure_cod"
+  },
+  {
+    "case": "迟到支付退款后订单仍为已关闭",
+    "expected": "已关闭",
+    "actual": "已关闭",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":\"2026-11-12T21:55:58.2652446+08:00\",\""
+  },
+  {
+    "case": "迟到支付退款不二次恢复库存(M-26)",
+    "expected": "2",
+    "actual": "2",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "渠道超时通知受理",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"event_id\":40,\"order_no\":\"ORD-1794491098130850000-1002-3\",\"order_status\":\"已关闭\",\"chann"
+  },
+  {
+    "case": "超时通知不改订单状态标记",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"event_id\":40,\"order_no\":\"ORD-1794491098130850000-1002-3\",\"order_status\":\"已关闭\",\"chann"
+  },
+  {
+    "case": "超时通知后订单状态不变",
+    "expected": "已关闭",
+    "actual": "已关闭",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"expires_at\":\"2026-11-12T21:54:58.13085+08:00\",\"is_terminal\":true,\"order_no\":\"ORD-179"
+  },
+  {
+    "case": "重复超时通知幂等",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"event_id\":40,\"order_no\":\"ORD-1794491098130850000-1002-3\",\"order_status\":\"已关闭\",\"chann"
+  },
+  {
+    "case": "买家越权发超时通知被拒",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "运营汇总可查",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"duplicate_refund_events\":1,\"duplicate_release_noop_events\":1,\"effective_payment_amount\":30000,\"late_payment_events\":1,\"late_"
+  },
+  {
+    "case": "买家无权查看运营汇总",
+    "expected": "M-20",
+    "actual": "M-20",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-20\",\"message\":\"无权限 / 越权：不能查看或处理他人订单\",\"data\":null}"
+  },
+  {
+    "case": "取消待支付订单成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":\"2026-11-12T21:55:58.3333731+08:00\",\"closed_at\":null,\""
+  },
+  {
+    "case": "取消后订单=已取消",
+    "expected": "已取消",
+    "actual": "已取消",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":\"2026-11-12T21:55:58.3333731+08:00\",\"closed_at\":null,\""
+  },
+  {
+    "case": "重复取消被拒(M-10)",
+    "expected": "M-10",
+    "actual": "M-10",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"M-10\",\"message\":\"重复操作被拒绝，不产生第二笔业务结果\",\"data\":null}"
+  },
+  {
+    "case": "下单 qty=2 后可售=3",
+    "expected": "3",
+    "actual": "3",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 3, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 2, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "下单 qty=2 后占用=2",
+    "expected": "2",
+    "actual": "2",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 3, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 2, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "演示时钟推进 11 分钟",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"clock_offset_minutes\":11,\"server_time\":\"2026-11-12T21:55:59.2805561+08:00\"}}"
+  },
+  {
+    "case": "超时关单执行成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"clock_offset_minutes\":11,\"closed_count\":1}}"
+  },
+  {
+    "case": "本次关闭订单数=1",
+    "expected": "1",
+    "actual": "1",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"clock_offset_minutes\":11,\"closed_count\":1}}"
+  },
+  {
+    "case": "超时关闭后可售回到5",
+    "expected": "5",
+    "actual": "5",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 5, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 0, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "超时关闭后占用归零",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 5, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 0, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "超时订单=已关闭",
+    "expected": "已关闭",
+    "actual": "已关闭",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":\"2026-11-12T21:55:59.281058+08:00\",\"e"
+  },
+  {
+    "case": "重复关单不多释放(占用仍为0)",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 5, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 0, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "重复关单后可售仍为5",
+    "expected": "5",
+    "actual": "5",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 5, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 0, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "申请退款成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "客服拒绝退款成功",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "拒绝后订单恢复为待发货",
+    "expected": "待发货",
+    "actual": "待发货",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:00.243665+08:00\",\"goods_id\":1,\"goods_name"
+  },
+  {
+    "case": "拒绝后退款状态留痕为已拒绝",
+    "expected": "已拒绝",
+    "actual": "已拒绝",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:00.243665+08:00\",\"goods_id\":1,\"goods_name"
+  },
+  {
+    "case": "拒绝后允许继续发货",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"amount\":0,\"channel_trade_no\":\"SHIP:ORD-1794491100243665000-1001-1\",\"effective\":true,"
+  },
+  {
+    "case": "发货后订单=已发货",
+    "expected": "已发货",
+    "actual": "已发货",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "第1轮并发前置下单成功（库存充足）",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "第1轮并发只形成一种合法结果",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "refund=M-11 ship=0 status=已发货"
+  },
+  {
+    "case": "第1轮发货成功则终态为已发货",
+    "expected": "已发货",
+    "actual": "已发货",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "第2轮并发前置下单成功（库存充足）",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "第2轮并发只形成一种合法结果",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "refund=0 ship=M-22 status=退款审核中"
+  },
+  {
+    "case": "第2轮退款成功则状态为退款审核中",
+    "expected": "退款审核中",
+    "actual": "退款审核中",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "第3轮并发前置下单成功（库存充足）",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "第3轮并发只形成一种合法结果",
+    "expected": "True",
+    "actual": "True",
+    "verdict": "PASS",
+    "detail": "refund=0 ship=M-22 status=退款审核中"
+  },
+  {
+    "case": "第3轮退款成功则状态为退款审核中",
+    "expected": "退款审核中",
+    "actual": "退款审核中",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "20 并发请求全部有明确结果",
+    "expected": "20",
+    "actual": "20",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "成功下单数=可售5",
+    "expected": "5",
+    "actual": "5",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "库存不足数=15",
+    "expected": "15",
+    "actual": "15",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "并发后可售=0",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 0, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 5, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "并发后占用=5",
+    "expected": "5",
+    "actual": "5",
+    "verdict": "PASS",
+    "detail": "{'available_stock': 0, 'goods_no': 'GOODS-ACT-001', 'id': 1, 'name': '活动商品', 'occupied_stock': 5, 'status': '在售', 'unit_price': 10000}"
+  },
+  {
+    "case": "重启前订单可查",
+    "expected": "0",
+    "actual": "0",
+    "verdict": "PASS",
+    "detail": "{\"code\":\"0\",\"message\":\"ok\",\"data\":{\"buyer_id\":1001,\"cancelled_at\":null,\"closed_at\":null,\"expires_at\":\"2026-11-12T21:55:0"
+  },
+  {
+    "case": "【环境限制·非代码缺陷】重启后同一订单仍可查（demo-memory 无持久化，真实 MySQL 未验证）",
+    "expected": "0",
+    "actual": "M-30",
+    "verdict": "DIFF",
+    "detail": "{\"code\":\"M-30\",\"message\":\"支付通知指向未知订单，订单状态不变\",\"data\":null}"
+  },
+  {
+    "case": "【环境限制·非代码缺陷】重启后商品可售回到初始5",
+    "expected": "5",
+    "actual": "5",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v01-goods.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v02-orders.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v03-goods-admin.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v04-ops-summary.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v05-shipment-list.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v06-shipment-form.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v07-refund-review.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  },
+  {
+    "case": "页面 v08-late-payment.html 可达",
+    "expected": "200",
+    "actual": "200",
+    "verdict": "PASS",
+    "detail": ""
+  }
+]

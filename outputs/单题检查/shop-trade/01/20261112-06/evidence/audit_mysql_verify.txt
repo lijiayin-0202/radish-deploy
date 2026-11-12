@@ -1,0 +1,40 @@
+===== 检查者独立 MySQL/InnoDB 复核（第6轮）=====
+时间：2026-11-12 21:47:29
+
+--- 1. 业务表引擎与字符集 ---
+TABLE_NAME	ENGINE	TABLE_COLLATION
+goods	InnoDB	utf8mb4_0900_ai_ci
+order	InnoDB	utf8mb4_0900_ai_ci
+payment	InnoDB	utf8mb4_0900_ai_ci
+[断言] PASS | 三张业务表均为 InnoDB + utf8mb4 | TABLE_NAME	ENGINE	TABLE_COLLATION | goods	InnoDB	utf8mb4_0900_ai_ci | order	InnoDB	utf8mb4_0900_ai_ci | payment	InnoDB	utf8mb4_0900_ai_ci
+
+--- 2. 唯一约束清单 ---
+TABLE_NAME	INDEX_NAME	NON_UNIQUE
+goods	PRIMARY	0
+goods	uk_goods_goods_no	0
+order	PRIMARY	0
+order	uk_order_order_no	0
+payment	PRIMARY	0
+payment	uk_payment_dedup_key	0
+payment	uk_payment_channel_effective	0
+payment	uk_payment_channel_effective	0
+ticket	PRIMARY	0
+ticket	uk_ticket_ticket_no	0
+[断言] PASS | 唯一索引存在：uk_order_order_no | 
+[断言] PASS | 唯一索引存在：uk_payment_dedup_key | 
+[断言] PASS | 唯一索引存在：uk_payment_channel_effective | 
+[断言] PASS | 唯一索引存在：uk_goods_goods_no | 
+
+--- 3. 自行构造重复插入验证 1062 ---
+ERROR 1062 (23000) at line 1: Duplicate entry 'AUDIT-DUP-0001' for key 'order.uk_order_order_no'
+[断言] PASS | 重复 order_no 被拦截且报 1062 | ERROR 1062 (23000) at line 1: Duplicate entry 'AUDIT-DUP-0001' for key 'order.uk_order_order_no'
+
+--- 4. 数据库重启后行数据仍在 ---
+order_no	total_amount	status
+AUDIT-PERSIST-0001	10000	待支付
+[断言] PASS | 数据库重启后行数据仍在 | mysqld_alive=True rows=order_no	total_amount	status
+AUDIT-PERSIST-0001	10000	待支付
+
+--- 5. 应用进程重启后同一订单仍可查询 ---
+[说明] 学生口令临时文件已失效，检查者自建一次性账号 audit_chk 复核（复核后删除）
+[跳过] 无法准备数据库账号，未执行应用级持久化复核
