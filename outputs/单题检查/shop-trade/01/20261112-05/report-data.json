@@ -1,0 +1,1118 @@
+{
+  "schema_version": "3.0",
+  "meta": {
+    "delivery_date": "2026-11-12",
+    "deployment": "未部署。本地无远端仓库（git remote -v 为空）、无 main 分支、无制品与流水线、无上线地址，部署与上线冒烟按缺证登记为 unknown/fail（见 LIM-06、表格 code_runtime.deployed_smoke）。",
+    "version_chain": "dev/01 共 7 次提交：6cc6f13（基线 feat：需求/原型/计划文档 + 全部业务源码）→ 6083edd [opt] 补齐验收检查 Skill 与商品调价等交付产物 → 018551c [opt] 补齐模拟支付渠道服务与第四轮冒烟产物 → 00520bd [test] 补充第五轮边界单测与证据采集产物 → 537453c [docs] 补齐接口边界矩阵与第五轮证据闭环文档 → 68801cb [docs] 回补版本链核查与第五轮提交记录 → 58719fb [test] 追加提交后门禁复核原始输出（HEAD，检查基准）。全程仅 dev/01 一个分支，无 main、无远端、无 PR 记录。",
+    "scope": "题面「题目 01 + 一、所有题目共同适用的要求」全量条目，叠加固定清单 references/profiles/01.json 的 58 个原子评分项：A1 八条业务规则与五组演示场景（13 项）、A2 数据与持久化、A3 代码与并发、A4 流程与交付物、B1 阶段与顺序、B2 测试与验收独立性、B3 Agent 与 Skill、B4 Git/流水线/部署/讲解。核查手段为：全仓产物清点与缺证登记、Go 工具链独立复跑（gofmt/go vet/go build/go test/go test -coverpkg）、独立二进制 + 独立端口 18097 的 120 条反例探测、源码通读与版本链核查。",
+    "token_note": "Token 计分暂记 0.00/1.5、状态 unknown，理由：教师未发布本题 Token 基准（references/profiles/01.json 的 token_baselines 为空），学生亦未提交分阶段原始 usage 与去重台账，无可比总量，无法计算消耗比与可避免 Token，因此不计分、不推定学生浪费。该缺口已按教师责任登记为限制项 LIM-01 与门禁项 TOKEN；教师发布基准并由学生补交官方 usage 原件后，须重新运行 token_score 并重算总分，故本批次 5.93 为当前已核验得分而非最终成绩。"
+  },
+  "tables": {
+    "completion": [
+      {
+        "requirement_id": "01-A1-01",
+        "role_precondition": "买家角色；商品在售且可售数量足够",
+        "operations": "运营调价 10000→12000 后，用同一商品分别下单并查询订单商品与金额，读取商品可售与占用",
+        "expected": "旧订单 unit_price 保持 10000，新订单为 12000，可售与占用随下单变化",
+        "actual": "旧单 unit_price=10000、新单=12000、total_amount=20000（10000×2）；下单后 goods1 可售 3、占用 2；运营越权下单返回 M-20",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-02",
+        "role_precondition": "买家角色；待支付订单与演示教学时钟",
+        "operations": "独立进程下单 quantity=2，推进演示时钟 11 分钟，执行超时关单，重复关单后再查库存与订单状态",
+        "expected": "超时订单转已关闭并释放占用，重复关闭不多释放，越界时钟参数被拒",
+        "actual": "closed_count=1，可售回到 5、占用归零；重复关单占用仍为 0；offset_minutes=-1 返回 PARAM_ERROR",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-03",
+        "role_precondition": "模拟渠道角色；已支付订单与渠道交易号",
+        "operations": "分别提交金额不符、验签失败、未知订单通知，再提交同一 channel_trade_no 两次并把同一交易号用于另一订单",
+        "expected": "前三类各自返回对应错误码；重复通知幂等不重复记款；同一交易号不得归属两单",
+        "actual": "M-29、M-28、M-30；重复通知返回 0 且留痕「重复支付通知已幂等处理，未重复记款」；跨订单复用同号返回 M-27",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-04",
+        "role_precondition": "买家与模拟渠道角色；有效期内订单与已超时关闭订单",
+        "operations": "对有效期内订单支付；对已关闭订单支付；再由客服核实异常、发起迟到支付退款并回调渠道成功",
+        "expected": "有效期内转待发货；迟到支付不改订单状态、不重占库存，可核实可退款且不二次释放库存",
+        "actual": "有效期内转「待发货」；迟到支付返回 M-09，订单状态与占用均不变；核实与发起退款成功，渠道回调成功后订单仍为「已关闭」，库存占用未二次恢复",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-05",
+        "role_precondition": "买家申请、仓库发货、客服审核三角色",
+        "operations": "买家申请整单退款；仓库尝试发货；客服同意一次、再用另一单走拒绝路径并继续发货",
+        "expected": "申请期间发货被拒；同意与拒绝均需写明原因；拒绝后允许继续发货",
+        "actual": "发货被拒 M-22；同意与拒绝均成功（拒绝留痕「已拒绝」）；拒绝后订单恢复「待发货」并可成功登记发货，终态「已发货」",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-06",
+        "role_precondition": "买家与模拟渠道角色；已付款订单",
+        "operations": "客服同意退款后先回调失败、再登记重试后回调成功，并用库存核查接口与重复通知交叉验证",
+        "expected": "渠道失败保留待处理记录，客服可重试；成功后买家可见结果且可售恢复；重复通知不重复退款",
+        "actual": "失败返回 M-08 且订单停在「退款处理中」；重试后成功返回 0，订单「已退款」stock_restored=true；逐单核查 expected=actual=1、consistent=true；重复通知后恢复次数仍为 1",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-07",
+        "role_precondition": "仓库角色；待发货订单",
+        "operations": "登记发货两次、提交空承运方一次、再对已发货订单申请售前退款",
+        "expected": "发货只能登记一次，已发货不受理售前退款，不实现签收与售后物流",
+        "actual": "首次发货成功；重复发货 M-19；空承运方 M-23；已发货申请退款 M-11；源码确认无签收/退货/售后物流实现",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-08",
+        "role_precondition": "运营角色；存在收款、退款、发货与异常记录",
+        "operations": "以运营角色读取运营汇总并按订单查询记录，再以买家角色访问同一接口",
+        "expected": "运营可查收款、退款、发货与异常记录及可售、已收款、已退款汇总；越权被拒；异常记录不能通过改写订单状态消失",
+        "actual": "运营汇总可查；买家访问返回 M-20；源码无任何改写订单状态或删除业务记录入口，异常仅以 noop/rejected 留痕追加",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-09",
+        "role_precondition": "运营上架与调价、买家下单付款、仓库发货、买家查运单、运营核查",
+        "operations": "按场景顺序连续执行五步，跨角色调用真实接口",
+        "expected": "成交链路全程可操作，订单与金额、库存状态自洽",
+        "actual": "五步全部返回成功响应，订单状态依次为待支付→待发货→已发货，运单与汇总数据一致",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-10",
+        "role_precondition": "20 个并发买家请求；商品可售 5 件",
+        "operations": "20 线程并发下单后读取商品快照；另在独立进程关闭超时订单后由另一买家重新下单",
+        "expected": "不超卖、库存守恒，未付款订单关闭释放占用后他人可购买",
+        "actual": "成功 5 + M-02 15 = 20，可售 0、占用 5；独立进程关闭后可售回到 5，另一买家下单成功",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-11",
+        "role_precondition": "买家付款后申请、仓库尝试发货、客服批准、模拟渠道回调",
+        "operations": "按场景顺序执行申请→发货受限→同意→首次失败→重试→再次成功，再用核查接口核对数量",
+        "expected": "退款链全程可操作，失败与重试留痕，最终订单与数量一致",
+        "actual": "发货被拒 M-22；失败 M-08 订单停在「退款处理中」；重试后成功返回 0，订单「已退款」，逐单核查 expected=actual=1、consistent=true",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-12",
+        "role_precondition": "订单先关闭；客服从异常列表处理",
+        "operations": "关闭订单后支付成功通知，由客服核实、发起退款、渠道回调成功，最后查订单与库存",
+        "expected": "生成异常待处理记录，订单不恢复、不重复释放，可核实并退款",
+        "actual": "支付返回 M-09 并带 event_id；核实与发起退款成功；渠道回调成功；订单仍为「已关闭」，库存占用与处理前相同",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      },
+      {
+        "requirement_id": "01-A1-13",
+        "role_precondition": "退款申请与发货同时到达；重复通知；越权访问",
+        "operations": "3 轮并发同时发起退款申请与发货，重复支付与退款通知各两次，越权访问 6 类接口",
+        "expected": "并发只形成一种合法结果；重复通知幂等；越权一律被拒",
+        "actual": "3 轮并发结果恒为 refund=0 且 ship=M-22、订单落「退款审核中」；重复通知幂等；6 类越权全部返回 M-20",
+        "status": "pass",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-04",
+          "E-12"
+        ]
+      }
+    ],
+    "code_runtime": [
+      {
+        "metric": "format_vet",
+        "status": "pass",
+        "command": "gofmt -l . ； go vet ./...",
+        "expected": "gofmt 无输出、go vet 无告警并返回 0",
+        "actual": "gofmt -l . 无输出；go vet 无输出，exit=0",
+        "exit_code": "0",
+        "environment": "Windows 11 + PowerShell，Go 官方工具链",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-13"
+        ]
+      },
+      {
+        "metric": "build",
+        "status": "pass",
+        "command": "go build -o <tmp>/shop-trade-audit.exe .",
+        "expected": "构建成功并产出可执行文件",
+        "actual": "exit=0，无错误输出",
+        "exit_code": "0",
+        "environment": "Windows 11 + PowerShell，Go 官方工具链",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-13"
+        ]
+      },
+      {
+        "metric": "startup",
+        "status": "pass",
+        "command": "GVA_ADDR=:18097 <exe>（未设置 GVA_MYSQL_DSN，demo-memory 模式）",
+        "expected": "进程启动并监听端口",
+        "actual": "进程正常启动，检查者独立二进制可拉起并监听 18097",
+        "exit_code": "0",
+        "environment": "Windows 11，本地进程，无远端依赖",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-12",
+          "E-13"
+        ]
+      },
+      {
+        "metric": "health",
+        "status": "pass",
+        "command": "GET /health",
+        "expected": "HTTP 200 且返回健康状态",
+        "actual": "HTTP 200，响应体正常",
+        "exit_code": "0",
+        "environment": "Windows 11，本地 demo-memory 实例",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-12"
+        ]
+      },
+      {
+        "metric": "normal_business",
+        "status": "pass",
+        "command": "下单→支付→发货→查单→退款→迟到支付全链共 120 条断言",
+        "expected": "正常路径全部返回成功且状态自洽",
+        "actual": "120 条断言 119 PASS，唯一 1 条 DIFF 为 demo-memory 无持久化的环境限制，非业务失败",
+        "exit_code": "0",
+        "environment": "检查者独立实例，端口 18097",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-12"
+        ]
+      },
+      {
+        "metric": "abnormal_business",
+        "status": "pass",
+        "command": "越权、幂等、重复、并发、非法参数与未知订单共 38 类负向断言",
+        "expected": "各类异常返回 M-xx 或 PARAM_ERROR 且不产生第二笔业务结果",
+        "actual": "全部返回预期错误码；重复支付/退款通知不重复记款与退款；20 并发守恒；6 类越权全部 M-20",
+        "exit_code": "0",
+        "environment": "检查者独立实例，端口 18097",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-12"
+        ]
+      },
+      {
+        "metric": "persistence_restart",
+        "status": "partial",
+        "command": "下单→支付→查单→真实终止并重启同一二进制进程→再查同一订单",
+        "expected": "真实 MySQL 下重启后同一订单仍可查、可售与占用保持",
+        "actual": "demo-memory 模式下重启后查单返回 M-30、可售回到初始 5，业务结果不落库；真实 MySQL 未验证",
+        "exit_code": "0",
+        "environment": "本机无 MySQL 实例（where mysql 无结果），GVA_MYSQL_DSN 未设置",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-12",
+          "E-13"
+        ]
+      },
+      {
+        "metric": "deployed_smoke",
+        "status": "unknown",
+        "command": "（无）无远端仓库、无 main 分支、无部署流水线，无法执行上线冒烟",
+        "expected": "对上线地址执行健康与核心业务冒烟并留存响应",
+        "actual": "未执行：git remote -v 为空、无部署产物，缺证按 unknown 登记而非判失败",
+        "exit_code": "（未执行）",
+        "environment": "无远端与部署环境",
+        "revision": "58719fb（dev/01，2026-11-12）",
+        "evidence": [
+          "E-13",
+          "E-14"
+        ]
+      }
+    ],
+    "workflow": [
+      {
+        "stage": "requirements",
+        "predecessors": [],
+        "time": "2026-11-12（基线提交 6cc6f13 内）",
+        "snapshot": "需求文档 v1.0（666 行）与 docs/dev-assumptions.md",
+        "handoff": "题面、需求文档、假设清单 A-01~A-25 移交原型阶段",
+        "status": "pass",
+        "gate": "需求条目、角色、状态机、异常与验收条件齐备后方可进入原型",
+        "evidence": [
+          "E-01"
+        ]
+      },
+      {
+        "stage": "prototype",
+        "predecessors": [
+          "requirements"
+        ],
+        "time": "2026-11-12（基线提交 6cc6f13 内）",
+        "snapshot": "原型设计文档 v1.0 与 resource/static/ 9 个视图",
+        "handoff": "显隐矩阵、状态机与失败状态移交任务规划",
+        "status": "pass",
+        "gate": "视图覆盖角色、关键结果与失败状态后方可进入规划",
+        "evidence": [
+          "E-02"
+        ]
+      },
+      {
+        "stage": "planning",
+        "predecessors": [
+          "prototype"
+        ],
+        "time": "2026-11-12（基线提交 6cc6f13 内）",
+        "snapshot": "任务规划文档 v1.1（285 行）",
+        "handoff": "M0/M1 任务、依赖、完成判定与五组场景绑定移交开发",
+        "status": "pass",
+        "gate": "每条需求可映射到任务与完成条件后方可开发",
+        "evidence": [
+          "E-03"
+        ]
+      },
+      {
+        "stage": "development",
+        "predecessors": [
+          "planning"
+        ],
+        "time": "2026-11-12（6cc6f13 及后续 6 次提交）",
+        "snapshot": "Go 源码、schema.sql、模拟渠道服务、8 个业务视图与 AGENTS.md v1.1",
+        "handoff": "源码与运行说明移交测试；因无独立测试会话，仅移交至同一开发会话",
+        "status": "pass",
+        "gate": "构建与启动自检通过后移交测试",
+        "evidence": [
+          "E-04",
+          "E-05",
+          "E-06"
+        ]
+      },
+      {
+        "stage": "testing",
+        "predecessors": [
+          "development"
+        ],
+        "time": "2026-11-12（同开发会话内）",
+        "snapshot": "12 个 *_test.go、112 份集成证据与 5 个采集脚本",
+        "handoff": "无独立测试 Agent 会话导出，缺证按阶段失败登记",
+        "status": "fail",
+        "gate": "须由独立测试 Agent 读取原题与对应版本代码后执行并导出会话",
+        "evidence": [
+          "E-09",
+          "E-10",
+          "E-14"
+        ]
+      },
+      {
+        "stage": "acceptance",
+        "predecessors": [
+          "testing"
+        ],
+        "time": "（未发生）",
+        "snapshot": "无独立验收会话与验收报告；outputs/ 下各批次均为开发会话自检",
+        "handoff": "无独立验收结论与证据位置移交 PR",
+        "status": "fail",
+        "gate": "须由独立验收 Agent 逐项给出通过/不通过与证据位置",
+        "evidence": [
+          "E-14"
+        ]
+      },
+      {
+        "stage": "deployment",
+        "predecessors": [
+          "acceptance"
+        ],
+        "time": "（未发生）",
+        "snapshot": "无远端仓库、无 main 分支、无制品、无部署流水线与上线地址",
+        "handoff": "无上线版本与冒烟结果移交班级群提交",
+        "status": "fail",
+        "gate": "须经 PR 合并 main、流水线门禁通过后部署并留存地址与回退方案",
+        "evidence": [
+          "E-13",
+          "E-14"
+        ]
+      }
+    ],
+    "agents_skills": [
+      {
+        "id": "SKILL-AGENT-RULES",
+        "kind": "agent_rules",
+        "name": "题目 01 项目级 Agent 约束",
+        "source_version": "AGENTS.md v1.1（v1.0 历史版本保留）",
+        "location": "AGENTS.md；AGENTS-v1.0.md",
+        "scenario": "开发前编写并加载，覆盖七阶段与三角色边界",
+        "loaded_at": "（无加载记录文件；第 0 章自述在业务开发前生效）",
+        "usage_location": "开发阶段约束开发、测试与验收三类会话的范围与提交门禁",
+        "reason": "题面共同要求第 3 节规定必须在业务开发开始前自行编写并实际使用项目级 Agent 约束",
+        "input_output": "输入为题面与三份上游文档；输出为三角色职责、可改范围、提交规范、质量门禁与证据索引",
+        "help": "约束了 P-01~P-08 禁止项、一次提交只含一种类型、覆盖率与 race 门禁、三方会话隔离",
+        "limitations": "无实际加载记录文件，加载生效只能由文件自述推断；首次基线提交一次性纳入全部文件，无法证明开发前加载",
+        "status": "pass",
+        "evidence": [
+          "E-06"
+        ]
+      },
+      {
+        "id": "SKILL-BIZ-GVA-MODEL",
+        "kind": "business_skill",
+        "name": "gva-model-generate（GVA GORM 模型与 InnoDB DDL）",
+        "source_version": ".codebuddy/skills/gva-model-generate",
+        "location": "SKILL.md + scripts + references",
+        "scenario": "为本题订单、支付、退款、发货与事件表生成 GVA GORM 模型与 DDL",
+        "loaded_at": "2026-11-12（开发阶段）",
+        "usage_location": "开发阶段生成 server/model 与 schema.sql",
+        "reason": "题面要求技术栈为 Go + Gorm + MySQL(InnoDB)，需保证模型与 DDL 一致",
+        "input_output": "输入为需求数据模型；输出为 server/model/*.go 与 schema.sql（已落库可核对）",
+        "help": "统一了字段命名、软删除与状态枚举，并输出 InnoDB + utf8mb4 建表语句",
+        "limitations": "真实 MySQL 实例未执行 DDL，唯一键冲突未真实触发",
+        "status": "pass",
+        "evidence": [
+          "E-07",
+          "E-05"
+        ]
+      },
+      {
+        "id": "SKILL-BIZ-UNIT-TEST-RACE",
+        "kind": "business_skill",
+        "name": "unit-test-race（覆盖率与竞争检测门禁）",
+        "source_version": ".codebuddy/skills/unit-test-race",
+        "location": "SKILL.md + scripts + references",
+        "scenario": "为 service 层补边界单测并输出覆盖率与 race 门禁结论",
+        "loaded_at": "2026-11-12（第 4、5 轮整改期）",
+        "usage_location": "整改阶段生成 r4_edge_test.go、r5_edge_test.go、r5_edge2_test.go 与覆盖率输出",
+        "reason": "AGENTS.md Q-02/Q-03 要求整体及核心包覆盖率 ≥85% 且并发逻辑执行 go test -race",
+        "input_output": "输入为 service 层错误分支清单；输出为 3 个边界测试文件、coverage-r5.out 与门禁原始输出",
+        "help": "以注入仓储技术错误的方式覆盖错误分支、条件更新未命中与唯一键冲突路径",
+        "limitations": "go test -race 因 CGO_ENABLED=0 且无 gcc/clang 无法执行，race 探针证据仍缺",
+        "status": "pass",
+        "evidence": [
+          "E-07",
+          "E-09",
+          "E-13"
+        ]
+      },
+      {
+        "id": "SKILL-BIZ-APIPOST-CASE",
+        "kind": "business_skill",
+        "name": "apipost-case-gen（接口用例生成）",
+        "source_version": ".codebuddy/skills/apipost-case-gen",
+        "location": "SKILL.md + scripts + references",
+        "scenario": "按 23 个接口生成覆盖五组场景与异常路径的用例",
+        "loaded_at": "2026-11-12（开发阶段）",
+        "usage_location": "开发阶段生成用例集与 evidence/smoke/SKILL-apipost-case-gen.txt",
+        "reason": "题面共同要求补齐接口与异常路径的可执行用例",
+        "input_output": "输入为 docs/interface-list.md 接口契约；输出为用例 JSON 与文件级冒烟输出",
+        "help": "把接口契约与状态机约束转成可执行的正负用例",
+        "limitations": "用例仅生成到文件层，未在 Apipost 平台实际运行与导出",
+        "status": "pass",
+        "evidence": [
+          "E-07"
+        ]
+      },
+      {
+        "id": "SKILL-ACCEPT-CHECK",
+        "kind": "acceptance_skill",
+        "name": "acceptance-check（自编验收 Skill）",
+        "source_version": ".codebuddy/skills/acceptance-check",
+        "location": "SKILL.md",
+        "scenario": "按题面逐项验收并输出通过/不通过结论与证据位置",
+        "loaded_at": "2026-11-12（第 3、4 轮检查期）",
+        "usage_location": "被第 3、4 轮检查流程引用为必过门禁清单来源",
+        "reason": "题面共同要求把验收条件固化为可重复使用的检查规则",
+        "input_output": "输入为题面验收条件与交付物清单；输出为门禁项清单（本仓库未见其独立执行产生的结论）",
+        "help": "把单测、覆盖率、race、gofmt/vet、五组场景、Agent 验收、Git 流程与 AI/Skill 记录固化为必过门禁",
+        "limitations": "从未由独立验收 Agent 会话执行，缺少独立核验记录与复检闭环",
+        "status": "partial",
+        "evidence": [
+          "E-07",
+          "E-14"
+        ]
+      }
+    ],
+    "prompts": [
+      {
+        "id": "P-01",
+        "requirement_ids": [
+          "01-A1-01"
+        ],
+        "task": "实现下单、价格快照与可售占用",
+        "predecessors": [],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "读取需求 A1-01 与原型显隐矩阵，明确一单仅一种商品、金额以分为单位、单价 10000 分",
+        "ai_action": "新增 server/service/order_service.go 的 CreateOrder 与内存仓储扣减逻辑，下单写入商品与价格快照并扣减可售",
+        "tool_result": "提交 6cc6f13 含下单与快照实现；go build / go test 原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：调价后旧单 10000、新单 12000、可售与占用正确",
+        "status": "unknown",
+        "gap": "原始提示原文与模型回复未留档，无法核验提示是否给出边界与完成条件",
+        "correct_approach": "在建仓同时导出完整会话为 events.jsonl，逐条记录提示、实现提交与验证证据",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-02",
+        "requirement_ids": [
+          "01-A1-02"
+        ],
+        "task": "实现待支付 10 分钟与超时关闭释放",
+        "predecessors": [
+          "P-01"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现 expires_at 计算、超时关单服务与演示教学时钟接口，按服务端时间判定 10 分钟阈值",
+        "ai_action": "新增 CloseExpiredOrders 与 /api/v1/admin/orders/close-expired、/api/v1/admin/clock",
+        "tool_result": "提交 6cc6f13 含超时关单与时钟接口；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立进程：closed_count=1、可售回 5、重复关单不再释放",
+        "status": "unknown",
+        "gap": "原始提示未留档；超时阈值的假设取舍未在提示中显式确认",
+        "correct_approach": "导出会话并把「10 分钟与服务端时间」的假设确认写入开发前记录",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-03",
+        "requirement_ids": [
+          "01-A1-03"
+        ],
+        "task": "实现支付通知鉴权、金额匹配与幂等",
+        "predecessors": [
+          "P-02"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现渠道签名校验、金额比对、订单匹配与重复通知幂等留痕",
+        "ai_action": "新增 HandlePaymentCallback 与 noopPayment 留痕路径；错误码 M-27/M-28/M-29/M-30",
+        "tool_result": "提交 6cc6f13 含支付回调与幂等留痕实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：M-29/M-28/M-30/M-27 与幂等留痕全部命中",
+        "status": "unknown",
+        "gap": "原始提示与工具结果未留档，无法核验提示对「同交易号不得归属两单」的表述",
+        "correct_approach": "导出完整会话与工具输出，使四类错误分支的提示依据可追溯",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-04",
+        "requirement_ids": [
+          "01-A1-04"
+        ],
+        "task": "实现有效期内支付与迟到支付旁路",
+        "predecessors": [
+          "P-03"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现支付成功转待发货，并在订单已关闭时生成异常待处理事件而不恢复订单",
+        "ai_action": "新增迟到支付事件表与事件创建逻辑；客服核实与发起退款接口",
+        "tool_result": "提交 6cc6f13 含迟到支付事件链实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：M-09、状态不变、占用不变、核实与退款成功",
+        "status": "unknown",
+        "gap": "原始提示未留档；迟到支付的旁路设计决策无法追溯到具体提示",
+        "correct_approach": "导出会话并在提示中显式写明「迟到支付不得恢复订单与库存」",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-05",
+        "requirement_ids": [
+          "01-A1-05"
+        ],
+        "task": "实现售前退款申请与客服同意/拒绝",
+        "predecessors": [
+          "P-04"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现整单退款申请、申请期间暂停发货、客服同意与拒绝并记录原因",
+        "ai_action": "新增 ApplyRefund/RejectRefund/ApproveRefund 与条件更新保护；错误码 M-22/M-24",
+        "tool_result": "提交 6cc6f13 含退款审核链实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：申请成功、M-22、拒绝后恢复待发货并可继续发货",
+        "status": "unknown",
+        "gap": "原始提示未留档；同意与拒绝两条分支的提示覆盖不可核验",
+        "correct_approach": "导出会话并为同意/拒绝分别留存提示与实现对应关系",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-06",
+        "requirement_ids": [
+          "01-A1-06"
+        ],
+        "task": "实现渠道退款回调、重试与库存恢复",
+        "predecessors": [
+          "P-05"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现退款成功回调、渠道失败保留待处理记录、客服登记重试与成功后的库存恢复",
+        "ai_action": "新增 HandleRefundCallback/RetryRefund 与 EventStockRestore 事件；错误码 M-08",
+        "tool_result": "提交 6cc6f13 含退款回调与重试实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：失败 M-08→重试→成功、stock_restored=true、核查一致、重复通知不重复退款",
+        "status": "unknown",
+        "gap": "原始提示未留档；「只恢复一次」的实现意图无法追溯",
+        "correct_approach": "导出会话并留存「恢复次数守恒」的设计提示与对应验证",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-07",
+        "requirement_ids": [
+          "01-A1-07"
+        ],
+        "task": "实现发货登记一次与已发货不受理售前退款",
+        "predecessors": [
+          "P-06"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现发货登记的唯一性校验与状态前置校验",
+        "ai_action": "新增 RegisterShipment 与 M-19/M-23 错误码",
+        "tool_result": "提交 6cc6f13 含发货登记实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：重复发货 M-19、空承运方 M-23、已发货退款 M-11",
+        "status": "unknown",
+        "gap": "原始提示未留档",
+        "correct_approach": "导出会话",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-08",
+        "requirement_ids": [
+          "01-A1-08"
+        ],
+        "task": "实现运营核查汇总与异常只追加",
+        "predecessors": [
+          "P-07"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "实现运营汇总接口、异常记录只追加的留痕机制与角色隔离",
+        "ai_action": "新增 /api/v1/ops/summary 与 noopPayment/rejectedPayment 留痕路径",
+        "tool_result": "提交 6cc6f13 含运营汇总与只追加留痕实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立探测：运营可查、买家 M-20、源码无改写状态入口",
+        "status": "unknown",
+        "gap": "原始提示未留档；「异常不能通过改写订单状态消失」的约束依据不可追溯",
+        "correct_approach": "导出会话并保留约束提示原文",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-09",
+        "requirement_ids": [
+          "01-A1-09"
+        ],
+        "task": "打通活动正常成交场景",
+        "predecessors": [
+          "P-08"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "按场景 S1 串起上架调价、下单付款、发货、查运单与运营核查",
+        "ai_action": "串联既有接口并补演示数据",
+        "tool_result": "提交 6cc6f13 含场景 S1 演示数据；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立走通五步，状态与金额自洽",
+        "status": "unknown",
+        "gap": "原始提示未留档",
+        "correct_approach": "导出会话",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-10",
+        "requirement_ids": [
+          "01-A1-10"
+        ],
+        "task": "支撑 20 并发争抢与弃单释放",
+        "predecessors": [
+          "P-09"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "确保下单扣减与释放互斥、并发下不超卖",
+        "ai_action": "实现内存仓储互斥锁与条件更新；新增演示脚本 r4_evidence_suite.py",
+        "tool_result": "提交 00520bd 含第五轮边界单测与证据采集脚本；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13；00520bd",
+        "verification": "检查者独立 20 并发：成功 5 + M-02 15、库存守恒",
+        "status": "unknown",
+        "gap": "原始提示与并发压测提示未留档；真实行锁下的并发提示缺失",
+        "correct_approach": "导出会话并补充在真实 MySQL 上的并发验证提示与结论",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-11",
+        "requirement_ids": [
+          "01-A1-11"
+        ],
+        "task": "打通售前退款场景",
+        "predecessors": [
+          "P-10"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "按场景 S3 串起申请、发货受限、客服批准、渠道失败与再次成功",
+        "ai_action": "串联退款链接口并补演示数据",
+        "tool_result": "提交 6cc6f13 含场景 S3 演示数据；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立走通全链并核对数量恢复",
+        "status": "unknown",
+        "gap": "原始提示未留档",
+        "correct_approach": "导出会话",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-12",
+        "requirement_ids": [
+          "01-A1-12"
+        ],
+        "task": "打通迟到支付场景",
+        "predecessors": [
+          "P-11"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "按场景 S4 串起关闭、异常发现、核实、发起退款与无重复释放确认",
+        "ai_action": "串联迟到支付事件链接口",
+        "tool_result": "提交 6cc6f13 含场景 S4 演示数据；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立走通全链，订单仍为已关闭且占用未变",
+        "status": "unknown",
+        "gap": "原始提示未留档",
+        "correct_approach": "导出会话",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      },
+      {
+        "id": "P-13",
+        "requirement_ids": [
+          "01-A1-13"
+        ],
+        "task": "处理退款与发货并发、重复通知与越权",
+        "predecessors": [
+          "P-12"
+        ],
+        "time": "（缺失）未记录原始提示时间；可从提交时间推断",
+        "prompt_location": "（缺失）仓库无 events.jsonl 与 evidence/sessions/ 导出",
+        "context": "用条件更新与状态前置实现退款与发货互斥裁决，对重复通知幂等，对越权统一拒绝",
+        "ai_action": "新增 rows!=1 条件更新保护、M-22/M-20/M-19 等错误码与 15 处 requireRole 校验",
+        "tool_result": "提交 6cc6f13 含并发裁决与权限校验实现；原始输出未随会话留档",
+        "student_judgment": "（缺失）无学生逐项签审记录，仅有 AI 使用说明与 skill-usage 自述",
+        "revision": "6cc6f13（基线）",
+        "verification": "检查者独立 3 轮并发裁决恒为一种合法结果；重复通知幂等；6 类越权被拒",
+        "status": "unknown",
+        "gap": "原始提示未留档；并发裁决的判定口径不可追溯",
+        "correct_approach": "导出会话并在提示中写明互斥判定口径与复验方式",
+        "evidence": [
+          "E-14",
+          "E-11"
+        ]
+      }
+    ],
+    "limitations": [
+      {
+        "id": "LIM-01",
+        "scope": "Token 计分（1.5 分）",
+        "owner": "teacher",
+        "reason": "教师未发布本题 Token 基准（profile 01.json 的 token_baselines 为空），学生亦未提交分阶段原始 usage 与去重台账；无可比总量，无法计算消耗比。",
+        "score_effect": "Token 一项暂记 0.00/1.5，状态 unknown，最终得分待核定；不计入成果与过程分。",
+        "next_action": "教师发布基准后由学生补交官方 usage 原件与去重台账，再据实计分。",
+        "evidence": [
+          "E-14"
+        ]
+      },
+      {
+        "id": "LIM-02",
+        "scope": "固定清单核准与评分校准",
+        "owner": "teacher",
+        "reason": "仓库内未找到教师对 references/profiles/01.json 的核准记录，本班亦无该 profile 的已评分样本可作校准对照。",
+        "score_effect": "计分口径未经教师核准与校准，5.93 为当前已核验得分，不是最终成绩。",
+        "next_action": "由教师核准清单并组织首批评分校准，之后再确认本批次的最终分。",
+        "evidence": [
+          "E-14"
+        ]
+      },
+      {
+        "id": "LIM-03",
+        "scope": "真实 MySQL(InnoDB) 落库与唯一键冲突",
+        "owner": "student",
+        "reason": "本机无 MySQL 实例（where mysql 无结果），GVA_MYSQL_DSN 未设置；schema.sql 仅有文件级证据。",
+        "score_effect": "A2-04、A3-05、A3-06、A4-04 四项降为部分完成；唯一键冲突与 InnoDB 行锁结论无法证实。",
+        "next_action": "提供可复现的 MySQL 启动方式并在真实库执行 schema.sql、重启复查与唯一键冲突用例。",
+        "evidence": [
+          "E-12",
+          "E-13"
+        ]
+      },
+      {
+        "id": "LIM-04",
+        "scope": "go test -race 数据竞争检测",
+        "owner": "student",
+        "reason": "本机 CGO_ENABLED=0 且无 gcc/clang，-race 探针无法运行（-race requires cgo，exit=2）。",
+        "score_effect": "A3-06 判部分完成；AGENTS.md Q-03 的 race 门禁未获工具级证明。",
+        "next_action": "安装 C 工具链并设 CGO_ENABLED=1，提交 go test -race ./server/... 的完整原始输出。",
+        "evidence": [
+          "E-13"
+        ]
+      },
+      {
+        "id": "LIM-05",
+        "scope": "独立测试与独立验收会话",
+        "owner": "student",
+        "reason": "evidence/sessions/ 与 events.jsonl 均不存在；仓库内全部测试与检查产物出自同一开发会话。",
+        "score_effect": "A3-07、B1-02、B1-04、B2-03、B2-04、B2-05 六项判失败；B2-02、A3-08、B3-02 降为部分完成。",
+        "next_action": "新建独立测试与独立验收会话，各自导出并按题面逐项给出结论与证据位置。",
+        "evidence": [
+          "E-14"
+        ]
+      },
+      {
+        "id": "LIM-06",
+        "scope": "远端仓库、PR、流水线与部署",
+        "owner": "student",
+        "reason": "git remote -v 为空；.github/workflows/ci.yml 非注释非空行实测为 0；无 main 分支、制品与上线地址。",
+        "score_effect": "A4-05、A4-06、A4-07、B4-01、B4-04、B4-05 六项判失败，并触发门禁判定。",
+        "next_action": "经 GitHub MCP 建仓并关联远端，改为可执行 workflow，走 PR 合并 main 后部署并留存冒烟与回退方案。",
+        "evidence": [
+          "E-13",
+          "E-14"
+        ]
+      },
+      {
+        "id": "LIM-07",
+        "scope": "讲解视频与班级群提交凭据",
+        "owner": "student",
+        "reason": "全仓视频文件命中数为 0，也无群消息截图或提交索引。",
+        "score_effect": "A4-08、A4-09、A4-10 三项判失败。",
+        "next_action": "录制覆盖五组场景与异常结果的讲解视频并附时间目录，当日群交链接与截图并登记提交日期。",
+        "evidence": [
+          "E-14"
+        ]
+      },
+      {
+        "id": "LIM-08",
+        "scope": "检查者独立性",
+        "owner": "reviewer",
+        "reason": "本批次检查会话与本题第 1~5 轮开发会话同源，存在利益相关风险；虽已用独立二进制、独立端口与独立脚本取证，但无法等同独立第三方检查。",
+        "score_effect": "不改变分数，但结论建议由不同检查者复评确认后再定案。",
+        "next_action": "如学生对结论有异议，由教师指定与本次不同的检查者按同一固定清单复评。",
+        "evidence": [
+          "E-12",
+          "E-14"
+        ]
+      },
+      {
+        "id": "LIM-09",
+        "scope": "阶段先后顺序",
+        "owner": "unresolved",
+        "reason": "版本链为一次性基线提交加 6 次证据补齐提交，无法从 Git 历史证明需求→原型→计划→首次业务开发的先后；三份文档内容顺序与自述一致但属 statement 级材料。",
+        "score_effect": "B1-01 判 unknown，不按倒序推定失败；因该项 owner 非学生，触发待核定。",
+        "next_action": "后续迭代按阶段提交并在 evidence/checkpoints/ 冻结每阶段产物哈希与时间，使顺序可由版本链复核。",
+        "evidence": [
+          "E-11",
+          "E-14"
+        ]
+      }
+    ],
+    "understanding": [
+      {
+        "id": "UND-01",
+        "method": "独立二进制构建 + 独立端口启动 + 120 条 HTTP 断言（与学生脚本分离）",
+        "scope": "题面八条业务规则、五组演示场景、越权、幂等、并发守恒与终态保护",
+        "result": "119 PASS、1 条 DIFF 为 demo-memory 无持久化的环境限制；与学生既有证据高度一致",
+        "evidence": [
+          "E-12"
+        ]
+      },
+      {
+        "id": "UND-02",
+        "method": "go test -coverpkg=./... 生成独立 profile 并按包按函数拆解",
+        "scope": "整体与各包覆盖率、接入层覆盖均衡性",
+        "result": "整体 94.2%；server/service 包级 98.5%、逐函数最低 85.7%；server/api/v1 逐函数最低 57.1%",
+        "evidence": [
+          "E-13",
+          "E-09"
+        ]
+      },
+      {
+        "id": "UND-03",
+        "method": "全仓文件系统检索 + git 与工具链实测",
+        "scope": "23 项必交产物、远端、流水线、视频、会话导出与 Token 台账",
+        "result": "8 项必交产物缺失或为占位；就绪状态两项未就绪",
+        "evidence": [
+          "E-14"
+        ]
+      },
+      {
+        "id": "UND-04",
+        "method": "源码通读 + 测试替身审读",
+        "scope": "事务、锁语义、权限校验与错误码映射",
+        "result": "确认 WithTransaction/LockOrder/LockGoods 真实存在但未被真实库触发；requireRole 15 处校验有效；M-01~M-30 未逐条穷举",
+        "evidence": [
+          "E-04",
+          "E-09"
+        ]
+      }
+    ],
+    "daily": [
+      {
+        "id": "DAY-01",
+        "date": "2026-11-12",
+        "scope": "第 5 轮整改后交付版本的成果与过程复核",
+        "result": "成果 5.42/7、过程 0.50/1.5、Token 0.00/1.5，扣后原始分 5.93，状态待核定",
+        "evidence": [
+          "E-12",
+          "E-13",
+          "E-14"
+        ]
+      },
+      {
+        "id": "DAY-02",
+        "date": "2026-11-12",
+        "scope": "独立反例探测（120 条）与工具链门禁复跑",
+        "result": "独立探测 119 PASS / 1 环境限制 DIFF；gofmt 无输出、go vet 与 go build 通过、七包单测全 ok",
+        "evidence": [
+          "E-12",
+          "E-13"
+        ]
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "id": "E-01",
+      "level": "artifact",
+      "location": "题目01-小型电商订单交易发货与售前退款-需求文档.md",
+      "summary": "需求文档 v1.0（666 行）全文，含七类角色、八条业务规则、订单状态机、五组演示场景、AC-01~AC-25 与 A-01~A-25 假设清单",
+      "revision_time": "2026-11-12（v1.0）",
+      "scope": "需求、规则、状态机、异常、假设、验收六要素",
+      "provenance": "学生提交，检查者逐条与源码比对"
+    },
+    {
+      "id": "E-02",
+      "level": "artifact",
+      "location": "题目01-小型电商订单交易发货与售前退款-原型设计文档.md；resource/static/（9 个视图）",
+      "summary": "原型设计文档 v1.0 含显隐矩阵与状态机；配套 V01~V-08 与 index 共 9 个视图可访问",
+      "revision_time": "2026-11-12（v1.0）",
+      "scope": "角色覆盖、关键结果与失败状态的页面表达",
+      "provenance": "学生提交，检查者 HTTP 探测 9 页均 200"
+    },
+    {
+      "id": "E-03",
+      "level": "artifact",
+      "location": "题目01-小型电商订单交易发货与售前退款-任务规划文档.md",
+      "summary": "任务规划文档 v1.1（285 行），含 M0/M1 任务、依赖、输入输出、完成判定与五组场景映射",
+      "revision_time": "2026-11-12（v1.1）",
+      "scope": "需求到任务、依赖、测试验收与完成条件的映射",
+      "provenance": "学生提交，检查者与仓库产物逐一对照"
+    },
+    {
+      "id": "E-04",
+      "level": "artifact",
+      "location": "server/；docs/interface-list.md",
+      "summary": "Go 源码 24 个文件、23 个接口契约、附录 B 全量边界矩阵；覆盖题面八条规则的主路径与异常路径",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "业务规则实现、权限校验、状态机、幂等与金额守恒",
+      "provenance": "学生提交，检查者独立构建并实测"
+    },
+    {
+      "id": "E-05",
+      "level": "artifact",
+      "location": "schema.sql；scripts/mock_channel_service.py；docs/代码产物补齐说明.md",
+      "summary": "InnoDB + utf8mb4 建表脚本（含 uk_payment_dedup_key 等唯一键）、可控 HTTP 模拟支付渠道服务、运行说明与启动输出",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "初始化、演示数据、模拟第三方与启动复现入口",
+      "provenance": "学生提交，检查者读取 DDL 并拉起模拟渠道"
+    },
+    {
+      "id": "E-06",
+      "level": "artifact",
+      "location": "AGENTS.md；AGENTS-v1.0.md",
+      "summary": "项目级 Agent 约束 v1.1（23KB/7 章）与历史版本 v1.0；含三角色职责、Git 与提交规范、质量约束、业务边界、禁止行为与版本变更记录",
+      "revision_time": "2026-11-12（v1.1）",
+      "scope": "七阶段流程约束、角色范围、提交门禁与禁止项",
+      "provenance": "学生提交，检查者通读并核对第 7 章"
+    },
+    {
+      "id": "E-07",
+      "level": "artifact",
+      "location": ".codebuddy/skills/（gva-model-generate、unit-test-race、apipost-case-gen、acceptance-check）；evidence/smoke/SKILL-*.txt",
+      "summary": "四套自编 Skill 的 SKILL.md、脚本与 references，以及文件级冒烟输出",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "Skill 结构完整性、针对本题的适用性与真实调用产物",
+      "provenance": "学生提交，检查者逐个读取并核对输出物"
+    },
+    {
+      "id": "E-08",
+      "level": "artifact",
+      "location": "skill-usage.md",
+      "summary": "Skill 使用总结 10 节 29KB，含逐 Skill 的位置/原因/输入输出/帮助/局限，第 10.3 节 6 条真实失败样例与第 10.4 节闭环边界",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "全部实际使用 Skill 的说明与失败样例留痕",
+      "provenance": "学生提交，检查者抽查引用路径均可核验"
+    },
+    {
+      "id": "E-09",
+      "level": "raw_tool",
+      "location": "server/**/*_test.go（12 个）；coverage-r5.out；evidence/r5-quality-output.txt",
+      "summary": "单元测试源码与 go test / gofmt / go vet / go test -race 的真实执行输出，以及整体覆盖率原始文件",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "单元断言、负向边界、覆盖率与质量门禁",
+      "provenance": "学生执行，检查者独立复跑并生成独立 profile"
+    },
+    {
+      "id": "E-10",
+      "level": "artifact",
+      "location": "evidence/smoke/（38）；evidence/manual/（5，30 条）；evidence/manual-round2/（5，28 条）；evidence/partial-closure/（11）",
+      "summary": "接口冒烟、参数级与状态级异常手工记录、11 份 partial 独立闭环文档，共 112 份集成证据",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "接口行为、异常分支与业务状态边界的实测证据",
+      "provenance": "学生执行，检查者独立复现主要结论"
+    },
+    {
+      "id": "E-11",
+      "level": "raw_tool",
+      "location": "scripts/check_commit_message.py；evidence/r5-post-commit-verification.txt；evidence/r5-commit-message-check-output.txt；命令 git log --oneline -7",
+      "summary": "dev/01 分支 7 次真实提交、提交格式校验输出与提交后门禁复核原始输出",
+      "revision_time": "2026-11-12（HEAD 58719fb）",
+      "scope": "分支纪律、提交消息格式与版本链可追溯性",
+      "provenance": "学生仓库，检查者独立执行 git 与校验脚本"
+    },
+    {
+      "id": "E-12",
+      "level": "raw_tool",
+      "location": "outputs/单题检查/shop-trade/01/20261112-05/evidence/独立反例探测输出.txt；独立反例探测结果.json",
+      "summary": "检查者以独立二进制与独立端口 18097 执行的 120 条断言，119 PASS、1 条为环境限制",
+      "revision_time": "2026-11-12（检查者本批次）",
+      "scope": "题面八条规则、五组场景、越权、幂等、并发守恒与终态保护",
+      "provenance": "检查者独立执行，与学生测试分离留档"
+    },
+    {
+      "id": "E-13",
+      "level": "raw_tool",
+      "location": "outputs/单题检查/shop-trade/01/20261112-05/evidence/独立反例探测输出.txt（第 0 节）",
+      "summary": "检查者独立执行的 go version、CGO_ENABLED、where gcc/clang/mysql、gofmt -l、go vet、go build、go test -count=1、覆盖率、go test -race 与 CI 配置统计原始输出",
+      "revision_time": "2026-11-12（检查者本批次）",
+      "scope": "工具链、格式静态检查、构建、测试、覆盖率与流水线可运行性",
+      "provenance": "检查者独立执行"
+    },
+    {
+      "id": "E-14",
+      "level": "gap",
+      "location": "outputs/单题检查/shop-trade/01/20261112-05/evidence/产物清点与缺失核查.txt",
+      "summary": "23 项必交产物逐项存在性核查、events.jsonl 与会话导出检索、视频文件检索、Token 台账检索，以及教师规则发布、清单核准与评分校准三项就绪状态核查",
+      "revision_time": "2026-11-12（检查者本批次）",
+      "scope": "必交产物缺口的确定范围与就绪状态",
+      "provenance": "检查者全仓文件系统核查"
+    }
+  ],
+  "used_skill_ids": [
+    "SKILL-BIZ-GVA-MODEL",
+    "SKILL-BIZ-UNIT-TEST-RACE",
+    "SKILL-BIZ-APIPOST-CASE",
+    "SKILL-ACCEPT-CHECK"
+  ]
+}
