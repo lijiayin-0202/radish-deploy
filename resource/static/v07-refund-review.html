@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-07 退款审核列表</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-07 退款审核列表</span><span class="sub">客服 · 售前整单退款审核、失败重试与库存核查</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-07 退款审核列表（客服）</h1>
+    <p class="lead">售前整单退款：客服同意必须写明原因（M-24）；渠道首次失败保留待处理记录（M-08）供重试；退款成功只恢复一次库存。</p>
+
+    <section class="card">
+      <h2>审核操作（API-07 / 08 / 09）</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <div class="field grow"><label>order_no</label><input id="orderNo" placeholder="例如 ORD-..."></div>
+        <div class="field grow"><label>审核原因 / 备注（必填）</label><input id="remark" value="商品未发货，同意整单退款"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnApprove">审核同意</button>
+        <button id="btnReject" class="ghost">审核拒绝</button>
+        <button id="btnRetry" class="ghost">登记重试</button>
+        <button id="btnDetail" class="ghost">订单详情</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>退款渠道通知与核查</h2>
+      <div class="row">
+        <div class="field grow"><label>refund_channel_trade_no</label><input id="refundNo" value="REFUND-CH-001"></div>
+        <div class="field"><label>amount（分）</label><input id="amount" value="10000" type="number"></div>
+        <button id="btnFail" class="ghost">渠道失败（API-10）</button>
+        <button id="btnOK">渠道成功（API-10）</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnCheck" class="ghost">库存恢复逐单核查（API-23）</button>
+        <button id="btnSummary" class="ghost">运营汇总（API-16）</button>
+      </div>
+      <p class="hint">渠道通知请使用模拟渠道账号 <code>mock01</code>；核查可用 <code>ops01</code> / <code>cs01</code>。重复退款通知幂等，不重复退款。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('cs01');
+    function no() { return encodeURIComponent(Shop.val('orderNo')); }
+    Shop.click('btnApprove', function () { Shop.call('/api/v1/orders/' + no() + '/refund/approve', 'POST', { remark: Shop.val('remark') }); });
+    Shop.click('btnReject', function () { Shop.call('/api/v1/orders/' + no() + '/refund/reject', 'POST', { remark: Shop.val('remark') }); });
+    Shop.click('btnRetry', function () { Shop.call('/api/v1/orders/' + no() + '/refund/retry', 'POST', { remark: Shop.val('remark') }); });
+    Shop.click('btnDetail', function () { Shop.call('/api/v1/orders/' + no()); });
+    Shop.click('btnFail', function () {
+      Shop.call('/api/v1/refund/callback', 'POST', { order_no: Shop.val('orderNo'), refund_channel_trade_no: Shop.val('refundNo'), amount: Number(Shop.val('amount')), success: false, signature_valid: true });
+    });
+    Shop.click('btnOK', function () {
+      Shop.call('/api/v1/refund/callback', 'POST', { order_no: Shop.val('orderNo'), refund_channel_trade_no: Shop.val('refundNo'), amount: Number(Shop.val('amount')), success: true, signature_valid: true });
+    });
+    Shop.click('btnCheck', function () { Shop.call('/api/v1/ops/stock-check/' + no()); });
+    Shop.click('btnSummary', function () { Shop.call('/api/v1/ops/summary'); });
+  </script>
+</body>
+</html>

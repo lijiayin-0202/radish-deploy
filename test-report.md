@@ -123,3 +123,20 @@ CGO_ENABLED=1 go test ./... -race -count=1
 ## 8. 证据位置
 
 `coverage.out`、`coverage-all.out`、`coverage-report.md`、`gofmt-vet-output.txt`、`race-output.txt`、`scripts/run-race.ps1`、`scripts/demo-five-scenarios.ps1`、`evidence/final-verification-output.txt`、`evidence/go-run-main-output.txt`、`evidence/go-run-stdout.txt`、`evidence/go-run-stderr.txt`、`evidence/demo-five-scenarios-output.txt`、`evidence/verification-output.txt`、`evidence/verification-coverage-output.txt`、`apipost-run-summary.md`、`skill-usage.md`、`docs/完成声明边界.md`、`docs/git-提交指引.md`、`evidence/交付证据说明.md`。
+
+## 9. 代码产物补齐批次自检（2026-11-12，开发会话草稿）
+
+依据第二轮门禁复核报告第 3.1 节「① 代码 / 产物缺陷」整改，新增内容见 `docs/代码产物补齐说明.md`。
+
+| 项 | 结果 |
+| --- | --- |
+| 新增单元测试 | `server/service/extension_test.go`、`extension_gorm_test.go`、`server/api/v1/extension_api_test.go`、`server/router/extension_router_test.go`、`server/initialize/static_router_test.go` |
+| `gofmt -l .` / `go vet ./...` / `go build ./...` / `go test ./... -count=1` | 全部 exit=0，7 个包全部 ok |
+| 覆盖率（草稿口径） | `server/service` **88.9%**；`-coverpkg ./...` 整体 **87.4%**；新增代码未排除、覆盖率较整改前未下降 |
+| `go run main.go` 直接启动 | 通过，`/health` 返回 `status=ok`，`GET /` 返回静态首页 |
+| 原有接口与五组场景 | `scripts/verify-extension.ps1` 用全新进程完整复跑 `TST-S1~S5`，并冒烟 `/health`、`/me`、`/goods`、`/admin/clock`、`/ops/summary`、下单与状态查询，全部通过 |
+| 静态页面 | `GET /` 与 8 个 `V-01~V-08` 页面、`app.css`、`app.js` 均 HTTP 200 |
+| 新增接口 | API-21 调价（含 M-12 已有订单金额快照不变、越权 M-20）、API-22 超时通知（状态不变 + 重复幂等）、API-23 库存恢复逐单核查（只读、角色隔离）全部通过 |
+| 完整原始输出 | `evidence/code-artifact-verification.txt` |
+
+**边界**：以上仍是开发会话草稿自检，`go test -race` 因 `CGO_ENABLED=0` / 无 gcc 未启动，**归类为环境限制，不判定为代码缺陷，也不等于门禁通过**；真实 MySQL(InnoDB)、meegle、独立测试/验收会话、Apipost 第 2 轮、CI/部署与视频仍缺，不伪造。

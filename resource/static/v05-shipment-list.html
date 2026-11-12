@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-05 待发货订单列表</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-05 待发货订单列表</span><span class="sub">仓库 · 按订单号核对是否可发货</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-05 待发货订单列表（仓库）</h1>
+    <p class="lead">本题不提供订单全表列表接口；按 <code>order_no</code> 查看状态与详情。只有合法待发货订单可登记发货（M-18），退款流程中的订单发货被暂停（M-22）。</p>
+
+    <section class="card">
+      <h2>订单状态核对</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <div class="field grow"><label>order_no</label><input id="orderNo" placeholder="例如 ORD-..."></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnDetail">订单详情（API-02）</button>
+        <button id="btnStatus" class="ghost">状态（API-17）</button>
+        <button id="btnCheck" class="ghost">库存逐单核查（API-23）</button>
+      </div>
+      <p class="hint">确认 <code>status=待发货</code> 后到 V-06 录入发货；<code>refund_state</code> 非「未申请」时不可发货。</p>
+    </section>
+
+    <section class="card">
+      <h2>商品库存状态（只读）</h2>
+      <button id="btnGoods" class="ghost">查看可售 / 占用（API-18）</button>
+      <div id="goodsTable"></div>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('warehouse01');
+    Shop.click('btnDetail', function () { Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo'))); });
+    Shop.click('btnStatus', function () { Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo')) + '/status'); });
+    Shop.click('btnCheck', function () { Shop.call('/api/v1/ops/stock-check/' + encodeURIComponent(Shop.val('orderNo'))); });
+    Shop.click('btnGoods', function () { Shop.loadGoods(); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-02 我的订单列表与详情</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-02 我的订单列表 / 详情</span><span class="sub">买家 · 查看订单、状态、金额快照与取消</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-02 我的订单列表与详情（买家）</h1>
+    <p class="lead">本题不提供订单全表列表接口；按 <code>order_no</code> 逐单查看。终态为已取消、已关闭、已退款、已发货，迟到支付不改订单状态。</p>
+
+    <section class="card">
+      <h2>查询订单</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <div class="field grow"><label>order_no</label><input id="orderNo" placeholder="例如 ORD-..."></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnDetail">订单详情（API-02）</button>
+        <button id="btnStatus" class="ghost">状态（API-17）</button>
+        <button id="btnCancel" class="ghost">取消订单（API-03）</button>
+        <button id="btnCheck" class="ghost">库存恢复逐单核查（API-23）</button>
+      </div>
+      <p class="hint">越权查询他人订单返回 M-20；重复取消返回 M-10，库存只释放一次。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('buyer01');
+    Shop.click('btnDetail', function () { Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo'))); });
+    Shop.click('btnStatus', function () { Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo')) + '/status'); });
+    Shop.click('btnCancel', function () { Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo')) + '/cancel', 'POST', {}); });
+    Shop.click('btnCheck', function () { Shop.call('/api/v1/ops/stock-check/' + encodeURIComponent(Shop.val('orderNo'))); });
+  </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"strconv"
@@ -55,8 +56,18 @@ func buildServer() (*gin.Engine, string, string, error) {
 		}
 	}
 
+	// 扩展仓储能力只通过类型断言注入，OrderRepository 接口与主业务保持不变。
+	// 商品列表改由仓储读取，使运营调价结果能在 API-18 与 V-01 / V-03 页面立即看到。
+	var ext *service.ExtensionService
+	if er, ok := repo.(service.ExtensionRepository); ok {
+		ext = service.NewExtensionService(er, clock.Now)
+		goodsLister = func() ([]model.Goods, error) {
+			return er.ListGoods(context.Background())
+		}
+	}
+
 	svc := service.NewOrderServiceWithClock(repo, clock.Now)
-	engine := initialize.Routers(svc, goodsLister, clock, mode)
+	engine := initialize.Routers(svc, goodsLister, clock, mode, ext)
 	return engine, addr, mode, nil
 }
 
@@ -65,7 +76,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("服务初始化失败：%v", err)
 	}
-	log.Printf("shop-trade 启动 addr=%s mode=%s 健康检查=GET /health", addr, mode)
+	log.Printf("shop-trade 启动 addr=%s mode=%s 健康检查=GET /health 静态页面=GET /", addr, mode)
 	if err := engine.Run(addr); err != nil {
 		log.Fatalf("服务启动失败：%v", err)
 	}

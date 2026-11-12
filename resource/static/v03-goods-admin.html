@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-03 商品管理页</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-03 商品管理页</span><span class="sub">运营 · 商品维护与调价（API-21）</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-03 商品管理页（运营）</h1>
+    <p class="lead">补齐商品调价入口。调价只改商品单价，不改写订单状态、不消除异常记录；已有订单的下单时商品与金额快照不受影响（M-12 / M-13）。</p>
+
+    <section class="card">
+      <h2>在售商品与库存</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <button id="btnRefresh" class="ghost">刷新商品（API-18）</button>
+      </div>
+      <div id="goodsTable"></div>
+    </section>
+
+    <section class="card">
+      <h2>调价（API-21 · 仅运营）</h2>
+      <div class="row">
+        <div class="field"><label>goods_id</label><input id="goodsId" value="1" type="number" min="1"></div>
+        <div class="field"><label>新单价（分，正整数）</label><input id="price" value="12000" type="number" min="1"></div>
+        <div class="field grow"><label>调价原因</label><input id="reason" value="活动价格调整"></div>
+        <button id="btnPrice">提交调价</button>
+      </div>
+      <p class="hint">成功后响应含 <code>old_unit_price</code>、<code>new_unit_price</code>、<code>hint=M-12</code> 与 <code>constraint=M-13</code>；刷新商品可见新价。非运营调用返回 M-20。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('ops01');
+    Shop.click('btnRefresh', function () { Shop.loadGoods(); });
+    Shop.click('btnPrice', function () {
+      Shop.call('/api/v1/admin/goods/' + encodeURIComponent(Shop.val('goodsId')) + '/price', 'POST', {
+        unit_price: Number(Shop.val('price')),
+        reason: Shop.val('reason')
+      }).then(function (data) {
+        if (data && data.code === '0') { Shop.loadGoods(); }
+      });
+    });
+    Shop.loadGoods();
+  </script>
+</body>
+</html>

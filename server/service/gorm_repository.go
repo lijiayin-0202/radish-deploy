@@ -253,3 +253,29 @@ func (r *GormOrderRepository) SumEffectivePaymentsByEventType(ctx context.Contex
 		Scan(&total).Error
 	return total, err
 }
+
+// 以下三个方法是「代码产物补齐」批次新增，供 ExtensionService 使用；
+// 不改动上面任何既有仓储方法与 OrderRepository 接口。
+
+// UpdateGoodsPrice 只更新商品单价，条件命中主键索引，不触碰订单金额快照。
+func (r *GormOrderRepository) UpdateGoodsPrice(ctx context.Context, goodsID uint64, newPrice int64) error {
+	return r.db.WithContext(ctx).Model(&model.Goods{}).
+		Where("id = ? AND deleted_at IS NULL", goodsID).
+		UpdateColumn("unit_price", newPrice).Error
+}
+
+// ListGoods 读商品列表，使调价结果能被 API-18 与 V-01 / V-03 页面立即看到。
+func (r *GormOrderRepository) ListGoods(ctx context.Context) ([]model.Goods, error) {
+	var goods []model.Goods
+	err := r.db.WithContext(ctx).Where("deleted_at IS NULL").Order("id ASC").Find(&goods).Error
+	return goods, err
+}
+
+// ListPaymentsByOrderNo 读同一订单的只追加审计流水，用于逐单统计库存恢复次数。
+func (r *GormOrderRepository) ListPaymentsByOrderNo(ctx context.Context, orderNo string) ([]model.Payment, error) {
+	var payments []model.Payment
+	err := r.db.WithContext(ctx).
+		Where("order_no = ? AND deleted_at IS NULL", orderNo).
+		Order("id ASC").Find(&payments).Error
+	return payments, err
+}

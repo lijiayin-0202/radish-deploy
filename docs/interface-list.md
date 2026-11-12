@@ -4,6 +4,7 @@
 > 对齐依据：题目 01 八条业务规则、需求文档 `AC-01~AC-25`、原型设计文档 `V-01~V-08` 与 `M-01~M-30`、任务规划 `TST-S1~S5`。
 > 实现落点：`main.go`、`server/initialize/router.go`、`server/router/order.go`、`server/api/v1/order.go`、`server/api/v1/views.go`。
 > 业务逻辑全部在 `server/service/`，controller 只做参数绑定、身份解析与响应封装。
+> 增量版本：**v1.1**（见第 6 节）。`API-01~API-20` 的路径、方法与字段保持不变，v1.0 定稿内容与 Apipost 48 用例继续有效。
 
 ## 1. 通用约定（定稿）
 
@@ -74,3 +75,37 @@ go run main.go
 ## 5. 禁止项
 
 购物车、一单多商品、部分退款、售后退货、签收与售后物流、多商户、真实支付渠道、真实物流、促销优惠、完整财务系统；直接改写订单状态消除异常、删除业务记录、人工调账、重复退款/发货。
+
+## 6. v1.1 增量接口（代码产物补齐批次）
+
+> `API-01~API-20` 的路径、方法、请求与响应字段**全部不变**；第 3 节五组场景序列与已重建的 Apipost 48 用例继续有效。
+> 本节只登记第二轮门禁复核报告「① 代码 / 产物缺陷」整改新增的 3 个接口，不改下单、退款主业务。
+
+| 编号 | 方法 | 路径 | service 方法 | 允许角色 / 账号 | 主要请求字段 | 主要响应字段 | 典型 M-xx | 对应视图 / 验收 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| API-21 | POST | `/api/v1/admin/goods/{goods_id}/price` | `ExtensionService.UpdateGoodsPrice` | 运营 / `ops01` | `unit_price`（正整数分）、`reason` | `old_unit_price`、`new_unit_price`、`hint=M-12`、`constraint=M-13`、`audit_event_id` | M-20、PARAM_ERROR | V-03 / R-A1-02 |
+| API-22 | POST | `/api/v1/payment/timeout` | `ExtensionService.HandleChannelTimeout` | 模拟渠道 / 运营 | `order_no`、`channel_trade_no`、`reason` | `event_id`、`order_status`、`duplicate`、`order_status_unchanged=true` | M-30、M-20 | V-08 / R-A1-04 |
+| API-23 | GET | `/api/v1/ops/stock-check/{order_no}` | `ExtensionService.VerifyStockRestoration` | 运营 / 客服 | 路径 `order_no` | `expected_restore_times`、`actual_restore_times`、`available_stock`、`occupied_stock`、`consistent`、`conclusion` | M-17、M-26、M-20 | V-04 / V-07 / R-A1-07 |
+
+### 6.1 静态页面（非接口）
+
+| 路径 | 视图 | 用途 |
+| --- | --- | --- |
+| `GET /` / `GET /static/index.html` | 首页 | 八视图导航、运行方式与证据边界说明 |
+| `GET /static/v01-goods.html` | V-01 商品浏览（买家） | 查看商品单价、可售/占用库存并下单 |
+| `GET /static/v02-orders.html` | V-02 我的订单（买家） | 按 `order_no` 查看订单、状态、金额快照与取消 |
+| `GET /static/v03-goods-admin.html` | V-03 商品管理（运营） | 查看库存与调用 API-21 调价 |
+| `GET /static/v04-ops-summary.html` | V-04 运营核查（运营） | 汇总、库存与 API-23 逐单核查 |
+| `GET /static/v05-shipment-list.html` | V-05 待发货（仓库） | 按订单号核对状态与库存 |
+| `GET /static/v06-shipment-form.html` | V-06 发货录入（仓库） | 承运方 / 运单号登记 |
+| `GET /static/v07-refund-review.html` | V-07 退款审核（客服） | 同意 / 拒绝 / 重试、渠道通知、库存核查 |
+| `GET /static/v08-late-payment.html` | V-08 迟到支付异常（客服） | 异常核实、退款发起、API-22 超时通知 |
+
+静态资源由 `engine.Static("/static", "resource/static")` 提供，纯 HTML + 原生 JS（`app.css` / `app.js`），不引入 Vue 或前端构建。
+
+### 6.2 增量边界
+
+- API-22 只登记只追加审计，**不关单、不释放库存、不改订单状态**；10 分钟超时关单仍由服务端时间经 API-05 触发；重复通知按 `TIMEOUT:` dedup key 幂等。
+- API-23 只读，不修改订单与库存；「缓存恢复」按报告 `R-A1-07` 的「售前退款库存恢复逐单核查」口径实现，**不引入缓存组件**。
+- 不新增 `M-xx` 失败原因编号、不扩展 8 状态状态机、不改动 `OrderRepository` 接口与 `order_service.go`。
+- 静态页面与 CI 注释模板只是代码产物；第 3 轮浏览器验收、CI 运行与部署仍属过程/环境证据，不得冒充。

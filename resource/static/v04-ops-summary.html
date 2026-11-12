@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-04 运营对账核查汇总页</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-04 运营对账核查汇总页</span><span class="sub">运营 · 汇总、库存状态与逐单核查</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-04 运营对账核查汇总页（运营）</h1>
+    <p class="lead">查看订单、收款、异常、退款、发货与重复释放/重复退款汇总；异常记录只追加，不能通过改写订单状态消失（M-13 / M-14）。</p>
+
+    <section class="card">
+      <h2>汇总与库存</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <button id="btnSummary">运营核查汇总（API-16）</button>
+        <button id="btnGoods" class="ghost">商品库存（API-18）</button>
+      </div>
+      <div id="goodsTable"></div>
+    </section>
+
+    <section class="card">
+      <h2>库存恢复逐单核查（API-23）</h2>
+      <div class="row">
+        <div class="field grow"><label>order_no</label><input id="orderNo" placeholder="例如 ORD-..."></div>
+        <button id="btnCheck">逐单核查</button>
+      </div>
+      <p class="hint">返回 <code>expected_restore_times</code>、<code>actual_restore_times</code>、<code>available_stock</code>、<code>occupied_stock</code> 与 <code>consistent</code>；结论引用 M-17 / M-26，只读不修改数据。</p>
+    </section>
+
+    <section class="card">
+      <h2>演示教学时钟（API-20 / API-05）</h2>
+      <div class="row">
+        <div class="field"><label>offset_minutes（0~1440）</label><input id="offset" value="11" type="number" min="0" max="1440"></div>
+        <button id="btnClock" class="ghost">推进服务端时间</button>
+        <button id="btnClose" class="ghost">关闭超时订单</button>
+      </div>
+      <p class="hint">仅平移演示时间源，10 分钟超时业务规则不变；正式并发证据仍须真实 MySQL(InnoDB) 与 CGO=1 的 race 环境。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('ops01');
+    Shop.click('btnSummary', function () { Shop.call('/api/v1/ops/summary'); });
+    Shop.click('btnGoods', function () { Shop.loadGoods(); });
+    Shop.click('btnCheck', function () { Shop.call('/api/v1/ops/stock-check/' + encodeURIComponent(Shop.val('orderNo'))); });
+    Shop.click('btnClock', function () { Shop.call('/api/v1/admin/clock', 'POST', { offset_minutes: Number(Shop.val('offset')) }); });
+    Shop.click('btnClose', function () { Shop.call('/api/v1/admin/orders/close-expired', 'POST', {}); });
+  </script>
+</body>
+</html>

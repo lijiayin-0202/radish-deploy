@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"sort"
 	"sync"
 	"time"
 
@@ -446,4 +447,45 @@ func (m *memoryRepository) SumEffectivePaymentsByEventType(_ context.Context, ev
 		}
 	}
 	return total, nil
+}
+
+// 以下三个方法是「代码产物补齐」批次新增，供 ExtensionService 使用；
+// 不改动上面任何既有仓储方法与 OrderRepository 接口。
+
+func (m *memoryRepository) UpdateGoodsPrice(_ context.Context, goodsID uint64, newPrice int64) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	g, ok := m.goods[goodsID]
+	if !ok {
+		return ErrGoodsNotFound
+	}
+	g.UnitPrice = newPrice
+	return nil
+}
+
+func (m *memoryRepository) ListGoods(_ context.Context) ([]model.Goods, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	ids := make([]uint64, 0, len(m.goods))
+	for id := range m.goods {
+		ids = append(ids, id)
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	out := make([]model.Goods, 0, len(ids))
+	for _, id := range ids {
+		out = append(out, *cloneGoods(m.goods[id]))
+	}
+	return out, nil
+}
+
+func (m *memoryRepository) ListPaymentsByOrderNo(_ context.Context, orderNo string) ([]model.Payment, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	out := make([]model.Payment, 0)
+	for _, p := range m.payments {
+		if p.OrderNo == orderNo {
+			out = append(out, *clonePayment(p))
+		}
+	}
+	return out, nil
 }

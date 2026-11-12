@@ -53,6 +53,20 @@
 | **⑥ 禁用场景** | 接口清单未定稿时编造路径与响应；生成 `model.go`/SQL/service/单测；执行第 1、3 轮；把未运行的集合写成「第 2 轮通过」；把可控模拟渠道宣称为真实第三方接入 |
 | 实际帮助 / 局限 | 帮助：整改后已基于定稿清单重建 48 用例，消除「用例依据未定稿草案」问题。**局限**：集合为自拟 JSON、需在 Apipost 按实际导出格式转换；**未运行**，无 `apipost-run-export.json`，且第 1 轮 race 未通过，按三轮顺序不得开始第 2 轮 |
 
+## 3.1 自编 Skill ④ `acceptance-check`（补齐 `K-02` 验收检查缺口）
+
+| 项 | 内容 |
+| --- | --- |
+| 名称 / 来源 / 版本 | `acceptance-check`／本项目自编／v1.0（`.codebuddy/skills/acceptance-check/SKILL.md`） |
+| 使用位置与原因 | 第二轮门禁复核报告 `R-B3-01` 判定「3 个自编 Skill 均为生成/测试类，尚无验收检查 Skill」；用户整改指令明确要求新增本 Skill，补齐 `.agent/06` `K-02` 的缺口 |
+| **① 技能用途** | 依据原始题面、`AC-01~AC-25`、五组场景、`M-01~M-30`、`V-01~V-08` **只读核对最终交付版本**；核对三轮验证证据、PR 门禁与版本对应；把未通过项分为代码/产物缺陷、环境/权限缺失、过程证据缺失三类 |
+| **② 触发条件** | 用户要求验收、逐项核对题面、PR 前门禁核验、`ACC-01~05`、区分代码缺陷与环境限制；或拿到检查报告需要复核整改是否落地 |
+| **③ 输入** | 原始题面与三份上游文档、`AGENTS.md` 与 `.agent/01~06`、`commit-convention.md`、对应版本代码与 `git rev-parse HEAD`、接口清单定稿、测试 Agent 全部证据、开发交付清单、Skill 与 AI 过程记录、PR/部署/视频凭据、已知环境约束清单 |
+| **④ 输出产物** | 逐项核查矩阵（编号/核查项/依据/实际证据/结论/归属分类/缺口与复验条件）、版本对应链表、三类问题汇总表、未运行/未访问/未播放清单、PR 门禁核验清单与证据索引；写入 `outputs/单题检查/.../` 由验收 Agent 独立会话引用 |
+| **⑤ 验收检查点** | 每个适用必做项都有「通过/不通过」结论、证据位置与版本对应；`gofmt`/`go vet`/`go build`/单测/覆盖率/可运行入口/五组场景有原始输出与退出码；环境缺失与代码缺陷严格分离；`-race requires cgo`、无 MySQL、无 meegle 权限不得写成代码错误或写成通过；未运行/未访问/未播放项全部列出；无任何伪造的测试、覆盖率、PR、CI、部署或视频记录 |
+| **⑥ 禁用场景** | 生成 `model.go`/SQL/service/单测/Apipost 用例/页面/部署脚本；修改生产或测试代码、替开发/测试 Agent 修复缺陷；执行或伪造 race、真实 MySQL、meegle 核验、CI/CD、部署与视频证据；无原始输出时给出「验收通过/可合并/已上线」结论；把说明文档当成会话导出或验收报告本体 |
+| 实际帮助 / 局限 | 帮助：提供题面级只读核查与三类问题分类口径，避免把环境阻塞误判为代码缺陷。**局限**：本轮为文件级交付并按其检查清单做了整改产物自检，**未通过工具加载、未由验收 Agent 独立会话执行**；不冒充原过程调用，也不替代三轮验证 |
+
 ## 4. 插件 / 内置 Skill（非自编，不计入 `K-02` 计数）
 
 | Skill | 来源 | 实际触发与用途 | 输出 / 局限 |
@@ -73,23 +87,25 @@
 | 2026-11-12 | `student-project-audit` | 单题检查，输出评分与缺陷清单 | `outputs/单题检查/shop-trade/01/20261112-01/` | 已执行，3.23/10 不合格 |
 | 2026-11-12 | `unit-test-race`（整改重新加载） | 补齐 controller/router/main 单测、CGO 与 race 命令注释、覆盖率口径区分 | `main_test.go`、`server/api/v1/order_api_test.go`、`test-report.md` | 草稿 87.7% / 86.0%；非正式证据 |
 | 2026-11-12 | `apipost-case-gen`（整改重新加载） | 基于 `docs/interface-list.md` v1.0 定稿重建 48 用例 | `scripts/regen_apipost.py`、`apipost-collection.json` 等 | 已重建；**未运行 Apipost** |
+| 2026-11-12 | `student-project-audit`（第二轮） | 对整改后 `dev/01` 做第二轮门禁复核，识别代码缺陷与环境缺失项 | `outputs/单题检查/shop-trade/01/20261112-02/` | 已执行，5.38/10 不合格；本轮整改输入 |
+| 2026-11-12 | `acceptance-check`（本轮新增） | 依据第二轮报告 `R-B3-01` 补齐验收检查 Skill；整改验证阶段按其检查清单只读复核新增产物与原有接口 | `.codebuddy/skills/acceptance-check/SKILL.md`、本文件第 3.1 节、`docs/代码产物补齐说明.md` | 文件级交付与清单核对；**未通过工具加载、未由验收 Agent 独立会话执行**，不冒充原过程调用 |
 
 ## 6. Skill 检查 → 修正 → 复检闭环（`K-04`）
 
 | 阶段 | 真实情况 |
 | --- | --- |
-| 检查发现问题 | `student-project-audit` 的 `E-017/E-018` 与检查报告 `B3`：3 个自编 Skill 结构完整且真实调用，但 `skill-usage.md` 缺六项说明、缺验收检查 Skill、缺「发现问题 → 修正 → 复检」闭环记录 |
-| 学生指导修正 | 用户于整改指令中明确要求「补全 `skill-usage.md` 六类说明」；本文件即修正产物 |
-| 复检 | **尚未由验收 Agent 独立会话完成**。本轮开发会话只做到文件补齐，不自行判定闭环通过；复检须读取本题面条款、本文件与对应提交哈希后给出逐项结论 |
-| 未编造声明 | 不把「文件已补齐」写成 `K-04` 闭环已通过；不把未触发过的 Skill 列为已使用 |
+| 检查发现问题 | 第一轮 `student-project-audit` 的 `E-017/E-018` 与检查报告 `B3`：`skill-usage.md` 缺六项说明、缺验收检查 Skill、缺闭环记录；第二轮报告 `R-B3-01` 再次判定「尚无验收检查 Skill」 |
+| 学生指导修正 | 用户第一轮整改指令要求「补全 `skill-usage.md` 六类说明」；第二轮整改指令要求「新增【验收检查Skill】，放到 skills 目录，在 skill-usage.md 补充 6 类说明」（C-08 授权）；本文件与第 3.1 节即修正产物 |
+| 复检 | **尚未由验收 Agent 独立会话完成**。本轮只在开发会话按 `acceptance-check` 检查清单做了产物自检，不自行判定闭环通过；复检须读取题面条款、本文件与对应提交哈希后给出逐项结论 |
+| 未编造声明 | 不把「文件已补齐」写成 `K-04` 闭环已通过；不把未通过工具加载、未在独立会话触发的 Skill 写成已正式调用 |
 
 ## 7. 当前仍存在的 Skill 相关缺口（如实登记）
 
-1. `.agent/06` `K-02` 要求「至少两个自编 Skill：业务专项 Skill + **验收检查 Skill**」；当前 3 个自编 Skill 均为生成/测试类，**尚无验收检查 Skill**。是否新增属 C-08，须学生确认后以 `docs` 单独提交，不得完工后补造调用记录。
-2. `K-04` 闭环缺独立验收会话的复检结论。
-3. 三个自编 Skill 的 `SKILL.md` 修改需学生确认（C-08）并保留历史版本；本轮未修改 `SKILL.md`。
-4. 所有 Skill 的正式运行证据（真实 MySQL + `CGO_ENABLED=1` 的 race、Apipost 运行导出、第 3 轮页面验收）均待独立测试/验收 Agent 会话。
+1. `.agent/06` `K-02` 要求的「验收检查 Skill」已由本轮新增的 `acceptance-check` v1.0 补齐（用户整改指令明确授权，属 C-08）；**但缺独立验收 Agent 会话中的真实触发与复检记录**，文件级交付不等于过程证据，不得完工后补造调用记录。
+2. `K-04` 闭环仍缺独立验收会话的复检结论。
+3. Skill 变更须学生确认并保留历史版本：本轮新增 1 份 `SKILL.md`（`acceptance-check`），未改动原有 3 份 `SKILL.md`；`skill-usage.md` 的变更随本轮整改一并记录。
+4. 所有 Skill 的正式运行证据（真实 MySQL + `CGO_ENABLED=1` 的 race、Apipost 运行导出、第 3 轮页面验收）均待独立测试/验收 Agent 会话，属环境/过程证据，不伪造。
 
 ## 8. 证据位置
 
-`.codebuddy/skills/*/SKILL.md`、`docs/dev-assumptions.md`、`docs/interface-list.md`、`test-report.md`、`race-output.txt`、`coverage-report.md`、`apipost-run-summary.md`、`outputs/单题检查/shop-trade/01/20261112-01/检查报告.md`、`docs/完成声明边界.md`。
+`.codebuddy/skills/*/SKILL.md`、`.codebuddy/skills/acceptance-check/SKILL.md`、`docs/dev-assumptions.md`、`docs/interface-list.md`、`docs/代码产物补齐说明.md`、`test-report.md`、`race-output.txt`、`coverage-report.md`、`apipost-run-summary.md`、`outputs/单题检查/shop-trade/01/20261112-01/检查报告.md`、`outputs/单题检查/shop-trade/01/20261112-02/检查报告.md`、`docs/完成声明边界.md`。

@@ -1,0 +1,207 @@
+第二轮门禁复核 · 原始核查命令与输出转录
+检查对象：shop-trade / 题目 01 / dev/01 / HEAD 6cc6f134ee071e0a1cb8e71f03f824a178a249e0
+检查时间：2026-11-12（北京时间 Asia/Shanghai）
+说明：以下为本次复核实际执行的命令与工具返回输出，按命令组编号；未执行项列于末尾，不得视为已通过。
+注：覆盖率复跑使用 $env:TEMP/r2-service.out 与 r2-all.out，未改写学生提交的 coverage.out / coverage-all.out。
+
+================================================================
+[命令组 1] go run main.go 启动 + 健康接口 + 身份接口 + 五组场景
+================================================================
+命令（PowerShell）：
+  $busy = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue
+  if ($busy) { 'PORT_8080_BUSY'; exit 1 }
+  $p = Start-Process -FilePath 'go' -ArgumentList 'run','main.go' -WorkingDirectory 'd:/Desktop/shop' -PassThru -WindowStyle Hidden
+  for ($i=0; $i -lt 40; $i++) { Start-Sleep -Seconds 1; try { Invoke-RestMethod -Uri 'http://127.0.0.1:8080/health' -TimeoutSec 2; break } catch {} }
+  Invoke-RestMethod -Uri 'http://127.0.0.1:8080/api/v1/me' -Headers @{ 'X-Demo-Account' = 'buyer01' }
+  & ./scripts/demo-five-scenarios.ps1
+  Stop-Process -Id $p.Id -Force; 停止 8080 监听进程
+
+输出：
+go_run_pid=44328
+health={"mode":"demo-memory","status":"ok"}
+health_ok=True
+me={"code":"0","message":"ok","data":{"account":"buyer01","mode":"demo-memory","role":"买家","user_id":1001}}
+=== five scenarios ===
+=== TST-S1 活动正常成交 ===
+[S1-01] 买家下单 2 件 => code=0 message=ok
+[S1-02] 模拟渠道支付成功 => code=0 message=ok
+[S1-03] 订单状态查询 status=待发货 => code=0 message=ok
+[S1-04] 仓库登记发货 => code=0 message=ok
+[S1-05] 重复发货应被拒绝 => code=M-19 message=该订单已登记发货，不能重复登记
+[S1-06] 运营核查汇总 => code=0 message=ok
+=== TST-S2 缺货与弃单（库存释放 / 20 次抢单）===
+[S2-01] 20 次抢单 => 成功=3 被拒=17（库存守恒，绝不超卖；真实并发请用 Apipost 20 并发用例 + go test -race）
+[S2-02] 买家取消弃单（释放一次） => code=0 message=ok
+[S2-03] 重复取消应被拒绝 => code=M-10 message=重复操作被拒绝，不产生第二笔业务结果
+=== TST-S3 售前退款（渠道首次失败、再次成功）===
+[S3-01] 下单 => code=0 message=ok
+[S3-02] 买家申请整单退款 => code=0 message=ok
+[S3-03] 申请期间发货应暂停 => code=M-22 message=退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果
+[S3-04] 客服同意并写明原因 => code=0 message=ok
+[S3-05] 模拟渠道首次退款失败 => code=M-08 message=渠道退款失败，已保留待处理记录，请客服重试
+[S3-06] 客服重试登记 => code=0 message=ok
+[S3-07] 退款再次成功 => code=0 message=ok
+[S3-08] 重复退款通知应幂等 => code=0 message=ok
+[S3-09] 退款后状态 status=已退款 => code=0 message=ok
+=== TST-S4 迟到支付（终态不变 + 异常核实退款）===
+[S4-01] 下单 => code=0 message=ok
+[S4-02] 运营推进演示教学时钟 11 分钟 => code=0 message=ok
+[S4-03] 超时关闭待支付订单 => code=0 message=ok
+[S4-04] 关闭后迟到支付成功通知 => code=M-09 message=迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理
+[S4-05] 运营核查异常待处理数=1 => code=0 message=ok
+[S4-06] 客服核实并写明原因 => code=0 message=ok
+[S4-07] 发起迟到支付退款 => code=0 message=ok
+[S4-08] 迟到支付退款失败 => code=M-08 message=渠道退款失败，已保留待处理记录，请客服重试
+[S4-09] 迟到支付退款重试 => code=0 message=ok
+[S4-10] 迟到支付退款成功 => code=0 message=ok
+[S4-11] 终态保持 status=已关闭 => code=0 message=ok
+=== TST-S5 操作竞争、重复通知与越权 ===
+[S5-01] 重复支付通知应幂等 => code=0 message=ok
+[S5-02] 验签失败 => code=M-28 message=支付通知验签失败，订单状态不变
+[S5-03] 金额不符 => code=M-29 message=支付通知金额与订单不符，订单状态不变
+[S5-04] 未知订单 => code=M-30 message=支付通知指向未知订单，订单状态不变
+[S5-05] 退款申请与发货竞争：申请先到 => code=0 message=ok
+[S5-06] 退款申请与发货竞争：发货后到应被拒 => code=M-22 message=退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果
+[S5-07] buyer02 越权查询 buyer01 订单 => code=M-20 message=无权限 / 越权：不能查看或处理他人订单
+[S5-08] 篡改请求用户编号仍应拒绝 => code=M-20 message=无权限 / 越权：不能查看或处理他人订单
+[S5-09] 运营最终核查 => code=0 message=ok
+=== 五组场景 HTTP 演示结束：接口已可从头到尾调用；正式第 2 轮结果须由测试 Agent 在独立会话用 Apipost 运行导出 ===
+cleanup_done
+
+================================================================
+[命令组 2] Git 版本链与环境约束
+================================================================
+命令：
+  git -C d:/Desktop/shop log -1 --format='%H | %s | %cI'
+  git -C d:/Desktop/shop rev-parse HEAD
+  git -C d:/Desktop/shop branch --show-current
+  git -C d:/Desktop/shop status --short --branch
+  git -C d:/Desktop/shop remote -v
+  git -C d:/Desktop/shop rev-list --count HEAD
+  go env CGO_ENABLED
+  Get-Command gcc / meegle -ErrorAction SilentlyContinue
+  [bool]$env:GVA_MYSQL_DSN
+  Test-Path 'd:/Desktop/shop/.github/workflows' / 'Dockerfile'
+  递归统计 *.html / *.jsonl / *.mp4,*.mov,*.avi
+
+输出：
+=== GIT ===
+6cc6f134ee071e0a1cb8e71f03f824a178a249e0 | feat: 电商订单售前退款完整业务实现 | 2026-11-12T12:44:01+08:00
+6cc6f134ee071e0a1cb8e71f03f824a178a249e0
+dev/01
+## dev/01
+--- remote ---
+（空）
+--- commit count ---
+1
+=== ENV ===
+CGO_ENABLED=0
+gcc=NOT_FOUND
+meegle=NOT_FOUND
+GVA_MYSQL_DSN_set=False
+workflows=False
+Dockerfile=False
+html_count=0
+jsonl_count=0
+video_count=0
+
+================================================================
+[命令组 3] 质量门禁独立复跑
+================================================================
+命令：
+  gofmt -l .
+  go vet ./...
+  go build ./...
+  go test ./... -count=1
+  go test -coverprofile "$env:TEMP/r2-service.out" ./server/service/... -count=1
+  go tool cover -func "$env:TEMP/r2-service.out"
+  go test -coverpkg ./... -coverprofile "$env:TEMP/r2-all.out" ./... -count=1
+  go tool cover -func "$env:TEMP/r2-all.out"
+  go test ./server/service/... -race -count=1
+
+输出：
+=== R2 gofmt -l . ===
+exit=0
+=== R2 go vet ./... ===
+exit=0
+=== R2 go build ./... ===
+exit=0
+=== R2 go test ./... -count=1 ===
+ok  	shop-trade	0.867s
+ok  	shop-trade/server/api/v1	0.908s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.962s
+ok  	shop-trade/server/model	0.414s
+ok  	shop-trade/server/router	1.229s
+ok  	shop-trade/server/service	0.671s
+exit=0
+=== R2 coverage service ===
+ok  	shop-trade/server/service	0.472s	coverage: 87.7% of statements
+total:									(statements)				87.7%
+=== R2 coverage all ===
+ok  	shop-trade	0.662s	coverage: 5.5% of statements in ./...
+ok  	shop-trade/server/api/v1	0.613s	coverage: 62.4% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.682s	coverage: 4.6% of statements in ./...
+ok  	shop-trade/server/model	0.494s	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	0.789s	coverage: 2.5% of statements in ./...
+ok  	shop-trade/server/service	0.923s	coverage: 66.2% of statements in ./...
+total:									(statements)				86.0%
+=== R2 race probe ===
+go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+exit=2
+
+判定：race 失败原因为 -race 前置条件（CGO + C 编译器）缺失，不是单元测试失败、不是业务逻辑错误、不是数据竞争报告。按 rubric 第 41 行归为环境缺失项（unknown，待补证），不判定为代码缺陷。
+
+================================================================
+[命令组 4] 文档与接口清单定点核查
+================================================================
+命令：search_content 在 skill-usage.md 检索 技能用途|触发条件|输出产物|验收检查点|禁用场景|student-project-audit|闭环
+结果：13 处命中，含第 11 行六类说明定义、第 20~25 行（gva-model-generate）、第 34~39 行（unit-test-race）、第 48~53 行（apipost-case-gen）逐项 ①~⑥、第 61/73 行 student-project-audit 调用、第 77~89 行闭环与缺口。
+
+命令：search_content 在 docs/interface-list.md 检索 已定稿|API-20|API-01|X-Demo-Account|interface-list-draft
+结果：6 处命中，含第 3 行「状态：**已定稿并与实现一致**」、第 15 行身份约定、第 25 行 API-01~API-20 表、第 48 行 API-20、第 54~58 行五组场景接口序列。
+
+命令：list_dir d:/Desktop/shop/evidence、d:/Desktop/shop/docs
+结果：
+evidence/：会话导出说明.md、交付证据说明.md、事件清单说明.md、验收报告说明.md、AI使用说明.md、demo-five-scenarios-output.txt、final-verification-output.txt、go-run-main-output.txt、go-run-stderr.txt、go-run-stdout.txt、verification-coverage-output.txt、verification-output.txt（共 12）
+docs/：完成声明边界.md、dev-assumptions.md、git-提交指引.md、interface-list-draft.md、interface-list.md（共 5）
+
+命令：python -c "import json;d=json.load(open('apipost-collection.json',...));print('json_ok', list(d.keys()))"
+结果（整改批次原始输出）：json_ok ['collection_name','format_note','status','base_url','variables','role_headers_note','scenarios','forbidden_scope','run_prerequisites','source_interface_list','regenerated_at','mock_channel_note']
+
+================================================================
+[命令组 5] 计分
+================================================================
+命令：
+  python "C:/Users/10990/.codebuddy/skills/student-project-audit/scripts/score_audit.py" \
+    --input "d:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-02/audit-input.json" \
+    --output "d:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-02/score.json"
+
+输出：5.38/10 不合格；原始分 5.38
+
+命令：读取 score.json 摘要
+输出：
+raw 5.38 completion 4.58 process 0.80 final 5.38 不合格 provisional True cap 7.90 adjust 0
+counts {'pass': 9, 'partial': 24, 'fail': 7, 'unknown': 2, 'na': 0}
+blockers 33
+A1 3.00 3.00 2.40
+A2 1.80 1.80 1.05
+A3 1.70 1.70 0.68
+A4 1.50 1.50 0.45
+B1 0.60 0.60 0.15
+B2 0.80 0.80 0.40
+B3 0.30 0.30 0.20
+B4 0.30 0.30 0.05
+
+================================================================
+[未执行 / 未访问 / 未播放]
+================================================================
+1. CGO_ENABLED=1 go test ./... -race —— 无 gcc/clang，CGO_ENABLED=0。
+2. 真实 MySQL(InnoDB) 初始化、行锁并发、重启后查询 —— 无实例，GVA_MYSQL_DSN 未设置。
+3. meegle workitem get --work-item-id <编号> --project-key r17te9 —— CLI 未安装、无权限。
+4. GitHub MCP 建仓查询、PR、状态检查、主分支保护 —— 无远端、无平台权限。
+5. CI/CD 流水线运行、部署、冒烟、回滚 —— 无流水线配置、无部署地址。
+6. Apipost 第 2 轮运行与导出 —— 第 1 轮门禁未通过，按三轮顺序不得开始；无 apipost-run-export.json。
+7. 讲解视频播放、班级群提交凭据 —— 无视频/群记录。
+8. 独立测试 Agent / 验收 Agent 会话导出与结构化 events.jsonl —— 无导出文件；本轮复核与开发过程在同一会话，不冒充独立会话。

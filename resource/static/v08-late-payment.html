@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-08 迟到支付异常处理列表</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-08 迟到支付异常处理列表</span><span class="sub">客服 · 异常支付待处理核实与退款</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-08 迟到支付异常处理列表（客服）</h1>
+    <p class="lead">迟到支付成功通知只生成异常支付待处理记录，订单保持已关闭终态（M-09 / M-15）；异常记录只追加，不能通过改写订单状态消除（M-14）。</p>
+
+    <section class="card">
+      <h2>异常列表与核实（API-12 / 13）</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <div class="field"><label>event_id（异常事件 ID）</label><input id="eventId" value="1" type="number" min="1"></div>
+        <div class="field grow"><label>核实原因（必填）</label><input id="reason" value="已核对渠道流水，确认为迟到支付"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="btnSummary" class="ghost">异常汇总（API-16）</button>
+        <button id="btnVerify">核实异常（API-12）</button>
+        <button id="btnInitiate" class="ghost">发起退款（API-13）</button>
+        <button id="btnCheck" class="ghost">库存逐单核查（API-23）</button>
+      </div>
+      <p class="hint"><code>event_id</code> 来自支付回调返回 M-09 时响应中的 <code>data.event_id</code>；迟到支付退款不得二次恢复此前已释放数量（M-26）。</p>
+    </section>
+
+    <section class="card">
+      <h2>渠道超时通知分支（API-22）</h2>
+      <div class="row">
+        <div class="field grow"><label>order_no</label><input id="orderNo" placeholder="例如 ORD-..."></div>
+        <div class="field grow"><label>channel_trade_no</label><input id="tradeNo" value="TIMEOUT-CH-001"></div>
+        <button id="btnTimeout">发送超时通知</button>
+      </div>
+      <p class="hint">请使用 <code>mock01</code> 或 <code>ops01</code>。超时通知只登记只追加审计，<strong>不关单、不释放库存、不改订单状态</strong>；10 分钟关单仍由服务端时间经 API-05 触发。重复通知幂等。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('cs01');
+    function eid() { return encodeURIComponent(Shop.val('eventId')); }
+    Shop.click('btnSummary', function () { Shop.call('/api/v1/ops/summary'); });
+    Shop.click('btnVerify', function () { Shop.call('/api/v1/late-payment/' + eid() + '/verify', 'POST', { reason: Shop.val('reason') }); });
+    Shop.click('btnInitiate', function () { Shop.call('/api/v1/late-payment/' + eid() + '/refund/initiate', 'POST', { refund_no: 'LATE-REF-001', reason: Shop.val('reason') }); });
+    Shop.click('btnCheck', function () { Shop.call('/api/v1/ops/stock-check/' + encodeURIComponent(Shop.val('orderNo'))); });
+    Shop.click('btnTimeout', function () {
+      Shop.call('/api/v1/payment/timeout', 'POST', {
+        order_no: Shop.val('orderNo'),
+        channel_trade_no: Shop.val('tradeNo'),
+        reason: '模拟渠道通知超时'
+      });
+    });
+  </script>
+</body>
+</html>

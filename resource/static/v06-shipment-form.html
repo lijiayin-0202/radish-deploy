@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-06 发货录入表单</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-06 发货录入表单</span><span class="sub">仓库 · 登记一次发货</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-06 发货录入表单（仓库）</h1>
+    <p class="lead">承运方或运单号为空返回 M-23；重复发货返回 M-19；与退款流程冲突时只形成一种合法结果（M-22）。本题不做真实物流与签收。</p>
+
+    <section class="card">
+      <h2>发货登记（API-11）</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <div class="field grow"><label>order_no</label><input id="orderNo" placeholder="例如 ORD-..."></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="field"><label>承运方 carrier</label><input id="carrier" value="演示承运"></div>
+        <div class="field"><label>运单号 tracking_no</label><input id="tracking" value="TRK-001"></div>
+        <button id="btnShip">登记发货</button>
+        <button id="btnStatus" class="ghost">查看状态</button>
+      </div>
+      <p class="hint">发货为终态，之后不受理本题售前退款（M-11）。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('warehouse01');
+    Shop.click('btnShip', function () {
+      Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo')) + '/shipment', 'POST', {
+        carrier: Shop.val('carrier'),
+        tracking_no: Shop.val('tracking')
+      });
+    });
+    Shop.click('btnStatus', function () { Shop.call('/api/v1/orders/' + encodeURIComponent(Shop.val('orderNo')) + '/status'); });
+  </script>
+</body>
+</html>

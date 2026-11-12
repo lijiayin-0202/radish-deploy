@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V-01 商品浏览页</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">V-01 商品浏览页</span><span class="sub">买家 · 查看在售商品、单价与可售库存并下单</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>V-01 商品浏览页（买家）</h1>
+    <p class="lead">金额一律整数「分」；一单仅一种商品，数量 1 或 2 件。调价后本页显示新价，但已下订单的金额快照不变（M-12）。</p>
+
+    <section class="card">
+      <h2>商品列表（API-18）</h2>
+      <div class="row">
+        <div class="field"><label>演示账号</label><select id="account"></select></div>
+        <button id="btnRefresh" class="ghost">刷新商品</button>
+      </div>
+      <div id="goodsTable"></div>
+    </section>
+
+    <section class="card">
+      <h2>创建订单（API-01）</h2>
+      <div class="row">
+        <div class="field"><label>goods_id</label><input id="goodsId" value="1" type="number" min="1"></div>
+        <div class="field"><label>quantity（1 或 2）</label><input id="qty" value="1" type="number" min="1" max="2"></div>
+        <button id="btnOrder">提交订单</button>
+      </div>
+      <p class="hint">下单成功后把 <code>order_no</code> 带到 V-02 查看订单与状态；缺货或数量非法会返回 M-02 / M-03。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('buyer01');
+    Shop.click('btnRefresh', function () { Shop.loadGoods(); });
+    Shop.click('btnOrder', function () {
+      Shop.call('/api/v1/orders', 'POST', {
+        goods_id: Number(Shop.val('goodsId')),
+        quantity: Number(Shop.val('qty'))
+      });
+    });
+    Shop.loadGoods();
+  </script>
+</body>
+</html>

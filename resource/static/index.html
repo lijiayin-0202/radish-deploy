@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>shop-trade 演示页面入口</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header><span class="brand">shop-trade 题目 01</span><span class="sub">小型电商订单交易、发货与售前退款 · 静态演示视图 V-01~V-08</span></header>
+  <nav id="nav"></nav>
+  <main>
+    <h1>演示页面入口</h1>
+    <p class="lead">GVA 静态资源，纯 HTML + 原生 JS，无 Vue、无前端构建。启动：<code>go run main.go</code> 后访问 <code>http://127.0.0.1:8080/</code>。</p>
+
+    <section class="card">
+      <h2>八视图导航</h2>
+      <div class="row" id="pageLinks"></div>
+      <p class="hint">V-01 / V-02 买家，V-03 / V-04 运营，V-05 / V-06 仓库，V-07 / V-08 客服。身份由服务端预置账号映射，改请求用户编号不能越权。</p>
+    </section>
+
+    <section class="card">
+      <h2>本页状态</h2>
+      <p><span class="tag">代码产物补齐</span> 本批次新增：验收检查 Skill、商品调价接口、渠道超时通知分支、库存恢复逐单核查、8 个静态页面、CI 模板注释。</p>
+      <p><span class="tag">环境/过程证据</span> CGO/gcc、真实 MySQL(InnoDB)、meegle、独立测试/验收会话、视频与部署仍缺，页面与接口演示不冒充三轮验证证据。</p>
+      <p class="hint">五组强制场景仍以 <code>scripts/demo-five-scenarios.ps1</code> 的 HTTP 演示与 Apipost 用例为准；本页面只用于查看订单、退款与库存状态。</p>
+    </section>
+
+    <pre id="out"></pre>
+  </main>
+  <script src="/static/app.js"></script>
+  <script>
+    Shop.init('buyer01');
+    document.getElementById('pageLinks').innerHTML = [
+      ['v01-goods.html', 'V-01 商品浏览'], ['v02-orders.html', 'V-02 我的订单'],
+      ['v03-goods-admin.html', 'V-03 商品管理'], ['v04-ops-summary.html', 'V-04 运营核查'],
+      ['v05-shipment-list.html', 'V-05 待发货'], ['v06-shipment-form.html', 'V-06 发货录入'],
+      ['v07-refund-review.html', 'V-07 退款审核'], ['v08-late-payment.html', 'V-08 迟到支付']
+    ].map(function (p) { return '<a href="/static/' + p[0] + '" style="margin:4px 12px 4px 0;display:inline-block">' + p[1] + '</a>'; }).join('');
+  </script>
+</body>
+</html>
