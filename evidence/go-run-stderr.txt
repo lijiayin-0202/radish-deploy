@@ -1,0 +1,1 @@
+2026/11/12 12:07:42 shop-trade 启动 addr=:8080 mode=demo-memory 健康检查=GET /health

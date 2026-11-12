@@ -1,0 +1,1488 @@
+{
+  "collection_name": "shop-trade 题目01 第2轮 Apipost 用例（基于接口清单 v1.0 定稿重新生成）",
+  "format_note": "用例草案结构，不是 Apipost 官方导出格式；接口路径、方法、请求/响应字段与身份头已与定稿清单及 server/router/order.go 一致；导入前须按实际 Apipost 导出格式转换",
+  "status": "未运行；不得作为第 2 轮接口自动化证据",
+  "base_url": "{{base_url}}",
+  "variables": {
+    "base_url": "http://127.0.0.1:8080",
+    "goods_id": 1,
+    "unit_price": 10000,
+    "quantity": 2,
+    "buyer01_id": 1001,
+    "buyer02_id": 1002,
+    "ops_id": 2001,
+    "warehouse_id": 3001,
+    "cs_id": 4001,
+    "order_no": "{{order_no}}",
+    "channel_trade_no": "{{channel_trade_no}}",
+    "refund_channel_trade_no": "{{refund_channel_trade_no}}",
+    "late_event_id": "{{late_event_id}}",
+    "late_refund_no": "{{late_refund_no}}",
+    "buyer01_account": "buyer01",
+    "buyer02_account": "buyer02",
+    "buyer03_account": "buyer03",
+    "ops_account": "ops01",
+    "warehouse_account": "warehouse01",
+    "cs_account": "cs01",
+    "mock_channel_account": "mock01"
+  },
+  "role_headers_note": "身份只由 X-Demo-Account 解析为服务端预置账号（user_id + role）；X-Role / X-User-Id 一律忽略，改请求中的用户编号不能越权",
+  "scenarios": [
+    {
+      "id": "TST-S1",
+      "name": "活动正常成交",
+      "trace": {
+        "AC": [
+          "AC-02",
+          "AC-03",
+          "AC-06",
+          "AC-14",
+          "AC-18"
+        ],
+        "V": [
+          "V-01",
+          "V-02",
+          "V-04",
+          "V-06"
+        ],
+        "E": [
+          "E-11"
+        ]
+      },
+      "cases": [
+        {
+          "case_id": "S1-01",
+          "api": "API-01",
+          "name": "买家下单 2 件",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 2
+          },
+          "preconditions": [
+            "活动商品在售，单价 10000 分，可售 5 件"
+          ],
+          "assertions": [
+            "HTTP 200",
+            "data.status == '待支付'",
+            "data.total_amount == 20000",
+            "持久化 goods.available_stock == 3 且 occupied_stock == 2"
+          ],
+          "capture": {
+            "order_no": "data.order_no"
+          }
+        },
+        {
+          "case_id": "S1-02",
+          "api": "API-04",
+          "name": "模拟渠道支付成功",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "channel_trade_no": "PAY-S1-001",
+            "amount": 20000,
+            "signature_valid": true
+          },
+          "trigger": "可控 HTTP 模拟渠道通知入口即定稿清单 API-04 / API-10 / API-14；通过 signature_valid、success、amount、channel_trade_no 触发成功/失败/验签失败/金额不符/未知订单/重复通知，无独立真实第三方服务",
+          "assertions": [
+            "data.result == '已记款'",
+            "订单转待发货",
+            "有效收款记录 1 条且金额 20000 分",
+            "库存占用不变"
+          ],
+          "capture": {
+            "channel_trade_no": "PAY-S1-001"
+          }
+        },
+        {
+          "case_id": "S1-03",
+          "api": "API-04",
+          "name": "同一支付通知重复到达",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "channel_trade_no": "{{channel_trade_no}}",
+            "amount": 20000,
+            "signature_valid": true
+          },
+          "assertions": [
+            "data.result == '重复支付通知已幂等处理，未重复记款'",
+            "收款记录仍为 1 条",
+            "订单状态不变",
+            "失败原因引用 M-25"
+          ],
+          "trace": {
+            "M": [
+              "M-25"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S1-04",
+          "api": "API-11",
+          "name": "仓库登记发货",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/shipment",
+          "headers": {
+            "X-Demo-Account": "warehouse01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "carrier": "顺丰",
+            "tracking_no": "SF-S1-001"
+          },
+          "assertions": [
+            "data.result == '发货登记成功'",
+            "订单转已发货终态",
+            "发货登记记录 1 条",
+            "承运方与运单号与请求一致"
+          ]
+        },
+        {
+          "case_id": "S1-05",
+          "api": "API-11",
+          "name": "重复登记发货",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/shipment",
+          "headers": {
+            "X-Demo-Account": "warehouse01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "carrier": "顺丰",
+            "tracking_no": "SF-S1-002"
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-19",
+            "运单号仍为 SF-S1-001",
+            "发货登记记录仍 1 条"
+          ],
+          "trace": {
+            "M": [
+              "M-19"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S1-06",
+          "api": "API-02",
+          "name": "买家查询运单",
+          "method": "GET",
+          "path": "/api/v1/orders/{{order_no}}",
+          "headers": {
+            "X-Demo-Account": "buyer01"
+          },
+          "assertions": [
+            "HTTP 200",
+            "可见承运方与运单号",
+            "订单状态已发货",
+            "金额仍为 20000 分"
+          ]
+        },
+        {
+          "case_id": "S1-07",
+          "api": "API-16",
+          "name": "运营核查汇总",
+          "method": "GET",
+          "path": "/api/v1/ops/summary",
+          "headers": {
+            "X-Demo-Account": "ops01"
+          },
+          "assertions": [
+            "已收款 20000 分",
+            "已退款 0 分",
+            "可售 3 件",
+            "发货记录 1 条",
+            "异常记录 0 条",
+            "无重复释放与重复退款"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "TST-S2",
+      "name": "缺货与弃单（含 20 并发抢单与库存释放）",
+      "trace": {
+        "AC": [
+          "AC-04",
+          "AC-05",
+          "AC-09",
+          "AC-15"
+        ],
+        "V": [
+          "V-01",
+          "V-02",
+          "V-03",
+          "V-04"
+        ],
+        "E": [
+          "E-01",
+          "E-02",
+          "E-03",
+          "E-11"
+        ]
+      },
+      "cases": [
+        {
+          "case_id": "S2-01",
+          "api": "API-01",
+          "name": "非法数量 0 与 3 件",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 0
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-03",
+            "不创建订单",
+            "库存不变"
+          ],
+          "trace": {
+            "M": [
+              "M-03"
+            ],
+            "E": [
+              "E-01"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-02",
+          "api": "API-01",
+          "name": "购买已下架商品",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 2,
+            "quantity": 1
+          },
+          "preconditions": [
+            "将 goods_id=2 置为下架"
+          ],
+          "assertions": [
+            "明确拒绝且原因引用 M-01",
+            "库存不变"
+          ],
+          "trace": {
+            "M": [
+              "M-01"
+            ],
+            "E": [
+              "E-02"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-03",
+          "api": "API-01",
+          "name": "可售 1 件时下单 2 件",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 2
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-02",
+            "库存不变"
+          ],
+          "trace": {
+            "M": [
+              "M-02"
+            ],
+            "E": [
+              "E-03"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-04",
+          "api": "API-01",
+          "name": "20 并发抢 5 件",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 1
+          },
+          "concurrency": {
+            "requests": 20,
+            "repeatable": true,
+            "note": "须在真实 MySQL(InnoDB) 事务 + 行锁环境执行，并记录 go test -race 结果"
+          },
+          "assertions": [
+            "成功数 == 5，被拒数 == 15",
+            "被拒请求均有 M-02 原因且可查",
+            "available_stock == 0 且 occupied_stock == 5",
+            "已占用 + 可售 == 5，无超卖"
+          ],
+          "trace": {
+            "M": [
+              "M-02"
+            ],
+            "AC": [
+              "AC-05"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-05",
+          "api": "API-03",
+          "name": "买家取消弃单",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/cancel",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "assertions": [
+            "订单转已取消终态",
+            "库存仅释放一次",
+            "释放记录可查"
+          ],
+          "trace": {
+            "M": [
+              "M-06"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-06",
+          "api": "API-05",
+          "name": "运营超时关闭待支付订单",
+          "method": "POST",
+          "path": "/api/v1/admin/orders/close-expired",
+          "headers": {
+            "X-Demo-Account": "ops01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "limit": 100
+          },
+          "preconditions": [
+            "服务端时间满 10 分钟；若演示教学时钟缩短，须记录缩短值并保证测试与线上演示规则一致"
+          ],
+          "assertions": [
+            "订单转已关闭终态",
+            "库存仅释放一次",
+            "closed_count 与实际关闭数一致"
+          ],
+          "trace": {
+            "M": [
+              "M-06"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-07",
+          "api": "API-05",
+          "name": "重复关闭同一订单",
+          "method": "POST",
+          "path": "/api/v1/admin/orders/close-expired",
+          "headers": {
+            "X-Demo-Account": "ops01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "limit": 100
+          },
+          "assertions": [
+            "不产生第二笔业务结果",
+            "库存不多释放",
+            "重复操作留痕可查"
+          ],
+          "trace": {
+            "M": [
+              "M-10"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-08",
+          "api": "API-01",
+          "name": "释放后其他买家再次购买",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer02",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 1
+          },
+          "assertions": [
+            "下单成功",
+            "库存守恒",
+            "再次超量下单明确拒绝 M-02"
+          ],
+          "trace": {
+            "M": [
+              "M-02"
+            ],
+            "AC": [
+              "AC-15"
+            ]
+          }
+        },
+        {
+          "case_id": "S2-09",
+          "api": "API-16",
+          "name": "运营核查库存循环",
+          "method": "GET",
+          "path": "/api/v1/ops/summary",
+          "headers": {
+            "X-Demo-Account": "ops01"
+          },
+          "assertions": [
+            "可售 + 占用 == 5",
+            "无重复释放",
+            "汇总与逐笔记录一致"
+          ],
+          "trace": {
+            "AC": [
+              "AC-18"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "TST-S3",
+      "name": "售前退款（首次渠道失败、再次成功）",
+      "trace": {
+        "AC": [
+          "AC-11",
+          "AC-12",
+          "AC-13",
+          "AC-14",
+          "AC-18"
+        ],
+        "V": [
+          "V-02",
+          "V-05",
+          "V-06",
+          "V-07",
+          "V-04"
+        ],
+        "E": [
+          "E-12",
+          "E-11"
+        ]
+      },
+      "cases": [
+        {
+          "case_id": "S3-01",
+          "api": "API-01/API-04",
+          "name": "前置：下单并支付成功",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 2
+          },
+          "assertions": [
+            "订单待发货",
+            "实收 20000 分"
+          ],
+          "capture": {
+            "order_no": "data.order_no"
+          }
+        },
+        {
+          "case_id": "S3-02",
+          "api": "API-06",
+          "name": "买家申请整单退款",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/apply",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "reason": "不想要了"
+          },
+          "assertions": [
+            "订单转退款审核中",
+            "显示暂停发货",
+            "退款申请流水可查"
+          ]
+        },
+        {
+          "case_id": "S3-03",
+          "api": "API-11",
+          "name": "申请期间仓库尝试发货",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/shipment",
+          "headers": {
+            "X-Demo-Account": "warehouse01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "carrier": "顺丰",
+            "tracking_no": "SF-S3-001"
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-07 或 M-22",
+            "未登记发货",
+            "订单仍为退款审核中"
+          ],
+          "trace": {
+            "M": [
+              "M-07",
+              "M-22"
+            ],
+            "AC": [
+              "AC-13"
+            ]
+          }
+        },
+        {
+          "case_id": "S3-04",
+          "api": "API-08",
+          "name": "客服同意并写明原因",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/approve",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "remark": "同意整单退款"
+          },
+          "assertions": [
+            "订单转退款处理中",
+            "审核记录含审核人与原因",
+            "退款金额 = 实收金额 20000 分"
+          ],
+          "trace": {
+            "M": [
+              "M-24"
+            ]
+          }
+        },
+        {
+          "case_id": "S3-05",
+          "api": "API-10",
+          "name": "模拟渠道首次退款失败",
+          "method": "POST",
+          "path": "/api/v1/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "refund_channel_trade_no": "RF-S3-001",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": false
+          },
+          "trigger": "可控 HTTP 模拟渠道通知入口即定稿清单 API-04 / API-10 / API-14；通过 signature_valid、success、amount、channel_trade_no 触发成功/失败/验签失败/金额不符/未知订单/重复通知，无独立真实第三方服务",
+          "assertions": [
+            "明确结果引用 M-08",
+            "订单停留退款处理中",
+            "失败待处理记录可查",
+            "未恢复库存",
+            "未回到可发货"
+          ],
+          "capture": {
+            "refund_channel_trade_no": "RF-S3-001"
+          },
+          "trace": {
+            "M": [
+              "M-08",
+              "M-16"
+            ],
+            "E": [
+              "E-12"
+            ]
+          }
+        },
+        {
+          "case_id": "S3-06",
+          "api": "API-10",
+          "name": "重复失败退款通知",
+          "method": "POST",
+          "path": "/api/v1/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "refund_channel_trade_no": "{{refund_channel_trade_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": false
+          },
+          "assertions": [
+            "幂等结果，不新增退款记录",
+            "订单状态不变",
+            "失败原因引用 M-10"
+          ],
+          "trace": {
+            "M": [
+              "M-10"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S3-07",
+          "api": "API-09",
+          "name": "客服重试登记",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/retry",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "remark": "客服重试"
+          },
+          "assertions": [
+            "重试记录含原因",
+            "重试次数 +1",
+            "订单仍为退款处理中"
+          ],
+          "trace": {
+            "M": [
+              "M-16"
+            ]
+          }
+        },
+        {
+          "case_id": "S3-08",
+          "api": "API-10",
+          "name": "退款再次成功",
+          "method": "POST",
+          "path": "/api/v1/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "refund_channel_trade_no": "{{refund_channel_trade_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": true
+          },
+          "trigger": "可控 HTTP 模拟渠道通知入口即定稿清单 API-04 / API-10 / API-14；通过 signature_valid、success、amount、channel_trade_no 触发成功/失败/验签失败/金额不符/未知订单/重复通知，无独立真实第三方服务",
+          "assertions": [
+            "订单转已退款终态",
+            "恢复可售数量 == 2 且仅一次",
+            "恢复库存流水 1 条",
+            "买家可见退款结果"
+          ]
+        },
+        {
+          "case_id": "S3-09",
+          "api": "API-10",
+          "name": "重复成功退款通知",
+          "method": "POST",
+          "path": "/api/v1/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "refund_channel_trade_no": "{{refund_channel_trade_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": true
+          },
+          "assertions": [
+            "不重复退款",
+            "不重复恢复库存",
+            "结果引用 M-25 或 M-10"
+          ],
+          "trace": {
+            "AC": [
+              "AC-13"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S3-10",
+          "api": "API-07/API-11",
+          "name": "退款拒绝分支",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/reject",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "remark": "补充材料后恢复可发货"
+          },
+          "preconditions": [
+            "另建一单并完成支付与退款申请"
+          ],
+          "assertions": [
+            "拒绝后回待发货且可继续登记发货",
+            "审核记录含审核人与原因",
+            "已发货后申请售前退款被拒 M-11"
+          ],
+          "trace": {
+            "AC": [
+              "AC-12"
+            ],
+            "M": [
+              "M-11"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "TST-S4",
+      "name": "迟到支付",
+      "trace": {
+        "AC": [
+          "AC-10",
+          "AC-17",
+          "AC-18"
+        ],
+        "V": [
+          "V-02",
+          "V-04",
+          "V-08"
+        ],
+        "E": [
+          "E-13",
+          "E-16"
+        ]
+      },
+      "cases": [
+        {
+          "case_id": "S4-01",
+          "api": "API-01/API-05",
+          "name": "前置：下单并超时关闭",
+          "method": "POST",
+          "path": "/api/v1/orders",
+          "headers": {
+            "X-Demo-Account": "buyer03",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "goods_id": 1,
+            "quantity": 2
+          },
+          "assertions": [
+            "订单已关闭终态",
+            "库存已释放一次"
+          ],
+          "capture": {
+            "order_no": "data.order_no"
+          }
+        },
+        {
+          "case_id": "S4-02",
+          "api": "API-04",
+          "name": "关闭后成功支付通知到达",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "channel_trade_no": "LATE-S4-001",
+            "amount": 20000,
+            "signature_valid": true
+          },
+          "trigger": "可控 HTTP 模拟渠道通知入口即定稿清单 API-04 / API-10 / API-14；通过 signature_valid、success、amount、channel_trade_no 触发成功/失败/验签失败/金额不符/未知订单/重复通知，无独立真实第三方服务",
+          "assertions": [
+            "结果引用 M-09",
+            "订单保持已关闭终态",
+            "未重新占用库存",
+            "生成异常支付待处理记录且可查"
+          ],
+          "capture": {
+            "late_event_id": "data.event_id"
+          },
+          "trace": {
+            "M": [
+              "M-09",
+              "M-15"
+            ],
+            "AC": [
+              "AC-10"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-03",
+          "api": "API-16",
+          "name": "运营查询异常待处理",
+          "method": "GET",
+          "path": "/api/v1/ops/summary",
+          "headers": {
+            "X-Demo-Account": "ops01"
+          },
+          "assertions": [
+            "异常支付待处理数 +1",
+            "异常可按订单查询",
+            "无可改写订单状态入口"
+          ]
+        },
+        {
+          "case_id": "S4-04",
+          "api": "API-12",
+          "name": "客服核实并写明原因",
+          "method": "POST",
+          "path": "/api/v1/late-payment/{{late_event_id}}/verify",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "reason": "核实为迟到支付"
+          },
+          "assertions": [
+            "核实记录含客服与原因",
+            "未填原因时明确拒绝 M-24"
+          ],
+          "trace": {
+            "M": [
+              "M-24"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-05",
+          "api": "API-13",
+          "name": "客服发起迟到支付退款",
+          "method": "POST",
+          "path": "/api/v1/late-payment/{{late_event_id}}/refund/initiate",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "refund_no": "LATE-RF-S4-001",
+            "reason": "核实后发起退款"
+          },
+          "assertions": [
+            "迟到支付退款请求已登记",
+            "订单状态不变",
+            "重复发起明确拒绝 M-10"
+          ],
+          "capture": {
+            "late_refund_no": "LATE-RF-S4-001"
+          },
+          "trace": {
+            "M": [
+              "M-26"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-06",
+          "api": "API-14/API-15",
+          "name": "迟到支付退款失败与重试",
+          "method": "POST",
+          "path": "/api/v1/late-payment/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "event_id": "{{late_event_id}}",
+            "refund_no": "{{late_refund_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": false
+          },
+          "assertions": [
+            "失败结果引用 M-08",
+            "失败待处理可查",
+            "客服重试登记成功",
+            "订单仍为已关闭"
+          ],
+          "trace": {
+            "M": [
+              "M-08",
+              "M-16"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-07",
+          "api": "API-14",
+          "name": "迟到支付退款成功",
+          "method": "POST",
+          "path": "/api/v1/late-payment/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "event_id": "{{late_event_id}}",
+            "refund_no": "{{late_refund_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": true
+          },
+          "assertions": [
+            "订单仍为已关闭终态",
+            "退款至多一次",
+            "未二次恢复此前已释放库存",
+            "异常记录仍可查"
+          ],
+          "trace": {
+            "M": [
+              "M-15",
+              "M-26"
+            ],
+            "AC": [
+              "AC-10"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-08",
+          "api": "API-14",
+          "name": "重复迟到支付退款通知",
+          "method": "POST",
+          "path": "/api/v1/late-payment/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "event_id": "{{late_event_id}}",
+            "refund_no": "{{late_refund_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": true
+          },
+          "assertions": [
+            "幂等结果，不产生第二笔退款",
+            "库存不变"
+          ],
+          "trace": {
+            "M": [
+              "M-25"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-09",
+          "api": "无",
+          "name": "尝试直接改写订单状态消除异常",
+          "method": "PUT/PATCH",
+          "path": "/api/v1/orders/{{order_no}}/status",
+          "headers": {
+            "X-Demo-Account": "ops01"
+          },
+          "body": {
+            "status": "待发货"
+          },
+          "assertions": [
+            "无该写入口（404/405 或明确拒绝）",
+            "异常支付记录仍可查询",
+            "审计流水完整"
+          ],
+          "trace": {
+            "M": [
+              "M-13",
+              "M-14"
+            ],
+            "E": [
+              "E-13"
+            ],
+            "AC": [
+              "AC-17"
+            ]
+          }
+        },
+        {
+          "case_id": "S4-10",
+          "api": "API-16",
+          "name": "运营收尾核查",
+          "method": "GET",
+          "path": "/api/v1/ops/summary",
+          "headers": {
+            "X-Demo-Account": "ops01"
+          },
+          "assertions": [
+            "无重复释放",
+            "无重复退款",
+            "异常与退款逐笔可查",
+            "核查结果引用 M-17"
+          ],
+          "trace": {
+            "M": [
+              "M-17"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "TST-S5",
+      "name": "操作竞争（退款与发货并发、重复通知、越权）",
+      "trace": {
+        "AC": [
+          "AC-06",
+          "AC-07",
+          "AC-08",
+          "AC-13",
+          "AC-14",
+          "AC-16"
+        ],
+        "V": [
+          "V-04",
+          "V-05",
+          "V-06",
+          "V-07",
+          "V-08"
+        ],
+        "E": [
+          "E-07",
+          "E-08",
+          "E-09",
+          "E-10",
+          "E-11",
+          "E-14"
+        ]
+      },
+      "cases": [
+        {
+          "case_id": "S5-01",
+          "api": "API-06 + API-11",
+          "name": "退款申请与发货并发",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/apply | /api/v1/orders/{{order_no}}/shipment",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "reason": "并发申请",
+            "carrier": "顺丰",
+            "tracking_no": "SF-RACE"
+          },
+          "concurrency": {
+            "requests": 2,
+            "repeatable": true,
+            "note": "两个请求同时发起；须在真实 MySQL(InnoDB) 行锁环境执行"
+          },
+          "assertions": [
+            "仅形成一种合法业务结果",
+            "无『已退款且已发货』",
+            "后到者明确拒绝且原因引用 M-22 或 M-10",
+            "审计留痕完整",
+            "go test -race 无数据竞争报告"
+          ],
+          "trace": {
+            "AC": [
+              "AC-13"
+            ],
+            "M": [
+              "M-22"
+            ]
+          },
+          "concurrent_accounts": [
+            "buyer01",
+            "warehouse01"
+          ]
+        },
+        {
+          "case_id": "S5-02",
+          "api": "API-04",
+          "name": "连续 3 次相同支付通知",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "channel_trade_no": "PAY-S5-001",
+            "amount": 20000,
+            "signature_valid": true
+          },
+          "assertions": [
+            "收款记录 1 条",
+            "订单仅一次进入待发货",
+            "库存占用不变",
+            "重复通知有明确结果 M-25"
+          ],
+          "trace": {
+            "AC": [
+              "AC-06"
+            ],
+            "M": [
+              "M-25"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-03",
+          "api": "API-10",
+          "name": "重复退款通知",
+          "method": "POST",
+          "path": "/api/v1/refund/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "refund_channel_trade_no": "{{refund_channel_trade_no}}",
+            "amount": 20000,
+            "signature_valid": true,
+            "success": true
+          },
+          "assertions": [
+            "不重复退款",
+            "不重复恢复库存",
+            "订单状态不变"
+          ],
+          "trace": {
+            "AC": [
+              "AC-13"
+            ],
+            "E": [
+              "E-11"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-04",
+          "api": "API-04",
+          "name": "同一渠道交易号指向两个订单",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{second_order_no}}",
+            "channel_trade_no": "{{channel_trade_no}}",
+            "amount": 20000,
+            "signature_valid": true
+          },
+          "assertions": [
+            "第二次被拒且原因引用 M-27",
+            "处理结果可查询",
+            "一个交易号至多归属一个订单"
+          ],
+          "trace": {
+            "AC": [
+              "AC-08"
+            ],
+            "M": [
+              "M-27"
+            ],
+            "E": [
+              "E-10"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-05",
+          "api": "API-04",
+          "name": "验签失败通知",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "channel_trade_no": "PAY-BAD-SIGN",
+            "amount": 20000,
+            "signature_valid": false
+          },
+          "assertions": [
+            "原因引用 M-28",
+            "订单状态不变",
+            "处理结果可查询"
+          ],
+          "trace": {
+            "AC": [
+              "AC-07"
+            ],
+            "E": [
+              "E-09"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-06",
+          "api": "API-04",
+          "name": "金额不符通知",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "{{order_no}}",
+            "channel_trade_no": "PAY-BAD-AMT",
+            "amount": 19999,
+            "signature_valid": true
+          },
+          "assertions": [
+            "原因引用 M-29",
+            "订单状态不变",
+            "处理结果可查询"
+          ],
+          "trace": {
+            "AC": [
+              "AC-07"
+            ],
+            "E": [
+              "E-07"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-07",
+          "api": "API-04",
+          "name": "未知订单通知",
+          "method": "POST",
+          "path": "/api/v1/payment/callback",
+          "headers": {
+            "X-Demo-Account": "mock01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "order_no": "NOT-EXIST",
+            "channel_trade_no": "PAY-UNKNOWN",
+            "amount": 20000,
+            "signature_valid": true
+          },
+          "assertions": [
+            "原因引用 M-30",
+            "无静默丢弃",
+            "处理结果可查询"
+          ],
+          "trace": {
+            "AC": [
+              "AC-07"
+            ],
+            "E": [
+              "E-08"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-08",
+          "api": "API-02",
+          "name": "buyer02 越权查询 buyer01 订单",
+          "method": "GET",
+          "path": "/api/v1/orders/{{order_no}}",
+          "headers": {
+            "X-Demo-Account": "buyer01"
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-20",
+            "不返回他人订单数据",
+            "权限拒绝留痕"
+          ],
+          "trace": {
+            "AC": [
+              "AC-16"
+            ],
+            "E": [
+              "E-14"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-09",
+          "api": "API-08",
+          "name": "仓库越权审核退款",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/approve",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "remark": "越权审核"
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-20",
+            "订单状态不变",
+            "留痕可查"
+          ],
+          "trace": {
+            "AC": [
+              "AC-16"
+            ],
+            "E": [
+              "E-14"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-10",
+          "api": "API-06",
+          "name": "篡改请求中的用户编号",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/apply",
+          "headers": {
+            "X-Demo-Account": "buyer01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "reason": "篡改编号",
+            "user_id": "{{buyer01_id}}"
+          },
+          "assertions": [
+            "身份由服务端解析，改编号无效",
+            "越权明确拒绝 M-20",
+            "不泄露他人数据"
+          ],
+          "trace": {
+            "AC": [
+              "AC-16"
+            ],
+            "E": [
+              "E-14"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-11",
+          "api": "API-11",
+          "name": "发货必填项缺失",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/shipment",
+          "headers": {
+            "X-Demo-Account": "warehouse01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "carrier": "",
+            "tracking_no": ""
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-23",
+            "未登记发货"
+          ],
+          "trace": {
+            "M": [
+              "M-23"
+            ]
+          }
+        },
+        {
+          "case_id": "S5-12",
+          "api": "API-07/API-08",
+          "name": "审核未写明原因",
+          "method": "POST",
+          "path": "/api/v1/orders/{{order_no}}/refund/approve",
+          "headers": {
+            "X-Demo-Account": "cs01",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "remark": ""
+          },
+          "assertions": [
+            "明确拒绝且原因引用 M-24",
+            "订单状态不变"
+          ],
+          "trace": {
+            "M": [
+              "M-24"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "forbidden_scope": [
+    "购物车",
+    "一单多商品",
+    "部分退款",
+    "售后退货",
+    "签收与售后物流",
+    "多商户",
+    "真实支付渠道",
+    "真实物流",
+    "促销优惠",
+    "完整财务系统"
+  ],
+  "run_prerequisites": [
+    "服务可启动：go run main.go（demo-memory）或配置 GVA_MYSQL_DSN 走 MySQL(InnoDB)",
+    "第 1 轮单元测试、覆盖率 ≥85%、go test -race（CGO_ENABLED=1）全部通过后才可执行本用例集",
+    "接口清单 docs/interface-list.md v1.0 已定稿，api/v1 与 router 已实现",
+    "真实 MySQL(InnoDB) 测试库、演示数据基线与服务端时间推进规则就绪",
+    "Apipost 环境变量与身份头确认，密钥/口令一律脱敏",
+    "本集合未运行，不得冒充第 2 轮运行导出结果"
+  ],
+  "source_interface_list": "docs/interface-list.md v1.0（定稿）；docs/interface-list-draft.md 仅保留为历史版本，不再作为用例依据",
+  "regenerated_at": "2026-11-12",
+  "mock_channel_note": "可控 HTTP 模拟渠道通知入口即定稿清单 API-04 / API-10 / API-14；通过 signature_valid、success、amount、channel_trade_no 触发成功/失败/验签失败/金额不符/未知订单/重复通知，无独立真实第三方服务"
+}

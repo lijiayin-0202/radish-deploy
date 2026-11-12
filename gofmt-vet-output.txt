@@ -1,0 +1,13 @@
+命令：gofmt -w .; gofmt -l .; go vet ./...
+执行时间：2026-11-12（本轮开发会话，草案）
+工作目录：d:/Desktop/shop
+
+--- gofmt -l . ---
+（无输出，全部 Go 文件已格式化）
+
+--- go vet ./... ---
+（无输出）
+vet-exit=0
+
+说明：本轮曾由 go vet 报出 `server/service/order_service_test.go:318:5: suspect and: o.Status == StatusRefunded && o.Status == StatusShipped`，
+已改为校验并发裁决只产生 `退款审核中` 或 `已发货` 之一；修复后复跑无告警。

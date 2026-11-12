@@ -1,0 +1,93 @@
+检查批次 20261112-01｜北京时间 2026-11-12｜工作目录 d:/Desktop/shop
+说明：以下命令均为只读核查或在检查输出目录内生成文件，未修改学生产物、未连接真实数据库、未触发部署。
+
+[C-01] 交付版本与 Git 状态
+$ git --no-pager log --oneline --all --decorate
+（无输出）
+$ git branch -a
+（无输出）
+$ git remote -v
+（无输出）
+$ git branch --show-current
+dev/01
+$ git rev-parse --verify HEAD
+fatal: Needed a single revision
+$ Get-Content .git/HEAD
+ref: refs/heads/dev/01
+$ Get-ChildItem -Recurse .git/refs -File
+（无输出；无 tag/branch ref 文件）
+$ git status --short
+26 行，全部为 "??"（未跟踪）
+=> 关联 E-004：无 HEAD、无提交、无远端、无 PR/合并记录。
+
+[C-02] 全量文件清点
+$ Get-ChildItem -Recurse -File -Force | Where-Object { $_.FullName -notmatch '\\\.git\\' } | … | Sort-Object
+共 41 个文件（清单见 E-003 / E-索引.md）
+$ search_file *.html  -> 0
+$ search_file *.yaml  -> 0
+$ search_file *.go    -> 10（server/ 下 9 个业务/测试 + health.go）
+$ 扩展名/名称检索 mp4|mov|avi|mkv|png|jpg|jpeg|pdf|yml|yaml|jsonl|log|csv 与 README|Dockerfile|session|会话|验收|部署|deploy|pipeline|meegle|PR|视频|群
+仅命中 .git/hooks/*.sample
+=> 关联 E-003、E-021：无页面、无 CI、无视频、无会话导出、无验收/部署/群提交证据。
+
+[C-03] 独立复跑（只读，不写学生文件）
+$ go list -f '{{.Name}} {{.ImportPath}}' ./...
+v1 shop-trade/server/api/v1
+global shop-trade/server/global
+model shop-trade/server/model
+service shop-trade/server/service
+$ gofmt -l .
+（无输出） gofmt_exit=0
+$ go vet ./...
+（无输出） vet_exit=0
+$ go build ./...
+build_exit=0
+$ go test -cover ./... -count=1
+    shop-trade/server/api/v1   coverage: 0.0% of statements
+?   shop-trade/server/global   [no test files]
+    shop-trade/server/model    coverage: 0.0% of statements
+ok  shop-trade/server/service  0.955s  coverage: 85.3% of statements
+test_exit=0
+=> 关联 E-005、E-006：4 个包均为库包，无 main 包（无启动入口）；格式/静态/单测通过，覆盖率复现。
+
+[C-04] race 与覆盖率原件核对
+$ Get-Content race-output.txt（关键行）
+CGO_ENABLED=0
+go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+race-exit=2
+=> 关联 E-007：竞态检测未启动，第 1 轮门禁未通过。
+$ Get-Content coverage-report.md（关键行）
+server/service 85.3%；-coverpkg=./... 整体 85.2%；自编 DAO 由 sqlmock 覆盖，未排除
+=> 关联 E-008。
+
+[C-05] Apipost 用例与运行状态
+$ $c = Get-Content -Raw -Encoding UTF8 apipost-collection.json | ConvertFrom-Json
+scenarios=5
+cases=48
+status=未运行；不得作为第 2 轮接口自动化证据
+=> 关联 E-011；apipost-run-summary.md 自述无 run-export（E-010）。
+
+[C-06] 计分器（技能目录为工作目录）
+$ cd C:/Users/10990/.codebuddy/skills/student-project-audit
+$ python scripts/score_audit.py --input d:/Desktop/shop/outputs/单题检查/shop-trade/01/20261112-01/audit-input.json --output .../score.json
+3.23/10 不合格；原始分 3.23
+$ python -c "…各类 score…"
+A1 3.00 3.00 1.35 27/20
+A2 1.80 1.80 0.75 3/4
+A3 1.70 1.70 0.68 17/25
+A4 1.50 1.50 0.00 0
+B1 0.60 0.60 0.10 1/10
+B2 0.80 0.80 0.20 1/5
+B3 0.30 0.30 0.15 3/20
+B4 0.30 0.30 0.00 0
+blockers 41
+=> score.json：raw 3.23、completion 2.78、process 0.45、gate_cap 7.90、gate_adjustment_exact 0、verdict 不合格。
+
+[C-07] 输出文件生成与校验
+$ python evidence/gen_csv.py
+wrote 要求与评分明细.csv rows=42
+wrote 过程与提示词明细.csv rows=22
+$ 读取前 3 字节
+239,187,191（EF BB BF，UTF-8 BOM）两份 CSV 均符合
+$ Import-Csv -Encoding UTF8 行数
+42 / 22

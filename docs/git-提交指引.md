@@ -1,0 +1,111 @@
+# Git 提交指引（`dev/01`）
+
+| 项 | 内容 |
+| --- | --- |
+| 项目 | `shop-trade` 题目 01 |
+| 依据 | 根目录 `commit-convention.md`（原文未改写）、`AGENTS.md` 第 2 章、`.agent/04-workflow-git.md`、`.agent/06-workflow-devflow.md` |
+| 适用分支 | `dev/01`（**禁止直接提交或推送 `main`**） |
+| 文件性质 | 开发 Agent 编写的操作指引与偏差说明；不是 PR / CI 运行结果 |
+
+## 1. 当前真实状态（2026-11-12）
+
+| 检查命令 | 结果 |
+| --- | --- |
+| `git branch --show-current` | `dev/01` |
+| `git remote -v` | 空：当前**无远程仓库**（因此不存在 PR / CI / 部署记录，不得编造） |
+| `git status --short --branch` | 整改前为 `## No commits yet on dev/01` + 全部文件未跟踪 |
+| `git log -1 --oneline` | 整改前报 `fatal: your current branch 'dev/01' does not have any commits yet`；按第 2 节建立首次提交后有有效 HEAD |
+| `git config user.name` / `user.email` | 已有全局身份；本轮**未修改任何 git config** |
+| `meegle` CLI | `Get-Command meegle` 无结果，**本机未安装 / 不可用** |
+| `go env CGO_ENABLED` / `gcc` | `0` / 无 C 编译器，`go test -race` 前置条件不满足 |
+
+首次提交后可用以下命令复核提交链（原始输出须另行保存，不得只写结论）：
+
+```powershell
+cd d:/Desktop/shop
+git status --short --branch
+git log --oneline --decorate -1
+git rev-parse HEAD
+git branch --show-current
+```
+
+## 2. 首次提交（用户明确指定）
+
+用户在整改指令中要求：「初始化 Git，给 `dev/01` 做第一次 commit 生成有效 HEAD，提交说明按用户指定 `feat: 电商订单售前退款完整业务实现`」。
+
+执行命令：
+
+```powershell
+cd d:/Desktop/shop
+git checkout -B dev/01     # 分支已存在且无提交时，仅确认当前分支仍为 dev/01
+git add -A
+git commit -m "feat: 电商订单售前退款完整业务实现"
+```
+
+### 2.1 与 `commit-convention.md` 的偏差（如实登记，不掩盖）
+
+| 规范要求 | 本次实际 | 影响 |
+| --- | --- | --- |
+| 格式 `[类型] [版本号] [需求/Bug编号] 中文描述` | `feat: 电商订单售前退款完整业务实现` | 格式不符，缺版本号与编号 |
+| `feat` 版本号、编号必填 | 无 | 不满足必填规则 |
+| `feat` 提交前必须执行 `meegle workitem get --work-item-id <数字编号> --project-key r17te9` 并保留输出 | 本机 `meegle` 不可用，且无经核验的真实工作项 ID，**未执行核验** | 不得声称已核验，不得伪造编号或输出 |
+| 一次 commit 只含一种类型 | 首次提交包含生产代码、测试代码、文档、Skill 与证据产物 | 属混合类型基线提交 |
+
+**结论**：本次提交仅为「建立有效 HEAD 的初始化基线提交」，按用户明确指定执行；**不得视为合规 `feat` 提交**，不得作为 PR 门禁「提交格式合规、编号核验真实」的证据。后续门禁核验须由验收 Agent 逐项判定，缺项如实记为不通过。
+**禁止**在事后改写历史以伪装成合规提交；如需修正，只能由学生确认后新增独立提交并保留原历史。
+
+## 3. 后续合规提交流程
+
+1. **确认分支**：`git branch --show-current` 必须为 `dev/01`。禁止在 `main` 上提交。
+2. **确认编号**：学生提供飞书项目真实工作项 ID（需求或缺陷），且编号必须属于本次变更；不得使用占位符 `<真实编号>`。
+3. **执行核验并保留完整原始输出**（命令、执行时间、完整结果、退出码）：
+
+   ```bash
+   meegle workitem get --work-item-id <数字编号> --project-key r17te9
+   ```
+
+   核验失败、编号不存在、工具不可用或查询失败时**禁止提交 `feat` / `fix`**，须提醒学生确认编号（C-05）。
+4. **按类型拆分**，一次提交只含一种类型：
+
+   | 类型 | 版本号 | 编号 | 本题用途 |
+   | --- | --- | --- | --- |
+   | `feat` | 必填 | 必填 | 下单、支付回调、退款、发货、页面等业务实现 |
+   | `fix` | 必填 | 必填 | 缺陷清单中已登记 Bug 的修复 |
+   | `hotfix` | 必填 | 可选（事后补） | 仅真实线上紧急修复 |
+   | `opt` | 必填 | 可选 | 重构与优化 |
+   | `docs` | 可选 | 可选 | 需求/原型/任务/AGENTS/Skill 文档 |
+   | `test` | 可选 | 可选 | 单测、并发验证、测试报告 |
+
+   合规示例（编号须替换为经核验的真实编号，不得提交占位符）：
+
+   ```text
+   [feat] [v1.0.0] [#数字编号] 实现订单创建与库存预扣
+   [fix] [v1.0.1] [#数字编号] 修复重复支付通知重复记款
+   [docs] 更新需求文档假设清单
+   [test] 补充迟到支付场景单元测试
+   ```
+
+5. **提交后记录哈希**：`git rev-parse HEAD`，并把哈希写入测试/验收报告，建立版本对应关系。
+6. **不得**因缺编号把功能变更伪装成 `docs`、`test` 或 `opt`；不得把 `docs` 提交夹带业务代码。
+
+## 4. 推送远端与 PR 流程（当前均未执行）
+
+```powershell
+# 由学生在 GitHub MCP 创建独立仓库后，再关联远端（本轮无远端，不执行）
+git remote add origin <仓库 URL>
+git push -u origin dev/01
+```
+
+PR 前置门禁（全部通过才允许 `dev/01` → `main`）：单元测试全部通过；整体与核心业务包覆盖率 ≥85%；`go test -race` 在 `CGO_ENABLED=1` 环境无数据竞争；`gofmt` / `go vet` 通过；`TST-S1~S5` 有实际执行结果；独立验收 Agent 逐项通过；提交在 `dev/01` 且格式/编号核验真实；会话导出、`skill-usage.md`、AI 过程记录齐全。
+
+合并优先保留原始提交；`main` 禁止直接推送、禁止删除、禁止强推；合并后须对 `main` 实际发布提交**重新执行门禁、构建与部署**，开发分支旧报告不得当作主分支已验证证据。
+
+## 5. 本轮禁止项
+
+- 不推送 `main`，不伪造 meegle 核验输出，不编造 PR / CI / 部署记录。
+- 不修改 git config，不改写已建立的提交历史来掩盖第 2.1 节偏差。
+- 不把密钥、访问令牌、演示口令、签名密钥或用户敏感信息写入仓库、日志与会话导出，相关内容一律脱敏。
+
+## 6. 关联文档
+
+`commit-convention.md`、`AGENTS.md`、`evidence/交付证据说明.md`、`docs/完成声明边界.md`、`test-report.md`。

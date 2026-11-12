@@ -1,0 +1,16 @@
+命令：go env CGO_ENABLED; go test -race -coverprofile=coverage-race.out ./server/service/... -count=1
+执行时间：2026-11-12（本轮开发会话，草案）
+工作目录：d:/Desktop/shop
+
+CGO_ENABLED=0
+go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+race-exit=2
+
+结论（不得改写为「通过」）：
+1. 本机 `CGO_ENABLED=0` 且无 gcc/clang，`go test -race` 未能启动，未产出正式竞态检测证据。
+2. 本轮所有并发验证（20 并发抢单、退款与发货竞争、重复通知）仅以开发会话草案形式执行，
+   使用内存仓储 + sync.Mutex 保证草案无数据竞争，不替代 MySQL(InnoDB) 事务 + 行锁口径。
+3. 正式第 1 轮证据须由测试 Agent 在独立会话中，把 `CGO_ENABLED=1`、安装 C 编译器、
+   连接真实 MySQL(InnoDB) 测试库与可控 HTTP 模拟渠道后，执行 `scripts/run-race.ps1`，
+   保留 `race-output-raw.txt`、覆盖率原始文件与退出状态。
+4. 在正式 race 证据产出前，PR 门禁中的「并发竞争检测」项为未通过，禁止继续发布。
