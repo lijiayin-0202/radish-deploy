@@ -1,0 +1,73 @@
+===== 订单表 order_no 唯一索引 & 数据持久化验证（真实 MySQL/InnoDB）=====
+时间：2026-11-12 19:58:15
+
+===== 步骤 0：环境与订单表约束 =====
+----- 版本与默认引擎 -----
+$ mysql -uroot 
+mysql_version	default_engine	charset_server
+8.4.11-0ubuntu0.26.04.1	InnoDB	utf8mb4
+[exit=0]
+----- 订单表约束 -----
+$ mysql -uroot shop_trade
+CONSTRAINT_NAME	TABLE_NAME	CONSTRAINT_TYPE
+PRIMARY	order	PRIMARY KEY
+uk_order_order_no	order	UNIQUE
+[exit=0]
+
+===== 步骤 1：首次插入订单（插入成功）=====
+----- 清理历史验证数据 -----
+$ mysql -uroot shop_trade
+
+[exit=0]
+----- 首次插入 -----
+$ mysql -uroot shop_trade
+
+[exit=0]
+----- 插入结果校验 -----
+$ mysql -uroot shop_trade
+id	order_no	buyer_id	goods_id	goods_no	goods_name	quantity	unit_price	total_amount	status	expires_at
+19	ORD001	1	1	G001	测试商品	1	9900	9900	pending	2026-12-31 23:59:59.000
+[exit=0]
+
+===== 步骤 2：重复插入相同 order_no（唯一索引拦截）=====
+----- 重复插入 -----
+$ mysql -uroot shop_trade
+ERROR 1062 (23000) at line 1: Duplicate entry 'ORD001' for key 'order.uk_order_order_no'
+[exit=1]
+
+===== 步骤 3：唯一索引定义核对 =====
+----- SHOW INDEX -----
+$ mysql -uroot shop_trade
+Table	Non_unique	Key_name	Seq_in_index	Column_name	Collation	Cardinality	Sub_part	Packed	Null	Index_type	Comment	Index_comment	Visible	Expression
+order	0	uk_order_order_no	1	order_no	A	0	NULL	NULL		BTREE			YES	NULL
+[exit=0]
+
+===== 步骤 4：事务回滚后不落盘 =====
+----- 事务回滚 -----
+$ mysql -uroot shop_trade
+rows_in_transaction
+1
+rows_after_rollback
+0
+[exit=0]
+
+===== 步骤 5：数据库重启后数据持久化校验 =====
+$ service mysql restart
+
+$ mysqladmin ping -> mysqld is alive
+----- 重启后仍可查询 -----
+$ mysql -uroot shop_trade
+id	order_no	buyer_id	goods_no	quantity	unit_price	total_amount	status	expires_at	created_at
+19	ORD001	1	G001	1	9900	9900	pending	2026-12-31 23:59:59.000	2026-11-12 19:58:16.470
+[exit=0]
+
+===== 步骤 6：清理验证数据 =====
+----- 删除验证数据 -----
+$ mysql -uroot shop_trade
+
+[exit=0]
+----- 清理后校验 -----
+$ mysql -uroot shop_trade
+rows_after_cleanup
+0
+[exit=0]
