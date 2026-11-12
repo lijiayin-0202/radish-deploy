@@ -506,6 +506,7 @@ func (s *OrderService) ApplyRefund(ctx context.Context, actor Actor, orderNo, re
 	return out, err
 }
 
+// RejectRefund：客服拒绝售前退款申请；恢复可发货状态并记录拒绝原因，驳回后订单允许继续发货。
 func (s *OrderService) RejectRefund(ctx context.Context, actor Actor, orderNo, remark string) (*model.Order, error) {
 	if err := s.requireRole(ctx, actor, "RejectRefund", orderNo, RoleCustomerService); err != nil {
 		return nil, err
@@ -556,6 +557,7 @@ func (s *OrderService) RejectRefund(ctx context.Context, actor Actor, orderNo, r
 	return out, err
 }
 
+// ApproveRefund：客服同意售前退款并发起渠道退款；渠道失败保留待处理记录，可再次重试。
 func (s *OrderService) ApproveRefund(ctx context.Context, actor Actor, orderNo, remark string) (*model.Order, error) {
 	if err := s.requireRole(ctx, actor, "ApproveRefund", orderNo, RoleCustomerService); err != nil {
 		return nil, err
@@ -608,6 +610,7 @@ func (s *OrderService) ApproveRefund(ctx context.Context, actor Actor, orderNo, 
 	return out, err
 }
 
+// RetryRefund：对渠道退款失败记录发起重试；成功后退款金额按幂等规则只恢复一次库存。
 func (s *OrderService) RetryRefund(ctx context.Context, actor Actor, orderNo, remark string) (*model.Order, error) {
 	if err := s.requireRole(ctx, actor, "RetryRefund", orderNo, RoleCustomerService); err != nil {
 		return nil, err
@@ -1053,6 +1056,7 @@ func (s *OrderService) HandleLatePaymentRefundCallback(ctx context.Context, acto
 	return out, err
 }
 
+// RetryLatePaymentRefund：对迟到支付的渠道退款失败记录发起重试；不改变原订单终态与库存占用。
 func (s *OrderService) RetryLatePaymentRefund(ctx context.Context, actor Actor, eventID uint64, refundNo, remark string) (*model.Payment, error) {
 	if err := s.requireRole(ctx, actor, "RetryLatePaymentRefund", "", RoleCustomerService); err != nil {
 		return nil, err
@@ -1090,6 +1094,7 @@ func (s *OrderService) RetryLatePaymentRefund(ctx context.Context, actor Actor, 
 	return out, err
 }
 
+// GetOrder：按订单号查询订单详情；买家只能查询本人订单，越权返回 M-20。
 func (s *OrderService) GetOrder(ctx context.Context, actor Actor, orderNo string) (*model.Order, error) {
 	if err := s.requireRole(ctx, actor, "GetOrder", orderNo, RoleBuyer, RoleOps, RoleWarehouse, RoleCustomerService); err != nil {
 		return nil, err
@@ -1107,6 +1112,7 @@ func (s *OrderService) GetOrder(ctx context.Context, actor Actor, orderNo string
 	return order, nil
 }
 
+// GetOpsSummary：运营核查汇总；按状态统计订单数与支付事件数，并列出待处理异常记录。
 func (s *OrderService) GetOpsSummary(ctx context.Context, actor Actor) (*OpsSummary, error) {
 	if err := s.requireRole(ctx, actor, "GetOpsSummary", "", RoleOps); err != nil {
 		return nil, err

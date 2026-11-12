@@ -109,6 +109,7 @@ func (r *GormOrderRepository) LockOrder(ctx context.Context, orderNo string) (*m
 	return &order, nil
 }
 
+// LockOrderByID：按主键加行锁读取订单（SELECT ... FOR UPDATE），用于事务内的并发裁决。
 func (r *GormOrderRepository) LockOrderByID(ctx context.Context, orderID uint64) (*model.Order, error) {
 	var order model.Order
 	err := r.db.WithContext(ctx).
@@ -124,6 +125,7 @@ func (r *GormOrderRepository) LockOrderByID(ctx context.Context, orderID uint64)
 	return &order, nil
 }
 
+// GetOrder：按订单号读取订单（不加锁），用于只读查询场景。
 func (r *GormOrderRepository) GetOrder(ctx context.Context, orderNo string) (*model.Order, error) {
 	var order model.Order
 	err := r.db.WithContext(ctx).Where("order_no = ? AND deleted_at IS NULL", orderNo).First(&order).Error
@@ -136,10 +138,12 @@ func (r *GormOrderRepository) GetOrder(ctx context.Context, orderNo string) (*mo
 	return &order, nil
 }
 
+// CreateOrder：写入订单行；order_no 唯一约束兜底，防止同一订单号重复落库。
 func (r *GormOrderRepository) CreateOrder(ctx context.Context, order *model.Order) error {
 	return r.db.WithContext(ctx).Create(order).Error
 }
 
+// UpdateOrderIfStatus：按「主键 + 期望原状态」条件更新订单；受影响行数为 0 表示状态已被并发变更，调用方须拒绝本次操作。
 func (r *GormOrderRepository) UpdateOrderIfStatus(ctx context.Context, order *model.Order, allowed []string, fields map[string]interface{}) (int64, error) {
 	res := r.db.WithContext(ctx).Model(&model.Order{}).
 		Where("id = ? AND status IN ? AND deleted_at IS NULL", order.ID, allowed).
@@ -167,6 +171,7 @@ func (r *GormOrderRepository) ListExpiredPendingOrders(ctx context.Context, now 
 	return orders, err
 }
 
+// GetPaymentByDedupKey：按幂等键读取支付/退款事件，用于重复通知与重复回调的幂等判定。
 func (r *GormOrderRepository) GetPaymentByDedupKey(ctx context.Context, dedupKey string) (*model.Payment, error) {
 	var payment model.Payment
 	err := r.db.WithContext(ctx).
@@ -181,6 +186,7 @@ func (r *GormOrderRepository) GetPaymentByDedupKey(ctx context.Context, dedupKey
 	return &payment, nil
 }
 
+// GetPaymentByID：按主键读取支付/退款/迟到支付异常事件。
 func (r *GormOrderRepository) GetPaymentByID(ctx context.Context, eventID uint64) (*model.Payment, error) {
 	var payment model.Payment
 	err := r.db.WithContext(ctx).
@@ -195,6 +201,7 @@ func (r *GormOrderRepository) GetPaymentByID(ctx context.Context, eventID uint64
 	return &payment, nil
 }
 
+// HasPaymentEvent：判断指定关联事件是否已存在同类记录，用于只追加流水的重复拦截。
 func (r *GormOrderRepository) HasPaymentEvent(ctx context.Context, relatedEventID uint64, eventType string) (bool, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Payment{}).
@@ -215,12 +222,14 @@ func (r *GormOrderRepository) CreatePayment(ctx context.Context, payment *model.
 	return err
 }
 
+// CountOrders：统计订单总数，供运营核查汇总使用。
 func (r *GormOrderRepository) CountOrders(ctx context.Context) (int64, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Order{}).Where("deleted_at IS NULL").Count(&count).Error
 	return count, err
 }
 
+// CountOrdersByStatus：按订单状态统计数量，供运营核查汇总使用。
 func (r *GormOrderRepository) CountOrdersByStatus(ctx context.Context, status string) (int64, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Order{}).
@@ -229,6 +238,7 @@ func (r *GormOrderRepository) CountOrdersByStatus(ctx context.Context, status st
 	return count, err
 }
 
+// CountPaymentsByEventType：按事件类型统计审计流水条数，供运营核查汇总使用。
 func (r *GormOrderRepository) CountPaymentsByEventType(ctx context.Context, eventType string) (int64, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Payment{}).
@@ -237,6 +247,7 @@ func (r *GormOrderRepository) CountPaymentsByEventType(ctx context.Context, even
 	return count, err
 }
 
+// CountPaymentsByResult：按处理结果统计审计流水条数，供运营核查汇总使用。
 func (r *GormOrderRepository) CountPaymentsByResult(ctx context.Context, result string) (int64, error) {
 	var count int64
 	err := r.db.WithContext(ctx).Model(&model.Payment{}).
@@ -245,6 +256,7 @@ func (r *GormOrderRepository) CountPaymentsByResult(ctx context.Context, result 
 	return count, err
 }
 
+// SumEffectivePaymentsByEventType：按事件类型累加有效金额（单位分），仅统计 effective=1 的有效业务结果。
 func (r *GormOrderRepository) SumEffectivePaymentsByEventType(ctx context.Context, eventType string) (int64, error) {
 	var total int64
 	err := r.db.WithContext(ctx).Model(&model.Payment{}).
