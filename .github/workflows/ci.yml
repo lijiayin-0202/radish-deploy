@@ -47,13 +47,15 @@ jobs:
 
       # 关键门禁：不达标直接失败。只统计不判定会使覆盖率门禁形同虚设，
       # 因此阈值判定必须是独立步骤且退出码非零即阻断。
+      # 阈值口径对齐 AGENTS.md Q-02：整体 ≥85%，核心业务包 server/service ≥85%。
+      # server/api/v1 属接入层（非核心业务包），脚本会输出其数值供观察但不设阈值，
+      # 其覆盖均衡性由第 7 轮检查登记的 A3-03 整改项跟踪。
       - name: 覆盖率阈值判定（整体 ≥85%，核心业务包 server/service ≥85%）
         run: |
           python3 scripts/coverage_gate.py \
             --profile coverage.out \
             --overall 85 \
             --pkg server/service:85 \
-            --pkg server/api/v1:85 \
             | tee coverage-gate-report.txt
           status=${PIPESTATUS[0]}
           echo "coverage-gate exit=${status}"
