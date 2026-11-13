@@ -1,0 +1,187 @@
+[
+  {
+    "case": "三张业务表均为 InnoDB",
+    "verdict": "PASS",
+    "detail": "共 3 张表"
+  },
+  {
+    "case": "测试载体与库存基线已就绪",
+    "verdict": "PASS",
+    "detail": "goods_id=2 available=6 occupied=0 需用量=6"
+  },
+  {
+    "case": "第1轮并发前置：订单已支付待发货",
+    "verdict": "PASS",
+    "detail": "order_no=ORD-1794494699688671300-1001-1 status=待发货"
+  },
+  {
+    "case": "第1轮并发只形成一种合法结果",
+    "verdict": "PASS",
+    "detail": "refund=0 ship=M-22"
+  },
+  {
+    "case": "第1轮退款胜出则订单行为退款审核中",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "第1轮订单终态唯一（已发货/退款审核中）",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "第1轮库存守恒 available+occupied 恒定",
+    "verdict": "PASS",
+    "detail": "available=5 occupied=1 合计=6 基线=6"
+  },
+  {
+    "case": "第1轮审计流水无重复终态事件",
+    "verdict": "PASS",
+    "detail": "终态类事件 1 条：[('发货登记', '已拒绝', 'M-22')]"
+  },
+  {
+    "case": "第2轮并发前置：订单已支付待发货",
+    "verdict": "PASS",
+    "detail": "order_no=ORD-1794494700268248100-1001-2 status=待发货"
+  },
+  {
+    "case": "第2轮并发只形成一种合法结果",
+    "verdict": "PASS",
+    "detail": "refund=0 ship=M-22"
+  },
+  {
+    "case": "第2轮退款胜出则订单行为退款审核中",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "第2轮订单终态唯一（已发货/退款审核中）",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "第2轮库存守恒 available+occupied 恒定",
+    "verdict": "PASS",
+    "detail": "available=4 occupied=2 合计=6 基线=6"
+  },
+  {
+    "case": "第2轮审计流水无重复终态事件",
+    "verdict": "PASS",
+    "detail": "终态类事件 1 条：[('发货登记', '已拒绝', 'M-22')]"
+  },
+  {
+    "case": "第3轮并发前置：订单已支付待发货",
+    "verdict": "PASS",
+    "detail": "order_no=ORD-1794494700852752700-1001-3 status=待发货"
+  },
+  {
+    "case": "第3轮并发只形成一种合法结果",
+    "verdict": "PASS",
+    "detail": "refund=M-11 ship=0"
+  },
+  {
+    "case": "第3轮发货胜出则订单行为已发货",
+    "verdict": "PASS",
+    "detail": "已发货"
+  },
+  {
+    "case": "第3轮订单终态唯一（已发货/退款审核中）",
+    "verdict": "PASS",
+    "detail": "已发货"
+  },
+  {
+    "case": "第3轮库存守恒 available+occupied 恒定",
+    "verdict": "PASS",
+    "detail": "available=3 occupied=3 合计=6 基线=6"
+  },
+  {
+    "case": "第3轮审计流水无重复终态事件",
+    "verdict": "PASS",
+    "detail": "终态类事件 1 条：[('发货登记', '发货登记成功', '')]"
+  },
+  {
+    "case": "第4轮并发前置：订单已支付待发货",
+    "verdict": "PASS",
+    "detail": "order_no=ORD-1794494701419166800-1001-4 status=待发货"
+  },
+  {
+    "case": "第4轮并发只形成一种合法结果",
+    "verdict": "PASS",
+    "detail": "refund=0 ship=M-22"
+  },
+  {
+    "case": "第4轮退款胜出则订单行为退款审核中",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "第4轮订单终态唯一（已发货/退款审核中）",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "第4轮库存守恒 available+occupied 恒定",
+    "verdict": "PASS",
+    "detail": "available=2 occupied=4 合计=6 基线=6"
+  },
+  {
+    "case": "第4轮审计流水无重复终态事件",
+    "verdict": "PASS",
+    "detail": "终态类事件 1 条：[('发货登记', '已拒绝', 'M-22')]"
+  },
+  {
+    "case": "第5轮并发前置：订单已支付待发货",
+    "verdict": "PASS",
+    "detail": "order_no=ORD-1794494701992466200-1001-5 status=待发货"
+  },
+  {
+    "case": "第5轮并发只形成一种合法结果",
+    "verdict": "PASS",
+    "detail": "refund=M-11 ship=0"
+  },
+  {
+    "case": "第5轮发货胜出则订单行为已发货",
+    "verdict": "PASS",
+    "detail": "已发货"
+  },
+  {
+    "case": "第5轮订单终态唯一（已发货/退款审核中）",
+    "verdict": "PASS",
+    "detail": "已发货"
+  },
+  {
+    "case": "第5轮库存守恒 available+occupied 恒定",
+    "verdict": "PASS",
+    "detail": "available=1 occupied=5 合计=6 基线=6"
+  },
+  {
+    "case": "第5轮审计流水无重复终态事件",
+    "verdict": "PASS",
+    "detail": "终态类事件 1 条：[('发货登记', '发货登记成功', '')]"
+  },
+  {
+    "case": "T0 持锁期间应用退款请求被阻塞（未提前返回）",
+    "verdict": "PASS",
+    "detail": "观察 4.0s 后请求仍未返回"
+  },
+  {
+    "case": "释放行锁后应用退款请求立即返回",
+    "verdict": "PASS",
+    "detail": "请求在释放锁后返回，阻塞观察时长约 4.0s"
+  },
+  {
+    "case": "释放锁后退款申请成功（证明此前阻塞源为 InnoDB 行锁）",
+    "verdict": "PASS",
+    "detail": "{\"code\": \"0\", \"message\": \"ok\", \"data\": {\"buyer_id\": 1001, \"cancelled_at\": null, \"closed_at\": null, \"expires_at\": \"2026-11-12T22:55:02.548+08:00\", \"goods_id\": 2,"
+  },
+  {
+    "case": "探针订单最终状态为退款审核中",
+    "verdict": "PASS",
+    "detail": "退款审核中"
+  },
+  {
+    "case": "测试数据已清理，商品库存已按原值复原",
+    "verdict": "PASS",
+    "detail": "available=2 occupied=0 原值=(2,0)"
+  }
+]
