@@ -6,3 +6,9 @@ __pycache__/
 /shop-trade
 /shop-trade.exe
 *.exe
+
+# 部署门禁产出的制品与版本清单目录
+/dist/
+
+# 本地 IDE 工程目录
+.idea/

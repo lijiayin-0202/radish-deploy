@@ -1,31 +1,98 @@
-# ============================================================
-# shop-trade 题目 01 —— CI 模板（仅注释，未启用，不可运行）
-# ============================================================
-# 本文件是「代码产物补齐」批次交付的模板占位，只写注释，不含任何可执行 YAML 键，
-# 不触发流水线、不代表已配置或已运行 CI，更不是部署或门禁通过的证据。
-# 当前仓库无远端、无 GitHub MCP 建仓记录、无流水线运行标识、无部署地址。
-#
-# 依赖环境（第二轮门禁复核已确认本机缺失，属环境/过程证据，不伪造）：
-#   1. CGO：go test -race 需要 CGO_ENABLED=1 且安装 gcc/clang。
-#      本机 go env CGO_ENABLED=0、gcc=NOT_FOUND，race 输出为
-#      "-race requires cgo; enable cgo by setting CGO_ENABLED=1"，exit=2。
-#   2. MySQL(InnoDB)：需真实实例、GVA_MYSQL_DSN 环境变量与 schema.sql 初始化；
-#      本机未设置 DSN，持久化、行锁、唯一键冲突与重启后查询证据缺失。
-#   3. meegle：feat/fix 提交前须执行
-#      meegle workitem get --work-item-id <数字编号> --project-key r17te9
-#      并保留命令、时间、完整结果与退出码；本机 CLI 不可用，禁止伪造编号核验。
-#   4. 远端与平台权限：GitHub MCP 建仓、PR 状态检查、main 分支保护、部署与回滚。
-#
-# 若后续具备条件，流水线至少应包含（此处不写可执行步骤）：
-#   - 检出 dev/01 或 main 的实际提交并记录 git rev-parse HEAD；
-#   - gofmt -l .、go vet ./...、go build ./...、go build -o <制品> .；
-#   - go test ./... -count=1；
-#   - go test -coverpkg ./... -coverprofile <profile> ./...，整体与各核心业务包 >= 85%；
-#   - CGO_ENABLED=1 go test ./... -race -count=1，保存 race-output-raw.txt 且无数据竞争；
-#   - 五组强制场景 TST-S1~S5 的实际执行结果；
-#   - 合并后对 main 实际发布提交重新执行全部门禁、构建、部署与冒烟。
-#
-# 提交规范：全部提交在 dev/01；禁止直推 main；一次提交只含一种类型；
-# feat/fix 必须先完成 meegle 编号核验；核验失败禁止提交。
-# 质量检查失败不得继续发布；开发分支旧版本报告不得当作主分支已验证证据。
-# ============================================================
+name: shop-trade-ci
+
+# 本文件是仓库生效的流水线定义（.github/workflows/ci.yml）。
+# 门禁作业与本地脚本一一对应，本地可原样复跑：
+#   python scripts/coverage_gate.py --profile coverage.out --overall 85 --pkg server/service:85
+#   python scripts/deploy_gate.py
+# 题面共同要求「流水线实际执行质量、覆盖率、构建和部署门禁」；AGENTS.md Q-02/Q-04 给出具体阈值。
+
+on:
+  push:
+    branches: [dev/01, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    name: 质量门禁（格式/静态/构建/测试/竞态/覆盖率阈值）
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup-go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: gofmt 格式检查
+        run: |
+          out=$(gofmt -l .)
+          if [ -n "$out" ]; then echo "gofmt 未通过："; echo "$out"; exit 1; fi
+
+      - name: go vet 静态检查
+        run: go vet ./...
+
+      - name: go build 编译
+        run: go build ./...
+
+      - name: 单元测试
+        run: go test -count=1 ./...
+
+      - name: 竞态检测（ubuntu-latest 自带 gcc，可开启 CGO）
+        run: CGO_ENABLED=1 go test -race ./... -count=1
+
+      - name: 采集覆盖率原始文件（全量 coverpkg，不排除自编生产代码）
+        run: go test -count=1 -coverpkg=./... -coverprofile=coverage.out ./...
+
+      # 关键门禁：不达标直接失败。只统计不判定会使覆盖率门禁形同虚设，
+      # 因此阈值判定必须是独立步骤且退出码非零即阻断。
+      - name: 覆盖率阈值判定（整体 ≥85%，核心业务包 server/service ≥85%）
+        run: |
+          python3 scripts/coverage_gate.py \
+            --profile coverage.out \
+            --overall 85 \
+            --pkg server/service:85 \
+            --pkg server/api/v1:85 \
+            | tee coverage-gate-report.txt
+          status=${PIPESTATUS[0]}
+          echo "coverage-gate exit=${status}"
+          exit ${status}
+
+      - name: 覆盖率明细
+        run: go tool cover -func=coverage.out
+
+      - name: 上传覆盖率原始文件与门禁报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-out
+          path: |
+            coverage.out
+            coverage-gate-report.txt
+
+  deploy-gate:
+    name: 部署门禁（构建制品/健康检查/业务冒烟/回退准备）
+    needs: quality-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup-go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # 部署门禁任一步失败即以非零码退出，阻断发布；本地可用同一命令原样复跑。
+      - name: 基础部署门禁
+        run: python3 scripts/deploy_gate.py --addr 127.0.0.1:18080 --out dist
+
+      - name: 上传制品与版本清单
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-artifact
+          path: |
+            dist/manifest.json
+            dist/manifest_history.jsonl
