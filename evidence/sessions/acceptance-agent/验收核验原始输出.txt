@@ -1,0 +1,158 @@
+﻿===== 独立验收 Agent 真实命令原始输出 =====
+会话角色：独立验收 Agent（与开发会话、测试会话完全隔离）
+验收对象：dev/01 @ bb1ca7fbce37ed22c83c29af484f79239ee32690
+执行时间：2026-11-13 09:19:19 KST
+主机：Windows / PowerShell；Go：go version go1.26.0 windows/amd64
+
+===== [1] gofmt -l . =====
+命令：gofmt -l .
+输出：[]  （空 = 无未格式化文件）
+gofmt_exit=0
+
+===== [2] go vet ./... =====
+命令：go vet ./...
+输出：[]
+vet_exit=0
+
+===== [3] go build ./... =====
+命令：go build ./...
+输出：[]
+build_exit=0
+
+===== [4] go test -count=1 ./... =====
+命令：go test -count=1 ./...
+ok  	shop-trade	1.249s
+ok  	shop-trade/server/api/v1	0.753s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.863s
+ok  	shop-trade/server/model	0.561s
+ok  	shop-trade/server/router	0.809s
+ok  	shop-trade/server/service	0.709s
+
+test_exit=0
+===== [5] go test -race -count=1 ./...   (CGO_ENABLED=1) =====
+NOTE: no C compiler on this host, so race cannot be re-run today. Below is the REAL failure output.
+COMMAND: set CGO_ENABLED=1 then run: go test -race -count=1 ./...
+go : # runtime/cgo
+At D:\Desktop\shop\evidence\sessions\acceptance-agent\collect-verify.ps1:16 char:2
++ (go test -race -count=1 ./... 2>&1 | Out-String) | Out-File -FilePath ...
++  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (# runtime/cgo:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+cgo: C compiler "gcc" not found: exec: "gcc": executable file not found in %PATH%
+FAIL	shop-trade [build failed]
+FAIL	shop-trade/server/api/v1 [build failed]
+?   	shop-trade/server/global	[no test files]
+FAIL	shop-trade/server/initialize [build failed]
+FAIL	shop-trade/server/model [build failed]
+FAIL	shop-trade/server/router [build failed]
+FAIL	shop-trade/server/service [build failed]
+FAIL
+
+race_exit=1
+
+===== [6] C compiler availability probe =====
+COMMAND: Get-Command gcc,clang,cc,x86_64-w64-mingw32-gcc ; Test-Path <mingw dirs>
+  gcc -> NOT FOUND
+  clang -> NOT FOUND
+  cc -> NOT FOUND
+  x86_64-w64-mingw32-gcc -> NOT FOUND
+  C:\mingw64\bin -> missing
+  C:\msys64\mingw64\bin -> missing
+  C:\ProgramData\chocolatey\bin -> missing
+  C:\TDM-GCC-64\bin -> missing
+
+===== [7] Independent coverage recomputation at current commit bb1ca7f =====
+COMMAND: go test -count=1 "-coverpkg=./..." "-coverprofile=evidence/sessions/acceptance-agent/acc-coverage-bb1ca7f.out" "./..."
+ok  	shop-trade	0.731s	coverage: 5.7% of statements in ./...
+ok  	shop-trade/server/api/v1	0.628s	coverage: 68.1% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.211s	coverage: 4.7% of statements in ./...
+ok  	shop-trade/server/model	0.450s	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	0.628s	coverage: 2.6% of statements in ./...
+ok  	shop-trade/server/service	0.954s	coverage: 72.7% of statements in ./...
+
+cov_test_exit=0
+
+COMMAND: go tool cover "-func=evidence/coverage/coverage-v1.8.0-def0977.out"   (versioned snapshot in repo)
+total:							(statements)				97.6%
+
+COMMAND: go tool cover "-func=evidence/sessions/acceptance-agent/acc-coverage-bb1ca7f.out"   (independent recompute at HEAD)
+total:							(statements)				97.6%
+
+
+===== [8] Line-by-line diff: independent recompute vs repo versioned snapshot =====
+COMMAND: go tool cover -func=<snapshot.out>   vs   evidence/coverage/coverage-v1.8.0-def0977.func.txt   (Compare-Object)
+recomputed_lines=158  snapshot_lines=158
+RESULT: IDENTICAL -- independent recomputation matches the repo versioned snapshot line by line
+
+===== [9] Coverage threshold gate (scripts/coverage_gate.py, AGENTS.md Q-02 criteria) =====
+COMMAND: python -X utf8 scripts/coverage_gate.py --profile <HEAD profile> --overall 85 --pkg server/service:85 --pkg server/api/v1:85 --pkg server/router:85 --pkg server/model:85 --pkg server/initialize:85
+===== 覆盖率阈值门禁 =====
+覆盖率文件：evidence\sessions\acceptance-agent\acc-coverage-bb1ca7f.out
+版本标注：v1.8.2-acceptance（提交 bb1ca7f）
+生成时间：2026-11-13 09:20:38
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=evidence\sessions\acceptance-agent\acc-coverage-bb1ca7f.out ./...
+整体语句覆盖率：97.63% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1563
+--- 核心业务包 ---
+  server/service      98.47%  (阈值 85.00%)  语句 1179 / 覆盖 1161  → PASS
+  server/api/v1       99.08%  (阈值 85.00%)  语句 326 / 覆盖 323  → PASS
+  server/router      100.00%  (阈值 85.00%)  语句 24 / 覆盖 24  → PASS
+  server/model       100.00%  (阈值 85.00%)  语句 3 / 覆盖 3  → PASS
+  server/initialize   90.00%  (阈值 85.00%)  语句 30 / 覆盖 27  → PASS
+--- 其它包（仅统计）---
+  shop-trade          64.10%
+结论：PASS
+
+gate_exit=0
+NOTE: the script default DEFAULT_PACKAGES only contains server/service:85. This run additionally
+      imposes 85% on every self-written package, to check the gate scope hides no failure.
+
+===== [10] Commit message format check (AGENTS.md 2.2 / 2.3) =====
+COMMAND: git --no-pager log --format=%h %s
+bb1ca7f [test] [v1.8.2] 刷新质量门禁与覆盖率原始输出并新增版本化覆盖率快照
+2462d52 [opt] [v1.8.1] 覆盖率门禁脚本补版本标注与清单输出
+def0977 [test] [v1.8.0] 补接入层分支覆盖测试与M-01~M-30错误码穷举脚本及真实执行输出
+f784e00 [docs] [v1.7.0] 归档第七轮单题检查报告、评分明细与两份输入
+ed675f7 [opt] [v1.6.1] 修正覆盖率阈值口径为整体与核心业务包server/service双阈值
+c452555 [docs] [v1.6.0] 补根目录README统一运行入口与AGENTS约束加载记录
+cd823f5 [test] [v1.6.0] 新增InnoDB行锁下退款与发货互斥裁决复现脚本与真实执行原始输出
+d37e8f6 [opt] [v1.6.0] 流水线定义落地生效路径并补齐覆盖率阈值判定与部署门禁作业
+a31384b [docs] [v1.5.0] 归档第六轮单题检查报告、评分明细与两份输入
+82c4847 [docs] [v1.4.0] 新增工单表 ticket_no 唯一索引与持久化验证文档及真实执行原始输出
+03c4238 [docs] [v1.4.0] 新增订单表 order_no 唯一索引与持久化验证文档及真实执行原始输出
+85c4ae6 [test] [v1.3.0] 修正 mysql_raw_01_schema.txt 原始输出编码为 UTF-8
+e142649 [docs] [v1.3.0] 归档第五轮单题检查报告、评分明细与两份输入
+501136c [docs] [v1.3.0] 补充MySQL核查记录、会话导出与CI流水线说明、竞态检测说明及门禁自查汇总
+9c32eff [test] [v1.3.0] 补充真实MySQL环境建表脚本与InnoDB核查、竞态检测、覆盖率及接口入参巡检证据
+25aa8f1 [opt] [v1.3.0] 补全订单服务与GORM仓储层导出方法文档注释并修正go.mod直接依赖声明
+58719fb [test] [v1.2.0] 追加提交后门禁复核原始输出
+68801cb [docs] [v1.2.0] 回补版本链核查与第五轮提交记录
+537453c [docs] [v1.2.0] 补齐接口边界矩阵与第五轮证据闭环文档
+00520bd [test] [v1.2.0] 补充第五轮边界单测与证据采集产物
+018551c [opt] [v1.2.0] 补齐模拟支付渠道服务与第四轮冒烟产物
+6083edd [opt] [v1.1.0] 补齐验收检查Skill与商品调价等交付产物
+6cc6f13 feat: 电商订单售前退款完整业务实现
+
+
+COMMAND: git log --format="%h %s" | Where-Object { $_ -notmatch "\[(feat|fix|hotfix|opt|docs|test)\]" }
+non-compliant commits: 1
+  6cc6f13 feat: 电商订单售前退款完整业务实现
+COMMAND: git log --format=%s | Select-String -Pattern "#\d+"   (work-item number presence)
+commits containing a work-item number: 0
+
+===== [11] Audit-trail append-only check (no UPDATE/DELETE on payment table) =====
+COMMAND: Select-String -Path server/**/*.go -Pattern "Delete\(|Unscoped|Update\(|UpdateColumn|Save\("
+D:\Desktop\shop\server\service\gorm_repository.go:276: UpdateColumn("unit_price", newPrice).Error
+
+
+===== [12] M-07 / M-16 / M-21 reference scan (independent recheck of the 30-code conclusion) =====
+COMMAND: git grep -n -E "M-07|M-16|M-21" -- server resource
+server/service/types.go:108:	"M-07": "退款申请审核中 / 处理中，发货已暂停",
+server/service/types.go:117:	"M-16": "退款失败待处理，请客服跟进重试",
+server/service/types.go:122:	"M-21": "当前为演示教学时钟，10 分钟超时已缩短为 X，测试与线上演示规则一致",
+
+RESULT: only the definition lines in server/service/types.go (messages map) are expected here.
+

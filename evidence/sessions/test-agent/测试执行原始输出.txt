@@ -1,0 +1,354 @@
+﻿
+================================================================================
+== 环境与版本基线（独立测试 Agent 实测，非转述）
+================================================================================
+$ git rev-parse HEAD; git --no-pager log --oneline -1; git --no-pager branch --show-current; go version; go env CGO_ENABLED
+bb1ca7fbce37ed22c83c29af484f79239ee32690
+bb1ca7f [test] [v1.8.2] 刷新质量门禁与覆盖率原始输出并新增版本化覆盖率快照
+dev/01
+go version go1.26.0 windows/amd64
+0
+EXITCODE=0
+
+
+================================================================================
+== 质量门禁 1/4：gofmt -l .
+================================================================================
+$ gofmt -l .
+EXITCODE=0
+
+
+================================================================================
+== 质量门禁 2/4：go vet ./...
+================================================================================
+$ go vet ./...
+EXITCODE=0
+
+
+================================================================================
+== 质量门禁 3/4：go build ./...
+================================================================================
+$ go build ./...
+EXITCODE=0
+
+
+================================================================================
+== 质量门禁 4/4：go test -count=1 ./...
+================================================================================
+$ go test -count=1 ./...
+ok  	shop-trade	1.542s
+ok  	shop-trade/server/api/v1	1.561s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.526s
+ok  	shop-trade/server/model	0.371s
+ok  	shop-trade/server/router	1.567s
+ok  	shop-trade/server/service	0.748s
+EXITCODE=0
+
+
+================================================================================
+== 并发竞争检测：go test -count=1 -race ./server/service/ （本机无 CGO/gcc，如实记录）
+================================================================================
+$ go test -count=1 -race ./server/service/
+go : go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+所在位置 D:\Desktop\shop\evidence\sessions\test-agent\_collect_output.ps1:45 字符: 50
++ ... -race ./server/service/" { go test -count=1 -race ./server/service/ }
++                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (go: -race requi...g CGO_ENABLED=1:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+EXITCODE=2
+
+
+================================================================================
+== 环境限制取证：本机无 gcc / clang / mysql（禁止使用 WSL）
+================================================================================
+$ where.exe gcc; where.exe clang; where.exe mysql
+where.exe : INFO: Could not find files for the given pattern(s).
+所在位置 D:\Desktop\shop\evidence\sessions\test-agent\_collect_output.ps1:49 字符: 5
++     where.exe gcc
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO: Could not...ven pattern(s).:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+where.exe : INFO: Could not find files for the given pattern(s).
+所在位置 D:\Desktop\shop\evidence\sessions\test-agent\_collect_output.ps1:50 字符: 5
++     where.exe clang
++     ~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO: Could not...ven pattern(s).:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+where.exe : INFO: Could not find files for the given pattern(s).
+所在位置 D:\Desktop\shop\evidence\sessions\test-agent\_collect_output.ps1:51 字符: 5
++     where.exe mysql
++     ~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO: Could not...ven pattern(s).:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+EXITCODE=1
+
+
+================================================================================
+== 覆盖率统计：go test -count=1 -coverpkg=./... -coverprofile=...
+================================================================================
+$ go test -count=1 -coverpkg=./... -coverprofile=evidence/sessions/test-agent/_raw_coverprofile.out ./...
+ok  	shop-trade	0.687s	coverage: 5.7% of statements in ./...
+ok  	shop-trade/server/api/v1	0.605s	coverage: 68.1% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.665s	coverage: 4.7% of statements in ./...
+ok  	shop-trade/server/model	0.387s	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	0.641s	coverage: 2.6% of statements in ./...
+ok  	shop-trade/server/service	0.517s	coverage: 72.7% of statements in ./...
+EXITCODE=0
+
+
+================================================================================
+== 覆盖率汇总：go tool cover -func（末 3 行）
+================================================================================
+$ go tool cover -func=evidence/sessions/test-agent/_raw_coverprofile.out | Select-Object -Last 3
+shop-trade/server/service/types.go:179:			boolPtr					100.0%
+shop-trade/server/service/types.go:180:			stringPtr				100.0%
+total:							(statements)				97.6%
+EXITCODE=0
+
+
+================================================================================
+== 按包覆盖率（去重合并后统计）
+================================================================================
+$ python covpkg2.py
+package                               stmts  covered   cover%
+shop-trade                               39       25    64.1%
+shop-trade/server/api/v1                326      323    99.1%
+shop-trade/server/initialize             30       27    90.0%
+shop-trade/server/model                   3        3   100.0%
+shop-trade/server/router                 24       24   100.0%
+shop-trade/server/service              1179     1161    98.5%
+TOTAL                                  1601     1563    97.6%
+EXITCODE=0
+
+
+================================================================================
+== 独立黑盒探测脚本执行（demo-memory 模式，GVA_ADDR=:18099，不连接 MySQL）
+================================================================================
+$ python evidence/sessions/test-agent/黑盒探测脚本.py
+>>> 编译被测程序: go build -o C:\Users\10990\AppData\Local\Temp\shop-ta-q6qoaqi6\shop-trade-ta.exe .
+>>> go build 成功
+>>> 启动服务: GVA_ADDR=:18099 （demo-memory 模式，未设置 GVA_MYSQL_DSN）
+>>> 健康检查通过: {"mode": "demo-memory", "status": "ok"}
+>>> 服务运行日志: D:\Desktop\shop\evidence\sessions\test-agent\_server_runtime.log
+
+>>> 服务模式确认: {"mode": "demo-memory", "status": "ok"}
+>>> 身份确认: {"code": "0", "message": "ok", "data": {"account": "buyer01", "mode": "demo-memory", "role": "买家", "user_id": 1001}}
+
+================ 场景 S2 缺货与弃单（20 并发抢单不超卖） ================
+[TC-S2-01] PASS | 20 并发下单（每单数量取 1 或 2）不超卖：预扣合计 ≤ 5 件（R-05 / AC-05） | 成功订单数=4 预扣合计=5 可售=0 占用=5
+[TC-S2-02] PASS | 库存守恒：已占用 + 可售 = 初始 5 件 | 可售=0 占用=5 初始=5
+[TC-S2-03] PASS | 被拒请求全部返回 M-02「可售数量不足，下单失败」 | 被拒数=16 错误码集合=['M-02']
+[TC-S2-04] PASS | 成功订单数 + 被拒数 = 20，被拒请求不产生订单 | 成功=4 被拒=16
+[TC-S2-05] PASS | 每个成功订单都有对应库存预扣（占用数 = 成功订单数量之和） | 占用=5 成功订单数量之和=5
+[TC-S2-09] PASS | 可售为 0 时下单 1 件被拒（M-02） | 可售=0 code=M-02 msg=可售数量不足，下单失败
+[TC-S2-10] PASS | 可售为 0 时下单 2 件被拒（E-03），库存不变 | code=M-02 msg=可售数量不足，下单失败 stock=(0, 5) 期望可售=0
+[TC-S2-06] PASS | 取消全部成功订单：每单释放一次，预扣合计全部释放（R-07） | 释放前可售=0 释放后可售=5 应释放=5
+[TC-S2-07] PASS | 释放后库存回到初始态：可售 5 / 占用 0 | stock=(5, 0)
+[TC-S2-08] PASS | 重复取消同一订单返回 M-10 且库存不再释放（R-08） | code=M-10 msg=重复操作被拒绝，不产生第二笔业务结果 stock=(5, 0)
+[TC-S2-11] PASS | 取消释放后，其他买家可再次下单成功（AC-15） | code=0 msg=ok
+[TC-S2-12] PASS | 清理后库存回到初始态：可售 5 / 占用 0 | stock=(5, 0)
+
+================ 场景 S2b 待支付 10 分钟超时关闭（服务端时间） ================
+[TC-S2-13] PASS | 下单后进入待支付，占用 1 件 | code=0 stock=(4, 1)
+[TC-S2-14] PASS | 运营可推进演示教学时钟（服务端时间 +11 分钟，A-01） | code=0 data={"clock_offset_minutes": 11, "server_time": "2026-11-13T09:45:51.7546969+08:00"}
+[TC-S2-15] PASS | 服务端时间满 10 分钟后超时关闭，订单转已关闭且预扣释放一次（T-04/R-07） | closed_count=1 status=已关闭 stock=(5, 0)
+[TC-S2-16] PASS | 重复关闭不多释放：再次关单 closed_count=0 且库存不变（R-08 / AC-09） | closed_count=0 stock=(5, 0)
+[TC-S2-17] PASS | 已关闭订单再主动取消返回 M-10（主动取消与超时关闭只生效一次） | code=M-10 msg=重复操作被拒绝，不产生第二笔业务结果 stock=(5, 0)
+[TC-S2-18] PASS | 演示教学时钟可复位为 0（仅平移服务端时间，10 分钟业务规则不变） | code=0 data={"clock_offset_minutes": 0, "mode": "demo-memory", "server_time": "2026-11-13T09:34:51.7999611+08:00"}
+
+================ 场景 S1 活动正常成交 ================
+[TC-S1-01] PASS | 活动商品在售、单价 10000 分、初始可售 5 件（AC-01） | goods={"available_stock": 5, "goods_no": "GOODS-ACT-001", "id": 1, "name": "活动商品", "occupied_stock": 0, "status": "在售", "unit_price": 10000}
+[TC-S1-02] PASS | buyer01 下单 2 件成功，订单待支付 | code=0 msg=ok order_no=ORD-1794533691801658300-1001-7
+[TC-S1-03] PASS | 订单金额 = 单价 10000 × 数量 2 = 20000 分（整数分，C-01/C-06） | order={"order_no": "ORD-1794533691801658300-1001-7", "unit_price": 10000, "quantity": 2, "total_amount": 20000, "status": "待支付"}
+[TC-S1-04] PASS | 下单后库存预扣：可售 3 件、占用 2 件（R-03/R-06） | stock=(3, 2)
+[TC-S1-05] PASS | 模拟渠道支付成功通知 → 订单转待发货，记款一次（R-14/R-15） | code=0 msg=ok status=待发货
+[TC-S1-06] PASS | 支付通知后库存占用不重复变化（可售 3 / 占用 2，R-12） | stock=(3, 2)
+[TC-S1-07] PASS | 仓库登记发货一次 → 订单转已发货（T-06/R-31） | code=0 msg=ok status=已发货
+[TC-S1-08] PASS | 买家可查本人订单的承运方与运单号（AC-02） | carrier=SF tracking=SF0001
+[TC-S1-09] PASS | 运营汇总：已收款 ≥ 20000 分、已发货订单数 ≥ 1 | summary={"duplicate_refund_events": 0, "duplicate_release_noop_events": 2, "effective_payment_amount": 20000, "late_payment_events": 0, "late_payment_refunded_events": 0, "no_duplicate_release_refund": false, "refunded_orders": 0, "shipped_orders": 1, "stock_restored_events": 0, "total_orders": 7}
+[TC-S1-10] PASS | 运营调价成功并回带 M-12 / M-13 约束提示文案 | code=0 hint=已有订单的下单时商品与价格不受本次调价 / 上下架影响 constraint=不得通过商品维护或改写订单状态消除异常记录
+[TC-S1-11] PASS | 调价后既有订单商品与金额快照保持下单时值不变（R-02 / AC-03） | unit_price=10000 total=20000
+[TC-S1-12] PASS | 恢复商品单价为 10000 分 | unit_price=10000
+
+================ 场景 S3 售前退款（首次失败→客服重试→再次成功） ================
+[TC-S3-01] PASS | buyer02 下单 2 件成功（应付 20000 分） | code=0 msg=ok
+[TC-S3-02] PASS | 支付成功 → 待发货，库存预扣 2 件 | status=待发货 stock=(1, 4)
+[TC-S3-03] PASS | 买家申请整单售前退款 → 退款审核中（发货暂停，T-05/R-26） | code=0 status=退款审核中
+[TC-S3-04] PASS | 申请期间仓库登记发货被拒，订单状态不变（R-26 / AC-11） | 实际 code=M-22 msg=退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果 status=退款审核中
+[TC-S3-05] PASS | 客服同意并写明原因 → 退款处理中（T-08） | code=0 status=退款处理中
+[TC-S3-06] PASS | 渠道明确退款失败 → 返回 M-08，保留待处理记录，订单仍为退款处理中（T-09/E-12） | code=M-08 msg=渠道退款失败，已保留待处理记录，请客服重试 status=退款处理中
+[TC-S3-07] PASS | 失败期间订单不回到可发货状态（R-29） | status=退款处理中
+[TC-S3-08] PASS | 客服重试退款登记成功，重试次数 +1（A-13） | code=0 retry=1
+[TC-S3-09] PASS | 渠道再次通知退款成功 → 订单转已退款（T-10） | code=0 msg=ok status=已退款
+[TC-S3-10] PASS | 正常售前退款恢复相应可售数量一次（+2），库存回到退款前水位（R-09 / AC-11） | stock=(3, 2) 期望=(3, 2)
+[TC-S3-11] PASS | 重复退款通知幂等：不重复退款、不重复恢复库存（R-19/R-30 / AC-13） | code=0 msg=ok data.result=重复退款通知已幂等处理，未重复退款 stock=(3, 2)
+[TC-S3-12] PASS | 买家可见退款结果：退款状态成功、金额 = 实收 20000 分（R-29/R-30） | refund_state=成功 total=20000
+[TC-S3-13] PASS | 运营逐单核查：库存恢复 1 次且一致（AC-11） | code=0 data={"order_no": "ORD-1794533691957033700-1002-8", "order_status": "已退款", "refund_kind": "正常售前退款", "quantity": 2, "unit_price_snapshot": 10000, "goods_id": 1, "goods_no": "GOODS-ACT-001", "available_stock": 3, "occupied_stock": 2, "stock_restored_flag": true, "expected_restore_times": 1, "actual_restore_times": 1, "duplicate_restore_events": 0, "consistent": true, "conclusion": "核查结果：无重复释放、无重复退款"}
+[TC-S3-14] PASS | 已退款订单不得再发货（F-03） | code=M-11 msg=已发货订单不受理本题售前退款 status=已退款
+[TC-S3-15] PASS | 已退款订单再次申请退款被拒（F-06 终态不可回退） | code=M-11 msg=已发货订单不受理本题售前退款
+
+================ 场景 S4 迟到支付 ================
+[TC-S4-01] PASS | buyer03 下单 1 件成功 | code=0 msg=ok
+[TC-S4-02] PASS | 订单因服务端时间满 10 分钟已关闭，预扣已释放一次 | status=已关闭 stock=(3, 2)
+[TC-S4-03] PASS | 关闭后到达支付成功通知 → 返回 M-09 并生成异常支付待处理记录（T-11 / AC-10） | code=M-09 msg=迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理 data={"amount": 10000, "channel_trade_no": "CH-LATE-001", "effective": null, "event_id": 33, "event_type": "迟到支付", "failure_code": "M-09", "failure_reason": "迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理", "id": 33, "need_refund": true, "occurred_at": "2026-11-13T09:34:52.2679278+08:00", "order_id": 9, "order_no": "ORD-1794533692222294300-1003-9", "order_status_snapshot": "已关闭", "result": "异常支付待处理", "signature_valid": true}
+[TC-S4-04] PASS | 迟到支付不改订单状态：订单保持已关闭终态（R-20 / F-01） | status=已关闭
+[TC-S4-05] PASS | 迟到支付不重新占用库存（可售/占用不变，R-20） | stock=(3, 2)
+[TC-S4-06] PASS | 迟到支付后再次超时关单：closed_count=0，库存不多释放（R-08） | closed_count=0 stock=(3, 2)
+[TC-S4-07] PASS | 客服核实异常并记录原因 → 异常支付已核实（R-21） | code=0 msg=ok
+[TC-S4-08] PASS | 重复核实被拒（M-10），不产生第二笔业务结果（F-08） | code=M-10 msg=重复操作被拒绝，不产生第二笔业务结果
+[TC-S4-09] PASS | 客服对迟到支付发起退款 → 退款请求已登记并标注 M-26 不恢复库存 | code=0 data={"amount": 10000, "channel_trade_no": "LATE-REF-001", "effective": null, "event_id": 36, "event_type": "迟到支付退款请求", "failure_code": "M-26", "failure_reason": "订单已关闭，向渠道发起退款", "id": 36, "need_refund": true, "occurred_at": "2026-11-13T09:34:52.3150468+08:00", "order_id": 9, "order_no": "ORD-1794533692222294300-1003-9", "order_status_snapshot": "已关闭", "result": "迟到支付退款请求已登记", "signature_valid": true}
+[TC-S4-10] PASS | 重复发起迟到支付退款被拒（M-10） | code=M-10 msg=重复操作被拒绝，不产生第二笔业务结果
+[TC-S4-11] PASS | 渠道确认迟到支付退款成功 | code=0 msg=ok data={"amount": 10000, "channel_trade_no": "LATE-REF-001", "effective": true, "event_id": 38, "event_type": "迟到支付退款成功", "failure_code": "M-26", "failure_reason": "迟到支付对应的退款不得再次恢复此前已释放数量", "id": 38, "need_refund": false, "occurred_at": "2026-11-13T09:34:52.3438632+08:00", "order_id": 9, "order_no": "ORD-1794533692222294300-1003-9", "order_status_snapshot": "已关闭", "result": "迟到支付退款成功，未二次恢复库存", "signature_valid": true}
+[TC-S4-12] PASS | 迟到支付退款不得再次恢复此前已释放数量（可售不二次增加，R-10/R-22） | stock=(3, 2) 期望=(3, 2)
+[TC-S4-13] PASS | 迟到支付退款后订单仍为已关闭终态 | status=已关闭
+[TC-S4-14] PASS | 运营逐单核查：本单未产生库存恢复（actual=0, expected=0, consistent=true） | code=0 data={"order_no": "ORD-1794533692222294300-1003-9", "order_status": "已关闭", "refund_kind": "未申请", "quantity": 1, "unit_price_snapshot": 10000, "goods_id": 1, "goods_no": "GOODS-ACT-001", "available_stock": 3, "occupied_stock": 2, "stock_restored_flag": false, "expected_restore_times": 0, "actual_restore_times": 0, "duplicate_restore_events": 0, "consistent": true, "conclusion": "核查结果：无重复释放、无重复退款"}
+[TC-S4-15] PASS | 运营汇总可识别迟到支付与迟到支付退款各 1 条（R-24 / AC-10） | summary={"duplicate_refund_events": 1, "duplicate_release_noop_events": 4, "effective_payment_amount": 40000, "late_payment_events": 1, "late_payment_refunded_events": 1, "no_duplicate_release_refund": false, "refunded_orders": 1, "shipped_orders": 1, "stock_restored_events": 1, "total_orders": 9}
+
+================ 场景 S5 操作竞争 ================
+[TC-S5-01] PASS | 退款与发货并发：未出现「两者都成功」的非法双重结果（R-28 / AC-13） | 并发轮次=2 两者同时成功=0 明细=[('0', 'M-22', '退款审核中'), ('M-11', '0', '已发货')]
+[TC-S5-02] PASS | 退款与发货并发：后到者被明确拒绝并给出 M-xx 原因（A-09） | 每轮 (退款码,发货码,最终状态)=[('0', 'M-22', '退款审核中'), ('M-11', '0', '已发货')]
+[TC-S5-03] PASS | 并发后订单状态唯一：要么退款链路（退款审核中/退款处理中），要么已发货 | 最终状态集合=['退款审核中', '已发货']
+[TC-S5-04] PASS | 前置：下单成功（1 件，待支付） | code=0 msg=ok
+[TC-S5-05] PASS | 同一订单连续 3 次相同支付成功通知：仅第 1 次记款（R-15 / AC-06） | r1=已记款 r2=重复支付通知已幂等处理，未重复记款 r3=重复支付通知已幂等处理，未重复记款
+[TC-S5-06] PASS | 重复支付通知不重复记款：已收款合计不变 | before=70000 after=70000
+[TC-S5-07] PASS | 重复支付通知库存占用不重复变化（R-12） | stock=(1, 4)
+[TC-S5-08] PASS | 重复支付通知后订单仅一次进入待发货 | status=待发货
+[TC-S5-09] PASS | 收尾：正常售前退款完成后库存回到释放前水位 | stock=(2, 3) 期望=(2, 3)
+[TC-S5-10] PASS | 前置：goods2 上创建 2 笔待支付订单 | x=0 y=0
+[TC-S5-11] PASS | 同一渠道交易号关联第二个订单被拒（M-27 / R-16 / AC-08） | code=M-27 msg=同一渠道交易号已归属其他订单，本次关联被拒
+[TC-S5-12] PASS | 被拒的第二单状态不变（仍待支付） | status=待支付
+[TC-S5-13] PASS | 清理：第二单取消后 goods2 占用回到 1（仅第一单占用） | stock=(1, 1)
+[TC-S5-14] PASS | 重复退款通知幂等：结果为「重复退款通知已幂等处理」，且库存未二次恢复 | result=重复退款通知已幂等处理，未重复退款 stock=(2, 0) 期望=(2, 0)
+
+================ 场景 E 边界与异常 ================
+[TC-E-01] PASS | 数量 0 被拒 → M-03「每单数量只能是 1 或 2 件」（E-01） | code=M-03 msg=每单数量只能是 1 或 2 件
+[TC-E-02] PASS | 数量 3 被拒 → M-03「每单数量只能是 1 或 2 件」（E-01） | code=M-03 msg=每单数量只能是 1 或 2 件
+[TC-E-03] PASS | 数量 -1 被拒 → M-03「每单数量只能是 1 或 2 件」（E-01） | code=M-03 msg=每单数量只能是 1 或 2 件
+[TC-E-04] PASS | 数量非法时不产生订单、不预扣库存 | total_orders 14 -> 14 stock=(2, 3)
+[TC-E-05] PASS | 一单提交空商品（等价多商品非法）→ M-04「一单只能购买一种商品」（E-04） | code=M-04 msg=一单只能购买一种商品
+[TC-E-06] PASS | 下单不存在的商品 → M-01「商品未上架，不能购买」 | code=M-01 msg=商品未上架，不能购买
+[TC-E-07] BLOCK | 购买已下架商品（E-02） | 因实现限制未能执行：服务端未提供商品上架/下架接口（POST /admin/goods/1/status → HTTP 404；PUT /goods/1 → HTTP 404），demo-memory 预置的两个商品均为「在售」，无法构造下架商品；已登记为缺陷 D-02
+[TC-E-08] PASS | 未支付订单登记发货被拒 → M-18「只有合法待发货订单可登记发货」（E-06 / F-07） | code=M-18 msg=只有合法待发货订单可登记发货 status=待支付
+[TC-E-09] PASS | 承运方/运单号为空登记发货 → M-23（E-23） | code=M-23 msg=承运方或运单号未填写，不能登记发货
+[TC-E-10] PASS | 客服同意退款未写原因 → M-24「审核退款 / 核实异常必须写明原因」 | code=M-24 msg=审核退款 / 核实异常必须写明原因 status=退款审核中
+[TC-E-11] PASS | 客服拒绝退款未写原因 → M-24 | code=M-24 msg=审核退款 / 核实异常必须写明原因
+[TC-E-12] PASS | 客服拒绝退款并写明原因 → 订单回到待发货（T-07） | code=0 status=待发货
+[TC-E-13] PASS | 客服拒绝后允许仓库继续发货（R-27 / AC-12） | code=0 msg=ok status=已发货
+[TC-E-14] PASS | 重复登记发货被拒 → M-19，且运单号不变（R-31 / AC-14） | code=M-19 msg=该订单已登记发货，不能重复登记 tracking=E12
+[TC-E-15] PASS | 已发货订单申请售前退款被拒 → M-11「已发货订单不受理本题售前退款」（R-32 / F-02） | code=M-11 msg=已发货订单不受理本题售前退款
+[TC-E-16] PASS | 待支付订单申请退款 → M-05「该订单状态不允许此操作」（F-05 / F-07） | code=M-05 msg=该订单状态不允许此操作
+[TC-E-17] PASS | 查询未知订单 → M-30「支付通知指向未知订单，订单状态不变」（E-08） | code=M-30 msg=支付通知指向未知订单，订单状态不变
+[TC-E-18] PASS | 核实未知异常事件 → M-14「异常记录不能通过直接修改订单状态消失」（E-13） | code=M-14 msg=异常记录不能通过直接修改订单状态消失
+[TC-E-19] PASS | 对未知异常事件发起迟到支付退款 → M-14 | code=M-14 msg=异常记录不能通过直接修改订单状态消失
+[TC-E-20] PASS | 待支付超时后再取消 → M-06「订单已超时关闭…占用已释放」 | code=M-06 msg=订单已超时关闭（服务端时间满 10 分钟），占用已释放 status=已关闭
+[TC-E-21] PASS | 模拟渠道超时通知：只登记审计，订单状态不变（E-16） | code=0 data={"event_id": 83, "order_no": "ORD-1794533693265898300-1001-17", "order_status": "待支付", "channel_trade_no": "TMO-001", "duplicate": false, "order_status_unchanged": true, "notice": "渠道超时通知已登记为只追加审计；订单状态不变，超时关单仍由服务端 10 分钟规则触发"}
+[TC-E-22] PASS | 重复渠道超时通知幂等，不产生第二笔业务结果（F-08） | code=0 data={"event_id": 83, "order_no": "ORD-1794533693265898300-1001-17", "order_status": "待支付", "channel_trade_no": "TMO-001", "duplicate": true, "order_status_unchanged": true, "notice": "重复渠道超时通知已幂等处理，未产生第二笔业务结果；订单状态不变"}
+[TC-E-23] PASS | 订单金额为整数分：total = unit_price × quantity 且为整型（C-01/C-14/A-03） | order={"unit_price": 10000, "quantity": 1, "total_amount": 10000}
+[TC-E-24] PASS | 已取消订单收到支付成功通知 → 不恢复订单（返回 M-15，F-01） | code=M-15 msg=迟到支付订单保持已关闭终态 status=已取消
+[TC-E-25] PASS | 金额不符 → M-29，订单状态不变且处理结果可查（AC-07 / E-07） | code=M-29 msg=支付通知金额与订单不符，订单状态不变 data={"amount": 9999, "channel_trade_no": "CH-E-AMT-001", "effective": null, "event_id": 90, "event_type": "支付通知处理结果", "failure_code": "M-29", "failure_reason": "支付通知金额与订单不符，订单状态不变", "id": 90, "need_refund": false, "occurred_at": "2026-11-13T09:34:53.7257731+08:00", "order_id": 20, "order_no": "ORD-1794533693710302400-1003-20", "order_status_snapshot": "待支付", "result": "已拒绝", "signature_valid": true}
+[TC-E-26] PASS | 验签失败 → M-28，订单状态不变且处理结果可查（AC-07 / E-09） | code=M-28 msg=支付通知验签失败，订单状态不变 data={"amount": 10000, "channel_trade_no": "CH-E-SIG-001", "effective": null, "event_id": 91, "event_type": "支付通知处理结果", "failure_code": "M-28", "failure_reason": "支付通知验签失败，订单状态不变", "id": 91, "need_refund": false, "occurred_at": "2026-11-13T09:34:53.7273079+08:00", "order_id": 20, "order_no": "ORD-1794533693710302400-1003-20", "order_status_snapshot": "待支付", "result": "已拒绝", "signature_valid": false}
+[TC-E-27] PASS | 未知订单 → M-30，订单状态不变且处理结果可查（AC-07 / E-08） | code=M-30 msg=支付通知指向未知订单，订单状态不变 data={"amount": 10000, "channel_trade_no": "CH-E-UNK-001", "effective": null, "event_id": 92, "event_type": "支付通知处理结果", "failure_code": "M-30", "failure_reason": "支付通知指向未知订单，订单状态不变", "id": 92, "need_refund": false, "occurred_at": "2026-11-13T09:34:53.7288337+08:00", "order_id": 0, "order_no": "ORD-NOT-EXIST-777", "order_status_snapshot": "", "result": "已拒绝", "signature_valid": true}
+[TC-E-28] FAIL | 支付通知处理结果有只读查询入口（AC-07 / R-17 / 原型 V-08「支付通知处理结果区」） | 候选路径返回=[('/api/v1/ops/payment-notices', 404), ('/api/v1/payment/notices', 404), ('/api/v1/ops/payments', 404), ('/api/v1/ops/notification-results', 404), ('/api/v1/payments', 404), ('/api/v1/ops/events', 404)]；全部非 200 表示无此查询入口
+
+================ 场景 R 权限隔离（5 个角色） ================
+[TC-R-01] PASS | 前置：buyer01 持有一笔待支付单与一笔待发货单 | pend=0 paid=0
+[TC-R-02] PASS | 买家越权查询他人订单 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-03] PASS | 买家越权取消他人待支付订单 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-04] PASS | 买家越权对他人订单申请退款 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-05] PASS | 仓库越权审核同意退款 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-06] PASS | 仓库越权审核拒绝退款 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-07] PASS | 客服越权登记发货 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-08] PASS | 运营越权创建订单 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-09] PASS | 买家越权发起支付通知 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-10] PASS | 客服越权查看运营汇总 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-11] PASS | 买家越权查看运营汇总 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-12] PASS | 买家越权进行库存逐单核查 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-13] PASS | 客服越权调整演示时钟 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：只有运营可调整演示时钟
+[TC-R-14] PASS | 买家越权执行超时关单 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-15] PASS | 买家越权调整商品价格 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-16] PASS | 买家越权处理迟到支付异常 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-17] PASS | 买家越权发起迟到支付退款 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-18] PASS | 买家越权登记发货 → 明确拒绝 M-20 且不返回他人数据（R-33/R-34/R-37 / AC-16） | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-19] PASS | 买家可查询本人订单（允许） | code=0 msg=ok
+[TC-R-20] PASS | 买家可取消本人待支付订单（允许） | code=0 msg=ok
+[TC-R-21] PASS | 运营可查看汇总（允许） | code=0 msg=ok
+[TC-R-22] PASS | 客服可做库存逐单核查（允许） | code=0 msg=ok
+[TC-R-23] PASS | 运营可执行超时关单（允许） | code=0 msg=ok
+[TC-R-24] PASS | 模拟渠道可发起支付通知（允许）（不因权限被拒） | code=M-05 msg=该订单状态不允许此操作
+[TC-R-25] PASS | 仓库对合法待发货订单登记发货被允许（角色权限校验通过） | code=0 msg=ok status=已发货
+[TC-R-26] PASS | 身份由服务端解析：改 X-User-Id / X-Role 不改变服务端身份（R-33 / AC-16） | me={"account": "buyer02", "mode": "demo-memory", "role": "买家", "user_id": 1002}
+[TC-R-27] PASS | 改请求中的用户编号不能越权访问他人订单，仍返回 M-20 | code=M-20 msg=无权限 / 越权：不能查看或处理他人订单
+[TC-R-28] PASS | 缺少 X-Demo-Account 的请求被拒绝（PARAM_ERROR），身份不可自报 | code=PARAM_ERROR msg=缺少或未知 X-Demo-Account；身份由服务端预置账号解析，X-Role / X-User-Id 不作为身份依据
+[TC-R-29] PASS | 未知账号头被拒绝（PARAM_ERROR） | code=PARAM_ERROR msg=缺少或未知 X-Demo-Account；身份由服务端预置账号解析，X-Role / X-User-Id 不作为身份依据
+
+================ 场景 D 数据一致性 ================
+[TC-D-01] PASS | 商品 1 库存两列守恒：可售 + 占用 = 初始 5（R-03/A-10） | goods1={"available_stock": 1, "goods_no": "GOODS-ACT-001", "id": 1, "name": "活动商品", "occupied_stock": 4, "status": "在售", "unit_price": 10000}
+[TC-D-02] PASS | 商品 2 库存两列守恒：可售 + 占用 = 初始 2 | goods2={"available_stock": 1, "goods_no": "GOODS-DEMO-002", "id": 2, "name": "演示商品", "occupied_stock": 1, "status": "在售", "unit_price": 10000}
+[TC-D-03] FAIL | 运营核查能确认「无重复释放、无重复退款」（R-24 / AC-10 / M-17）：被正确拒绝的重复操作不得被计为「发生了重复释放 / 重复退款」 | no_duplicate_release_refund=False duplicate_release_noop_events=6 duplicate_refund_events=2（本次运行中重复取消 / 重复关闭均被正确拒绝并只留痕、未产生第二笔业务结果）
+[TC-D-04] PASS | 不存在删除订单 / 异常记录的入口（DELETE 返回 404/405） | http=404 body={"_raw": "404 page not found"}
+[TC-D-05] PASS | 不存在直接改写订单状态的接口（POST /orders/{no}/status 返回 404/405） | http=404 body={"_raw": "404 page not found"}
+[TC-D-06] PASS | 不存在 PATCH 订单接口（返回 404/405） | http=404 body={"_raw": "404 page not found"}
+[TC-D-07] FAIL | 运营汇总包含「已收款、已退款、可售数量、异常记录数、待处理数」（题面规则 8 / AC-02 / AC-18 / A-25 / 原型 V-04） | 缺失字段=['已退款合计（分）', '商品可售数量', '异常记录数', '待处理数']；实际返回字段=['duplicate_refund_events', 'duplicate_release_noop_events', 'effective_payment_amount', 'late_payment_events', 'late_payment_refunded_events', 'no_duplicate_release_refund', 'refunded_orders', 'shipped_orders', 'stock_restored_events', 'total_orders']
+[TC-D-08] FAIL | 提供「按订单查询收款/退款/发货/异常记录 + 只读审计流水」的查询接口（R-38 / AC-18 / AC-20 / N-17~N-19 / 原型 V-04 C-05） | 探测的候选路径及返回=[('/api/v1/orders/ORD-X/records', 404), ('/api/v1/ops/audit', 404), ('/api/v1/ops/records', 404), ('/api/v1/orders/ORD-X/audit', 404), ('/api/v1/payments', 404), ('/api/v1/audit', 404), ('/api/v1/ops/order-records/ORD-X', 404)]；现有逐单只读接口仅 /api/v1/ops/stock-check/{order_no}，返回字段=[]，不含四类记录与审计流水
+[TC-D-09] PASS | 异常记录不能通过改写订单状态消除：迟到支付事件在全部操作后仍可查（R-23 / AC-17） | summary={"duplicate_refund_events": 2, "duplicate_release_noop_events": 6, "effective_payment_amount": 100000, "late_payment_events": 2, "late_payment_refunded_events": 1, "no_duplicate_release_refund": false, "refunded_orders": 4, "shipped_orders": 4, "stock_restored_events": 4, "total_orders": 22}
+[TC-D-10] PASS | 已收款合计为整数分且非负（C-01/A-03） | effective_payment_amount=100000
+
+================ 场景 M 错误码与文案映射 ================
+[TC-M-01] PASS | 顶层业务拒绝码返回的 message 与原型 3.3 文案表逐字一致 | 不一致项=[]
+[TC-M-04] FAIL | 事件记录中 failure_code=M-xx 对应的 failure_reason 与原型 3.3 文案表逐字一致 | 不一致项=[["M-26", "订单已关闭，向渠道发起退款", "迟到支付对应的退款不得再次恢复此前已释放数量"]]
+[TC-M-02] PASS | 原型 3.3 共定义 30 个 M-xx 文案；本次运行触发到 24 个不同错误码 | 观察到的错误码=['M-01', 'M-02', 'M-03', 'M-04', 'M-05', 'M-06', 'M-08', 'M-09', 'M-10', 'M-11', 'M-14', 'M-15', 'M-18', 'M-19', 'M-20', 'M-22', 'M-23', 'M-24', 'M-25', 'M-26', 'M-27', 'M-28', 'M-29', 'M-30']
+[TC-M-03] INFO | 本次黑盒运行未触发到的 M-xx 文案编号 | 未触发=['M-07', 'M-12', 'M-13', 'M-16', 'M-17', 'M-21']
+[TC-M-05] INFO | 顶层业务拒绝码实际返回文案 | {"M-02": "可售数量不足，下单失败", "M-10": "重复操作被拒绝，不产生第二笔业务结果", "M-22": "退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果", "M-08": "渠道退款失败，已保留待处理记录，请客服重试", "M-11": "已发货订单不受理本题售前退款", "M-09": "迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理", "M-27": "同一渠道交易号已归属其他订单，本次关联被拒", "M-03": "每单数量只能是 1 或 2 件", "M-04": "一单只能购买一种商品", "M-01": "商品未上架，不能购买", "M-18": "只有合法待发货订单可登记发货", "M-23": "承运方或运单号未填写，不能登记发货", "M-24": "审核退款 / 核实异常必须写明原因", "M-19": "该订单已登记发货，不能重复登记", "M-05": "该订单状态不允许此操作", "M-30": "支付通知指向未知订单，订单状态不变", "M-14": "异常记录不能通过直接修改订单状态消失", "M-06": "订单已超时关闭（服务端时间满 10 分钟），占用已释放", "M-15": "迟到支付订单保持已关闭终态", "M-29": "支付通知金额与订单不符，订单状态不变", "M-28": "支付通知验签失败，订单状态不变", "M-20": "无权限 / 越权：不能查看或处理他人订单"}
+[TC-M-06] INFO | 事件记录 failure_code 实际返回文案 | {"M-22": "退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果", "M-08": "渠道退款失败，已保留待处理记录，请客服重试", "M-25": "重复支付通知已幂等处理，未重复记款", "M-11": "已发货订单不受理本题售前退款", "M-09": "迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理", "M-10": "重复操作被拒绝，不产生第二笔业务结果", "M-26": "订单已关闭，向渠道发起退款", "M-27": "同一渠道交易号已归属其他订单，本次关联被拒", "M-18": "只有合法待发货订单可登记发货", "M-23": "承运方或运单号未填写，不能登记发货", "M-19": "该订单已登记发货，不能重复登记", "M-15": "迟到支付订单保持已关闭终态", "M-29": "支付通知金额与订单不符，订单状态不变", "M-28": "支付通知验签失败，订单状态不变", "M-30": "支付通知指向未知订单，订单状态不变", "M-05": "该订单状态不允许此操作"}
+>>> 服务已停止
+
+================ 黑盒探测测试统计 ================
+用例总数: 147
+通过:     138
+失败:     5
+阻塞:     1
+信息项:   3
+
+---- 失败用例明细 ----
+[TC-E-28] 支付通知处理结果有只读查询入口（AC-07 / R-17 / 原型 V-08「支付通知处理结果区」） | 候选路径返回=[('/api/v1/ops/payment-notices', 404), ('/api/v1/payment/notices', 404), ('/api/v1/ops/payments', 404), ('/api/v1/ops/notification-results', 404), ('/api/v1/payments', 404), ('/api/v1/ops/events', 404)]；全部非 200 表示无此查询入口
+[TC-D-03] 运营核查能确认「无重复释放、无重复退款」（R-24 / AC-10 / M-17）：被正确拒绝的重复操作不得被计为「发生了重复释放 / 重复退款」 | no_duplicate_release_refund=False duplicate_release_noop_events=6 duplicate_refund_events=2（本次运行中重复取消 / 重复关闭均被正确拒绝并只留痕、未产生第二笔业务结果）
+[TC-D-07] 运营汇总包含「已收款、已退款、可售数量、异常记录数、待处理数」（题面规则 8 / AC-02 / AC-18 / A-25 / 原型 V-04） | 缺失字段=['已退款合计（分）', '商品可售数量', '异常记录数', '待处理数']；实际返回字段=['duplicate_refund_events', 'duplicate_release_noop_events', 'effective_payment_amount', 'late_payment_events', 'late_payment_refunded_events', 'no_duplicate_release_refund', 'refunded_orders', 'shipped_orders', 'stock_restored_events', 'total_orders']
+[TC-D-08] 提供「按订单查询收款/退款/发货/异常记录 + 只读审计流水」的查询接口（R-38 / AC-18 / AC-20 / N-17~N-19 / 原型 V-04 C-05） | 探测的候选路径及返回=[('/api/v1/orders/ORD-X/records', 404), ('/api/v1/ops/audit', 404), ('/api/v1/ops/records', 404), ('/api/v1/orders/ORD-X/audit', 404), ('/api/v1/payments', 404), ('/api/v1/audit', 404), ('/api/v1/ops/order-records/ORD-X', 404)]；现有逐单只读接口仅 /api/v1/ops/stock-check/{order_no}，返回字段=[]，不含四类记录与审计流水
+[TC-M-04] 事件记录中 failure_code=M-xx 对应的 failure_reason 与原型 3.3 文案表逐字一致 | 不一致项=[["M-26", "订单已关闭，向渠道发起退款", "迟到支付对应的退款不得再次恢复此前已释放数量"]]
+
+---- 阻塞用例明细 ----
+[TC-E-07] 购买已下架商品（E-02） | 因实现限制未能执行：服务端未提供商品上架/下架接口（POST /admin/goods/1/status → HTTP 404；PUT /goods/1 → HTTP 404），demo-memory 预置的两个商品均为「在售」，无法构造下架商品；已登记为缺陷 D-02
+
+---- 观察到的 M-xx 错误码与文案 ----
+M-01 = 商品未上架，不能购买
+M-02 = 可售数量不足，下单失败
+M-03 = 每单数量只能是 1 或 2 件
+M-04 = 一单只能购买一种商品
+M-05 = 该订单状态不允许此操作
+M-06 = 订单已超时关闭（服务端时间满 10 分钟），占用已释放
+M-08 = 渠道退款失败，已保留待处理记录，请客服重试
+M-09 = 迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理
+M-10 = 重复操作被拒绝，不产生第二笔业务结果
+M-11 = 已发货订单不受理本题售前退款
+M-14 = 异常记录不能通过直接修改订单状态消失
+M-15 = 迟到支付订单保持已关闭终态
+M-18 = 只有合法待发货订单可登记发货
+M-19 = 该订单已登记发货，不能重复登记
+M-20 = 无权限 / 越权：不能查看或处理他人订单
+M-22 = 退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果
+M-23 = 承运方或运单号未填写，不能登记发货
+M-24 = 审核退款 / 核实异常必须写明原因
+M-27 = 同一渠道交易号已归属其他订单，本次关联被拒
+M-28 = 支付通知验签失败，订单状态不变
+M-29 = 支付通知金额与订单不符，订单状态不变
+M-30 = 支付通知指向未知订单，订单状态不变
+
+未触发的 M-xx: ['M-07', 'M-12', 'M-13', 'M-16', 'M-17', 'M-21']
+EXITCODE=1
+

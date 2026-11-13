@@ -1,0 +1,773 @@
+================================================================================
+第 9 轮重建 · 独立测试 Agent · 执行原始输出摘录
+会话基线: 8fe01bed5e092e8e9a401657a12433736830df91 (dev/01)
+环境: Windows 11 + PowerShell; go1.26.0 windows/amd64; CGO_ENABLED=0
+说明: 以下为本会话通过 execute_command 真实执行后 stdout 的逐字摘录。
+      [exit=N] 为命令退出码($LASTEXITCODE)。第一手「源码/文档阅读」主要经
+      read_file 工具完成(不属于命令输出)，本文件不转录其正文；对批量
+      Get-Content 的输出被工具截断处已如实标注，并说明已改用 read_file 补全。
+      未执行的命令见文末「未执行清单」，不编造任何输出。
+================================================================================
+
+
+--------------------------------------------------------------------------------
+[CMD-01] 环境核实（任务要求第 1 组命令）
+$ Set-Location 'd:/Desktop/shop'; git rev-parse HEAD; git --no-pager log --oneline -1; git branch --show-current; go version; go env CGO_ENABLED
+--------------------------------------------------------------------------------
+===== CMD: git rev-parse HEAD =====
+
+8fe01bed5e092e8e9a401657a12433736830df91
+[EXIT=0]
+===== CMD: git --no-pager log --oneline -1 =====
+8fe01be [docs] [v1.8.7] 归档第八轮单题检查报告、评分明细与两份输入
+[EXIT=0]
+===== CMD: git branch --show-current =====
+dev/01
+[EXIT=0]
+===== CMD: go version =====
+go version go1.26.0 windows/amd64
+[EXIT=0]
+===== CMD: go env CGO_ENABLED =====
+0
+[EXIT=0]
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-02] 初始全仓库文件清单（用于确认阅读范围；该次 stdout 被工具截断）
+$ Get-ChildItem -Recurse -File -Force | Where-Object {...} | Sort-Object FullName | ForEach-Object {...}
+--------------------------------------------------------------------------------
+（摘录开头）.agent\01-stack-structure.md | 5732 ... AGENTS.md | 23005 ...
+（摘录中段）resource\static\v01-goods.html | 1991 ... resource\static\v08-late-payment.html | 3506
+（摘录后段）schema.sql | 6357 ... scripts\pipeline_gates.py | 4274 ...
+server\service\order_service.go | 42919 ; server\service\types.go | 9990 ...
+题目01-小型电商订单交易发货与售前退款-任务规划文档.md | 37062
+题目01-小型电商订单交易发货与售前退款-需求文档.md | 65653
+题目01-小型电商订单交易发货与售前退款-原型设计文档.md | 50317
+... (content truncated) ...
+[exit=0]
+注：该输出被工具截断，随后用 CMD-03 精确列出关键目录，并用 read_file 逐文件补全第一手阅读。
+
+
+--------------------------------------------------------------------------------
+[CMD-03] 关键目录精确清单
+$ resource/static; evidence 顶层文件; evidence 子目录; error_code_enumeration* 位置; pipeline_gate_reports 内容
+--------------------------------------------------------------------------------
+===== resource/static =====
+
+app.css | 3073
+app.js | 3399
+index.html | 2430
+v01-goods.html | 1991
+v02-orders.html | 2193
+v03-goods-admin.html | 2350
+v04-ops-summary.html | 2903
+v05-shipment-list.html | 2286
+v06-shipment-form.html | 2006
+v07-refund-review.html | 3846
+v08-late-payment.html | 3506
+===== evidence (top-level files) =====
+acceptance-check-rerun.md | 6809
+agent-rules-load-log.md | 3446
+AI使用说明.md | 4357
+api_probe_runtime.log | 20783
+api_validation_probe.py | 11996
+api_validation_probe.txt | 7260
+app_mysql_runtime.log | 64831
+CI流水线说明.md | 5415
+code-artifact-verification.txt | 1332
+commit-message-check-output.txt | 948
+coverage-gate.out | 349414
+coverage-gate-func.txt | 11290
+coverage-report.md | 4427
+demo-five-scenarios-output.txt | 3473
+error_code_enumeration.json | 26499
+error_code_enumeration.txt | 9656
+error_code_enumeration_runtime.log | 10035
+final-verification-output.txt | 1787
+go-run-main-output.txt | 231
+go-run-stderr.txt | 91
+go-run-stdout.txt | 3288
+mock-channel-run.txt | 3801
+mysql_app_persistence.py | 13129
+mysql_prepare_user.sh | 821
+mysql_raw_00_env.txt | 2106
+mysql_raw_01_schema.txt | 141
+mysql_raw_02_inspect.txt | 11729
+mysql_raw_03_unique.txt | 4686
+mysql_raw_04_restart.txt | 4748
+mysql_raw_05_app_persistence.txt | 7810
+mysql_verify.sh | 6742
+mysql核查记录.md | 12308
+quality_gate.py | 4107
+quality_gate_output.txt | 14505
+r4-mock-channel-output.txt | 3838
+r4-suite-output.txt | 89
+r5-commit-message-check-output.txt | 2965
+r5-coverage-func.txt | 11381
+r5-coverage-output.txt | 1741
+r5-post-commit-verification.txt | 5596
+r5-quality-output.txt | 926
+race_raw_output.txt | 438
+race竞态检测说明.md | 3553
+schema.sql | 13046
+verification-coverage-output.txt | 738
+verification-output.txt | 3219
+wsl_race_run.sh | 360
+第四轮证据清单.md | 9941
+第五轮证据清单.md | 15528
+会话导出说明.md | 4004
+交付证据说明.md | 9109
+门禁自查汇总.md | 7608
+事件清单说明.md | 4377
+验收报告说明.md | 4120
+===== evidence subdirs =====
+coverage
+db
+html-check
+manual
+manual-round2
+partial-closure
+pipeline_gate_reports
+sessions
+smoke
+===== error_code_enumeration.txt location =====
+D:\Desktop\shop\evidence\error_code_enumeration.json
+D:\Desktop\shop\evidence\error_code_enumeration.txt
+D:\Desktop\shop\evidence\error_code_enumeration_runtime.log
+D:\Desktop\shop\scripts\error_code_enumeration.py
+===== pipeline_gate_reports =====
+AI_与_Skill_记录齐备.txt | 1976
+Git_流程.txt | 646
+编译_go_build.txt | 30
+单元测试.txt | 301
+覆盖率阈值判定.txt | 761
+覆盖率证据一致性.txt | 1014
+格式检查_gofmt.txt | 26
+静态检查_go_vet.txt | 28
+门禁总表.md | 1391
+敏感信息扫描.txt | 298
+五组必演示场景.txt | 1261
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-04] 文档行数统计（Measure-Object -Line，忽略空行，故数值偏小；仅作分段参考）
+--------------------------------------------------------------------------------
+题目01-小型电商订单交易发货与售前退款-需求文档.md | 513 lines
+题目01-小型电商订单交易发货与售前退款-原型设计文档.md | 553 lines
+题目01-小型电商订单交易发货与售前退款-任务规划文档.md | 227 lines
+AGENTS.md | 207 lines
+schema.sql | 114 lines
+main.go | 73 lines
+[exit=0]
+注：随后第一手阅读确认物理行数为 需求 667 / 原型 709 / 任务规划 227 / AGENTS 289 / schema.sql 120+ / main.go 83。
+
+
+--------------------------------------------------------------------------------
+[CMD-05] 精确物理行数（[System.IO.File]::ReadAllLines().Length）
+--------------------------------------------------------------------------------
+===== server/**/*.go line counts =====
+server/api/v1/api_branch_coverage_test.go | 235
+server/api/v1/extension.go | 128
+server/api/v1/extension_api_test.go | 143
+server/api/v1/health.go | 12
+server/api/v1/order.go | 576
+server/api/v1/order_api_test.go | 330
+server/api/v1/views.go | 100
+server/global/global.go | 20
+server/initialize/clock.go | 35
+server/initialize/gorm.go | 20
+server/initialize/router.go | 38
+server/initialize/router_test.go | 79
+server/initialize/static_router_test.go | 60
+server/model/model.go | 82
+server/model/model_test.go | 19
+server/router/extension.go | 20
+server/router/extension_router_test.go | 38
+server/router/order.go | 47
+server/router/order_router_test.go | 61
+server/service/clock.go | 18
+server/service/demo_repository.go | 491
+server/service/extension.go | 310
+server/service/extension_gorm_test.go | 57
+server/service/extension_test.go | 453
+server/service/gorm_repository.go | 293
+server/service/gorm_repository_test.go | 382
+server/service/memory_repository_test.go | 171
+server/service/order_service.go | 1151
+server/service/order_service_branches_test.go | 439
+server/service/order_service_test.go | 485
+server/service/r4_edge_test.go | 386
+server/service/r5_edge_test.go | 559
+server/service/r5_edge2_test.go | 737
+server/service/types.go | 247
+===== resource/static/*.html line counts =====
+index.html | 42
+v01-goods.html | 50
+v02-orders.html | 42
+v03-goods-admin.html | 53
+v04-ops-summary.html | 57
+v05-shipment-list.html | 47
+v06-shipment-form.html | 45
+v07-refund-review.html | 66
+v08-late-payment.html | 61
+===== main.go / scripts line counts =====
+main.go | 83
+scripts/coverage_gate.py | 186
+scripts/coverage_evidence_gate.py | 96
+scripts/scenario_gate.py | 145
+scripts/git_process_gate.py | 111
+scripts/record_gate.py | 76
+scripts/secret_scan_gate.py | 110
+scripts/error_code_enumeration.py | 353
+scripts/pipeline_gates.py | 85
+evidence/error_code_enumeration.txt | 100
+evidence/pipeline_gate_reports/门禁总表.md | 19
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-06] 第一手阅读用批量 Get-Content（main.go / schema.sql / global.go）
+--------------------------------------------------------------------------------
+（输出被工具截断，仅保留可核验片段）
+===== FILE: main.go =====
+package main
+...
+func buildServer() (*gin.Engine, string, string, error) {
+	addr := envOr("GVA_ADDR", ":8080")
+	dsn := os.Getenv("GVA_MYSQL_DSN")
+...
+	} else {
+		// 未配置 DSN 时启用演示模式：可直接启动并演示五组场景，但数据不持久化。
+		// 正式验收须配置 GVA_MYSQL_DSN 走 InnoDB 事务 + 行锁，并用 schema.sql 初始化。
+		repo = service.NewDemoOrderRepository()
+...
+func main() {
+	engine, addr, mode, err := buildServe
+... (content truncated) ...
+-- shop-trade 题目 01：仅创建 goods、order、payment 三张业务表。
+-- 金额字段一律 BIGINT，单位为「分」；不使用浮点数。
+-- 所有业务表使用 MySQL(InnoDB)：ENGINE=InnoDB、DEFAULT CHARSET=utf8mb4。
+... (content truncated) ...
+  ('GOODS-ACT-001', '活动商品', 10000, 5, 0, '在售', NOW(3), NOW(3)),
+  ('GOODS-DEMO-002', '演示商品', 10000, 2, 0, '在售', NOW(3), NOW(3))
+ON DUPLICATE KEY UPDATE `goods_no` = VALUES(`goods_no`);
+===== FILE: server/global/global.go =====
+（全文已由 read_file 补全）
+[exit=0]
+注：截断部分已用 read_file 逐文件补全（main.go 83 行、schema.sql 121 行、global.go 20 行），未据截断内容作推断。
+
+
+--------------------------------------------------------------------------------
+[CMD-07] 小文件批量读取（service/clock.go、initialize/*、router/*、api/v1/health.go）
+--------------------------------------------------------------------------------
+（输出完整，此处摘录关键行；全文已由本会话第一手阅读）
+===== FILE: server/service/clock.go =====  -> NewOrderServiceWithClock(repo, now)
+===== FILE: server/initialize/clock.go ===== -> DemoClock 只允许整体平移服务端时间，不缩短业务规则中的 10 分钟
+===== FILE: server/initialize/gorm.go ===== -> GormMysql(dsn) 只读环境变量 GVA_MYSQL_DSN；不执行任何 DDL
+===== FILE: server/initialize/router.go ===== -> Routers(...) 注册 /health、/api/v1 路由组、engine.Static("/static","resource/static")
+===== FILE: server/router/order.go ===== -> /me /goods /admin/clock /orders /payment/callback /refund/callback /late-payment/* /ops/summary 等
+===== FILE: server/router/extension.go ===== -> API-21 调价、API-22 渠道超时、API-23 库存恢复逐单核查
+===== FILE: server/api/v1/health.go ===== -> Health 返回 {"status":"ok","mode":mode}
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-08] 8 个视图与 index/app.js 批量读取（分 4 批；输出完整，此处摘录关键事实）
+--------------------------------------------------------------------------------
+V-01：商品列表 + 创建订单（goods_id/quantity），hint 提示 M-02/M-03；Shop.init('buyer01')
+V-02：仅「订单详情 / 状态 / 取消订单 / 库存恢复逐单核查」四个按钮；无「申请整单退款 / 查看退款结果 / 查看运单」
+V-03：商品列表 + 调价（API-21）；无上架/下架按钮
+V-04：汇总 + 逐单核查 + 演示教学时钟（offset_minutes 默认 11）；无逐笔四类记录区、无只读审计流水区
+V-05：按 order_no 核对状态；无 S-01 控制台
+V-06：发货登记（carrier/tracking_no）+ 状态
+V-07：审核同意/拒绝/重试 + 渠道失败/成功；无 S-01 模拟支付渠道控制台（8 类通知）
+V-08：异常核实 / 发起退款 / 渠道超时通知分支；无「支付通知处理结果区」
+index.html：八视图导航；声明「CGO/gcc、真实 MySQL(InnoDB)、meegle、独立测试/验收会话、视频与部署仍缺」
+app.js：accounts = ['buyer01','buyer02','buyer03','ops01','warehouse01','cs01','mock01']；call() 仅发送 X-Demo-Account；show() 展示服务端 JSON
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-09] 错误码三方一致性 · 只读静态复算（任务要求「独立核对」）
+--------------------------------------------------------------------------------
+[A] txt 用例行(OK/MISS 结尾) = 52
+[B] 脚本 probe( 调用行 = 46
+[C] 结论表行数 = 30 / 已触发=27 / 文案常量=3 / 未观测=0
+[D] types.go messages 条数 = 30
+[D2] codes = M-01,M-02,M-03,M-04,M-05,M-06,M-07,M-08,M-09,M-10,M-11,M-12,M-13,M-14,M-15,M-16,M-17,M-18,M-19,M-20,M-21,M-22,M-23,M-24,M-25,M-26,M-27,M-28,M-29,M-30
+[E] 非 types.go Go 源码引用: M-07=0 M-16=0 M-21=0 ; distinct=27
+    M-01 = 12
+    M-02 = 7
+    M-03 = 10
+    M-04 = 4
+    M-05 = 24
+    M-06 = 2
+    M-08 = 13
+    M-09 = 10
+    M-10 = 51
+    M-11 = 6
+    M-12 = 7
+    M-13 = 4
+    M-14 = 12
+    M-15 = 5
+    M-17 = 6
+    M-18 = 3
+    M-19 = 8
+    M-20 = 49
+    M-22 = 5
+    M-23 = 3
+    M-24 = 25
+    M-25 = 4
+    M-26 = 8
+    M-27 = 22
+    M-28 = 10
+    M-29 = 10
+    M-30 = 28
+[exit=0]
+注：[B] 只匹配「行首 probe(」，另有 6 处「变量 = probe(」赋值形式，合计 52，见 CMD-10。
+    上述 27 个引用数与 evidence/error_code_enumeration.txt 结论表「源码引用」列逐项吻合。
+
+
+--------------------------------------------------------------------------------
+[CMD-10] probe 调用总数与门禁脚本写文件副作用计数
+--------------------------------------------------------------------------------
+[probe] 总出现=53 def=1 实际调用=52 赋值形式=6
+===== 各脚本写文件 / 子进程语句计数 =====
+scripts/coverage_gate.py | write/open 语句=2 | subprocess 提及=2
+scripts/coverage_evidence_gate.py | write/open 语句=0 | subprocess 提及=2
+scripts/scenario_gate.py | write/open 语句=0 | subprocess 提及=0
+scripts/git_process_gate.py | write/open 语句=0 | subprocess 提及=2
+scripts/record_gate.py | write/open 语句=0 | subprocess 提及=0
+scripts/secret_scan_gate.py | write/open 语句=0 | subprocess 提及=2
+scripts/pipeline_gates.py | write/open 语句=2 | subprocess 提及=2
+scripts/error_code_enumeration.py | write/open 语句=6 | subprocess 提及=4
+[exit=0]
+注：经全文核读 coverage_gate.py 的 2 处为 open(path,'r') 与「仅 --manifest 时 write_text」；
+    本次命令行未带 --manifest，故不写文件。pipeline_gates.py / error_code_enumeration.py 会写既有文件，未运行。
+
+
+--------------------------------------------------------------------------------
+[CMD-11] Go 命令组（任务要求：gofmt / go vet / go build / go test）
+--------------------------------------------------------------------------------
+[pre] go.mod exists = True
+===== CMD: gofmt -l . =====
+
+[exit=0]
+===== CMD: go vet "./..." =====
+
+[exit=0]
+===== CMD: go build ./... =====
+
+[exit=0]
+===== CMD: go test -count=1 "./..." =====
+ok  	shop-trade	0.340s
+ok  	shop-trade/server/api/v1	0.305s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.313s
+ok  	shop-trade/server/model	0.278s
+ok  	shop-trade/server/router	0.348s
+ok  	shop-trade/server/service	0.378s
+
+[exit=0]
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-12] 门禁脚本 · 批次 1（任务要求第 10~12 条命令）
+--------------------------------------------------------------------------------
+===== CMD: python -X utf8 scripts/coverage_gate.py --profile evidence/coverage/coverage-v1.8.0-def0977.out --overall 85 --pkg server/service:85 =====
+
+===== 覆盖率阈值门禁 =====
+覆盖率文件：evidence\coverage\coverage-v1.8.0-def0977.out
+生成时间：2026-11-13 10:52:30
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=evidence\coverage\coverage-v1.8.0-def0977.out ./...
+整体语句覆盖率：97.63% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1563
+--- 核心业务包 ---
+  server/service      98.47%  (阈值 85.00%)  语句 1179 / 覆盖 1161  → PASS
+--- 其它包（仅统计）---
+  server/api/v1       99.08%
+  server/initialize   90.00%
+  server/model       100.00%
+  server/router      100.00%
+  shop-trade          64.10%
+结论：PASS
+
+[exit=0]
+===== CMD: python -X utf8 scripts/coverage_evidence_gate.py =====
+===== 覆盖率证据一致性门禁 =====
+快照目录：D:\Desktop\shop\evidence\coverage
+------------------------------------------------------------------------------------------------
+快照前缀：coverage-v1.8.0-def0977
+版本标注：v1.8.0；提交哈希：def0977；生成时间：2026-11-13 09:05:16
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=evidence\coverage\coverage-v1.8.0-def0977.out ./...
+重新解析快照：整体 97.63%（1563/1601）
+  server/api/v1           99.08%  (323/326)
+  server/initialize       90.00%  (27/30)
+  server/model           100.00%  (3/3)
+  server/router          100.00%  (24/24)
+  server/service          98.47%  (1161/1179)
+  shop-trade              64.10%  (25/39)
+------------------------------------------------------------------------------------------------
+快照组数：1；不合格项：0
+结论：PASS 覆盖率证据齐备、可追溯且达标
+
+[exit=0]
+===== CMD: python -X utf8 scripts/scenario_gate.py =====
+===== 五组必演示场景门禁（TST-S1~S5）=====
+证据文件：D:\Desktop\shop\evidence\demo-five-scenarios-output.txt
+------------------------------------------------------------------------------------------------
+场景     标题                               断言数      命中业务码                      判定
+------------------------------------------------------------------------------------------------
+S1     活动正常成交                           6        0,M-19                     PASS
+S2     缺货与弃单（库存释放 / 20 次抢单）             3        ,0,M-10                    PASS
+S3     售前退款（渠道首次失败、再次成功）                9        0,M-08,M-22                PASS
+S4     迟到支付（终态不变 + 异常核实退款）              11       0,M-08,M-09                PASS
+S5     操作竞争、重复通知与越权                     9        0,M-20,M-22,M-28,M-29,M-30 PASS
+------------------------------------------------------------------------------------------------
+场景数：5 / 5；断言总数：38；不合格场景：0
+结论：PASS 五组场景证据齐备且关键失败码命中
+
+[exit=0]
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-13] 门禁脚本 · 批次 2（任务要求第 13~15 条命令）
+--------------------------------------------------------------------------------
+===== CMD: python -X utf8 scripts/git_process_gate.py =====
+
+===== Git 流程门禁 =====
+仓库：D:\Desktop\shop
+当前分支：dev/01
+提交总数：28
+类型分布：docs=11, feat(基线)=1, opt=7, test=9
+受检提交（AGENTS.md 生效后）：27 条；格式合规：27 条；不合规：0 条
+基线提交豁免：6cc6f134ee07 | feat: 电商订单售前退款完整业务实现
+  说明：该提交为 AGENTS.md 生效前的题集基线交付，历史不得事后改写，按基线豁免处理并在此显式登记，不计入不合规。
+merge 提交：0 条
+结论：PASS 分支、提交格式与提交历史均合规
+
+[exit=0]
+===== CMD: python -X utf8 scripts/record_gate.py =====
+===== AI 与 Skill 记录齐备性门禁 =====
+仓库：D:\Desktop\shop
+------------------------------------------------------------------------------------------------
+文件                                             说明                     有效行数     判定
+------------------------------------------------------------------------------------------------
+skill-usage.md                                 Skill 调用记录             169      PASS
+evidence/AI使用说明.md                             AI 使用与过程说明             40       PASS
+evidence/会话导出说明.md                             会话导出说明                 25       PASS
+evidence/事件清单说明.md                             事件清单说明                 47       PASS
+evidence/agent-rules-load-log.md               AGENTS 约束加载登记          32       PASS
+evidence/门禁自查汇总.md                             门禁自查汇总                 51       PASS
+evidence/交付证据说明.md                             交付证据说明                 82       PASS
+evidence/验收报告说明.md                             验收报告归档说明               36       PASS
+evidence/CI流水线说明.md                            流水线说明                  55       PASS
+evidence/quality_gate_output.txt               质量门禁原始输出               220      PASS
+evidence/race_raw_output.txt                   竞态检测原始输出               14       PASS
+evidence/demo-five-scenarios-output.txt        五组场景原始输出               46       PASS
+evidence/error_code_enumeration.txt            错误码穷举原始输出              98       PASS
+------------------------------------------------------------------------------------------------
+记录项：13；通过：13；不通过：0
+结论：PASS 过程类记录齐备
+
+[exit=0]
+===== CMD: python -X utf8 scripts/secret_scan_gate.py =====
+===== 敏感信息扫描门禁 =====
+仓库：D:\Desktop\shop
+已扫描文件：217；跳过（二进制/覆盖率 profile/截图）：136
+命中：0 处
+结论：PASS 未发现密钥、令牌、演示口令等敏感信息
+
+[exit=0]
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-14] 既有「竞态 / 最终验证」原始输出读取（依据既有原始输出复核，未当日复跑）
+--------------------------------------------------------------------------------
+===== FILE: evidence/race_raw_output.txt =====
+
+== toolchain ==
+go version go1.26.8 linux/amd64
+gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+CGO_ENABLED=1
+GOPROXY=https://goproxy.cn,direct
+== go test -race ./... -count=1 ==
+ok  	shop-trade	1.035s
+ok  	shop-trade/server/api/v1	1.049s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.033s
+ok  	shop-trade/server/model	1.018s
+ok  	shop-trade/server/router	1.028s
+ok  	shop-trade/server/service	1.055s
+race_exit=0
+
+===== FILE: evidence/race竞态检测说明.md =====
+（摘录关键标注）版本：dev/01 @ `58719fb`；WSL Ubuntu；go1.26.8 linux/amd64；gcc 15.2.0；CGO_ENABLED=1；
+执行命令 CGO_ENABLED=1 go test -race ./... -count=1；逐字引用 race_raw_output.txt 的 7 行 ok。
+（说明性结论不采信，仅引用其中的逐字原始输出）
+
+===== FILE: evidence/final-verification-output.txt =====
+=== FINAL VERIFICATION 2026-11-12 (dev Agent draft, not formal gate evidence) ===
+--- gofmt -l . ---
+exit=0
+--- go vet ./... ---
+exit=0
+--- go build ./... ---
+exit=0
+--- go build -o binary . ---
+exit=0 bytes=15395328
+--- go test ./... -count=1 ---
+ok  	shop-trade	0.946s
+ok  	shop-trade/server/api/v1	1.028s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	1.028s
+ok  	shop-trade/server/model	0.394s
+ok  	shop-trade/server/router	1.028s
+ok  	shop-trade/server/service	1.028s
+exit=0
+--- coverage service ---
+ok  	shop-trade/server/service	0.474s	coverage: 87.7% of statements
+exit=0
+total:					(statements)				87.7%
+--- coverage all (-coverpkg ./...) ---
+ok  	shop-trade	0.607s	coverage: 5.5% of statements in ./...
+ok  	shop-trade/server/api/v1	0.577s	coverage: 62.4% of statements in ./...
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.674s	coverage: 4.6% of statements in ./...
+ok  	shop-trade/server/model	0.402s	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	0.689s	coverage: 2.5% of statements in ./...
+ok  	shop-trade/server/service	0.446s	coverage: 66.2% of statements in ./...
+exit=0
+total:					(statements)				86.0%
+--- race probe (CGO=0, expected to fail) ---
+go : go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
+...
+exit=2
+--- apipost collection json ---
+json_ok cases= 5
+[exit=0]
+注：以上均为既有历史原始输出，标注「依据既有原始输出复核，未当日复跑」；其结论不采信。
+
+
+--------------------------------------------------------------------------------
+[CMD-15] 既有「数据库层」原始输出读取（依据既有原始输出复核，未当日复跑）
+--------------------------------------------------------------------------------
+===== FILE: evidence/db/inno_ship_refund_race_raw.txt =====
+（摘录关键行）
+时间：2026-11-12 22:44:58
+MySQL：127.0.0.1:3306/shop_trade（用户 audit_chk）
+轮次：5
+  ('goods', 'InnoDB', 'utf8mb4_0900_ai_ci')
+  ('order', 'InnoDB', 'utf8mb4_0900_ai_ci')
+  ('payment', 'InnoDB', 'utf8mb4_0900_ai_ci')
+[断言] PASS | 三张业务表均为 InnoDB | 共 3 张表
+  隔离级别与锁等待超时：(('REPEATABLE-READ', 50),)
+  第1轮 refund=0 ship=M-22 → 表内 status=退款审核中
+[断言] PASS | 第1轮并发只形成一种合法结果 | refund=0 ship=M-22
+[断言] PASS | 第1轮库存守恒 available+occupied 恒定 | available=5 occupied=1 合计=6 基线=6
+  第3轮 refund=M-11 ship=0 → 表内 status=已发货
+[断言] PASS | 第3轮并发只形成一种合法结果 | refund=M-11 ship=0
+[断言] PASS | 第5轮库存守恒 available+occupied 恒定 | available=1 occupied=5 合计=6 基线=6
+[断言] PASS | T0 持锁期间应用退款请求被阻塞（未提前返回） | 观察 4.0s 后请求仍未返回
+[断言] PASS | 释放行锁后应用退款请求立即返回 | 请求在释放锁后返回，阻塞观察时长约 4.0s
+[断言] PASS | 测试数据已清理，商品库存已按原值复原 | available=2 occupied=0 原值=(2,0)
+共 37 条断言：PASS 37 条，FAIL 0 条
+[exit=0]
+注：真实 InnoDB 行锁并发裁决与阻塞探针结论只能引用此既有原始输出，标注「依据既有原始输出复核，未当日复跑」。
+
+
+--------------------------------------------------------------------------------
+[CMD-16] 既有「五组场景」与 record_gate.py 读取（未采信其结论，仅作对照/复核）
+--------------------------------------------------------------------------------
+===== FILE: evidence/demo-five-scenarios-output.txt =====
+（摘录关键行）
+=== TST-S1 活动正常成交 ===
+[S1-01] 买家下单 2 件 => code=0 message=ok
+[S1-05] 重复发货应被拒绝 => code=M-19 message=该订单已登记发货，不能重复登记
+=== TST-S2 缺货与弃单（库存释放 / 20 次抢单）===
+[S2-01] 20 次抢单 => 成功=3 被拒=17（库存守恒，绝不超卖；真实并发请用 Apipost 20 并发用例 + go test -race）
+[S2-03] 重复取消应被拒绝 => code=M-10 message=重复操作被拒绝，不产生第二笔业务结果
+=== TST-S3 售前退款（渠道首次失败、再次成功）===
+[S3-03] 申请期间发货应暂停 => code=M-22 ...
+[S3-05] 模拟渠道首次退款失败 => code=M-08 ...
+=== TST-S4 迟到支付（终态不变 + 异常核实退款）===
+[S4-04] 关闭后迟到支付成功通知 => code=M-09 ...
+[S4-11] 终态保持 status=已关闭 => code=0 message=ok
+=== TST-S5 操作竞争、重复通知与越权 ===
+[S5-07] buyer02 越权查询 buyer01 订单 => code=M-20 ...
+=== 五组场景 HTTP 演示结束：接口已可从头到尾调用；正式第 2 轮结果须由测试 Agent 在独立会话用 Apipost 运行导出 ===
+===== FILE: scripts/record_gate.py =====
+（全文已由 read_file 阅读；REQUIRED 为 13 项文件存在性/最小行数检查）
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-17] 覆盖率快照 gate/manifest 与提交关系核对
+--------------------------------------------------------------------------------
+===== coverage-v1.8.0-def0977.gate.txt =====
+
+===== 覆盖率阈值门禁 =====
+覆盖率文件：evidence\coverage\coverage-v1.8.0-def0977.out
+版本标注：v1.8.0（提交 def0977）
+生成时间：2026-11-13 09:05:16
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=evidence\coverage\coverage-v1.8.0-def0977.out ./...
+整体语句覆盖率：97.63% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1563
+--- 核心业务包 ---
+  server/service      98.47%  (阈值 85.00%)  语句 1179 / 覆盖 1161  → PASS
+--- 其它包（仅统计）---
+  server/api/v1       99.08%
+  server/initialize   90.00%
+  server/model       100.00%
+  server/router      100.00%
+  shop-trade          64.10%
+结论：PASS
+
+===== coverage-v1.8.0-def0977.manifest.json =====
+{
+  "profile": "evidence\\coverage\\coverage-v1.8.0-def0977.out",
+  "revision": "v1.8.0",
+  "commit": "def0977",
+  "generated_at": "2026-11-13 09:05:16",
+  "go_version": "go version go1.26.0 windows/amd64",
+  "collect_command": "go test -count=1 -coverpkg=./... -coverprofile=evidence\\coverage\\coverage-v1.8.0-def0977.out ./...",
+  "overall_coverage": 97.63,
+  "overall_threshold": 85.0,
+  "overall_pass": true,
+  "statements": 1601,
+  "covered_statements": 1563,
+  "packages": [
+    { "package": "server/service", "coverage": 98.47, "statements": 1179, "covered": 1161, "threshold": 85.0, "pass": true }
+  ],
+  "all_packages": {
+    "server/api/v1": 99.08,
+    "server/initialize": 90.0,
+    "server/model": 100.0,
+    "server/router": 100.0,
+    "server/service": 98.47,
+    "shop-trade": 64.1
+  },
+  "failures": [],
+  "pass": true
+}
+
+===== 提交关系核对 =====
+HEAD = 8fe01bed5e092e8e9a401657a12433736830df91
+--- git log -1 def0977
+def0977 [test] [v1.8.0] 补接入层分支覆盖测试与M-01~M-30错误码穷举脚本及真实执行输出
+--- git log -1 58719fb
+58719fb [test] [v1.2.0] 追加提交后门禁复核原始输出
+[def0977 为 HEAD 祖先的 exit=0]
+HEAD 提交总数 = 28
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-18] 覆盖率证据一致性脚本 / 门禁总表对照物读取（结论不采信）
+--------------------------------------------------------------------------------
+===== FILE: scripts/coverage_evidence_gate.py =====
+（全文已由本会话第一手阅读；只读校验四件套、git cat-file -e 提交存在性、用 coverage_gate.parse_profile 重新解析）
+===== FILE: evidence/pipeline_gate_reports/门禁总表.md =====
+（仅作对照物读取；内容声明 10 项门禁 exit=0 / PASS，生成时间 2026-11-13 10:12:23；
+ 本会话未运行 pipeline_gates.py，未采信该总表结论）
+[exit=0]
+
+
+--------------------------------------------------------------------------------
+[CMD-19] 执行门禁后工作区核实 + 测试代码量化抽查
+--------------------------------------------------------------------------------
+===== git status --short（执行门禁后核实工作区是否被改动）=====
+
+?? evidence/db/screenshots/
+[exit=0]
+===== 各测试文件 func Test 数量（抽查范围）=====
+server/api/v1/api_branch_coverage_test.go | Test函数=5
+server/api/v1/extension_api_test.go | Test函数=3
+server/api/v1/order_api_test.go | Test函数=5
+server/initialize/router_test.go | Test函数=3
+server/initialize/static_router_test.go | Test函数=1
+server/model/model_test.go | Test函数=1
+server/router/extension_router_test.go | Test函数=1
+server/router/order_router_test.go | Test函数=1
+server/service/extension_gorm_test.go | Test函数=2
+server/service/extension_test.go | Test函数=9
+server/service/gorm_repository_test.go | Test函数=6
+server/service/memory_repository_test.go | Test函数=3
+server/service/order_service_branches_test.go | Test函数=7
+server/service/order_service_test.go | Test函数=8
+server/service/r4_edge_test.go | Test函数=13
+server/service/r5_edge_test.go | Test函数=5
+server/service/r5_edge2_test.go | Test函数=10
+合计 Test 函数 = 83
+===== 关键测试函数名（并发/竞态/幂等/越权/迟到/退款）=====
+（摘录）order_api_test.go:156 TestAPIScenarioS1NormalAndS2Stock
+（摘录）order_api_test.go:205 TestAPIScenarioS3PresaleRefund
+（摘录）order_api_test.go:240 TestAPIScenarioS4LatePayment
+（摘录）order_service_test.go:155 TestPaymentCallbackNormalIdempotencyAndRejections
+（摘录）order_service_test.go:195 TestCancelCloseExpiredAndDuplicateRelease
+（摘录）order_service_test.go:227 TestPresaleRefundFailureRetrySuccessAndDuplicate
+（摘录）order_service_test.go:286 TestRefundShipmentCompetitionAndShipmentValidation
+（摘录）order_service_test.go:337 TestLatePaymentRefundNoSecondStockRestore
+（摘录）order_service_test.go:455 TestConcurrentCreateOrderDraftNotFormalEvidence
+（其余从略，完整清单见命令 stdout 原始返回）
+[exit=0]
+注：唯一未跟踪项 evidence/db/screenshots/ 在会话初始文件清单(CMD-02)中已存在；6 个门禁脚本经源码核读无写文件副作用，本会话未改动既有文件。
+
+
+--------------------------------------------------------------------------------
+[CMD-20] 执行时间 / round9 新建确认 / 既有 sessions 产物保留清单
+--------------------------------------------------------------------------------
+执行时间 = 2026-11-13 10:53:54 +08:00
+
+round9 目录已存在? False
+===== evidence/sessions 既有内容（本会话只读保留）=====
+evidence/sessions/acceptance-agent
+evidence/sessions/test-agent
+evidence/sessions/acceptance-agent/acc-coverage-bb1ca7f.out
+evidence/sessions/acceptance-agent/collect-verify.ps1
+evidence/sessions/acceptance-agent/独立验收会话说明.md
+evidence/sessions/acceptance-agent/逐项验收结论.md
+evidence/sessions/acceptance-agent/验收报告.md
+evidence/sessions/acceptance-agent/验收核验原始输出.txt
+evidence/sessions/test-agent/__pycache__
+evidence/sessions/test-agent/_collect_output.ps1
+evidence/sessions/test-agent/_raw_build.txt
+evidence/sessions/test-agent/_raw_coverage.txt
+evidence/sessions/test-agent/_raw_coverage_by_package.txt
+evidence/sessions/test-agent/_raw_coverfunc.txt
+evidence/sessions/test-agent/_raw_coverfunc_main.txt
+evidence/sessions/test-agent/_raw_coverprofile.out
+evidence/sessions/test-agent/_raw_gofmt.txt
+evidence/sessions/test-agent/_raw_probe.txt
+evidence/sessions/test-agent/_raw_probe_stats.txt
+evidence/sessions/test-agent/_raw_race_attempt.txt
+evidence/sessions/test-agent/_raw_test.txt
+evidence/sessions/test-agent/_raw_vet.txt
+evidence/sessions/test-agent/_server_runtime.log
+evidence/sessions/test-agent/测试执行原始输出.txt
+evidence/sessions/test-agent/测试报告.md
+evidence/sessions/test-agent/测试计划与用例清单.md
+evidence/sessions/test-agent/独立测试会话说明.md
+evidence/sessions/test-agent/黑盒探测脚本.py
+evidence/sessions/test-agent/__pycache__/黑盒探测脚本.cpython-314.pyc
+[exit=0]
+
+
+================================================================================
+未执行清单（如实登记，无输出可摘录）
+================================================================================
+- python -X utf8 scripts/pipeline_gates.py ........................ 未执行（任务禁止；会覆盖 evidence/pipeline_gate_reports/ 既有文件）
+- go test -race ./...（任何 -race）.................................. 未执行（CGO_ENABLED=0、无 gcc/clang、禁止 WSL）
+- 启动 / 连接 MySQL、重启一致性实测 .............................. 未执行（任务禁止）
+- 启动服务做黑盒 HTTP 探测（端口 18191 / 临时二进制）............ 未执行（本会话选择只做命令与源码判读）
+- python -X utf8 scripts/error_code_enumeration.py ................. 未执行（会覆盖既有 error_code_enumeration.txt/.json）
+- 缺陷修复与复测闭环 ............................................. 未执行（任务规定只登记、不修复）
+- 远端 GitHub 连接 / 真实 CI run / 部署 / 回退 / 合并发布 ......... 未执行（任务禁止 / 不在范围）
+- 讲解视频 / 班级群凭据 ........................................... 未执行（任务禁止 / 不在范围）
+- 任何删除命令 / git commit / git push / git merge ................ 未执行
+================================================================================
