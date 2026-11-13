@@ -3,8 +3,18 @@ name: shop-trade-ci
 # 本文件是仓库生效的流水线定义（.github/workflows/ci.yml）。
 # 门禁作业与本地脚本一一对应，本地可原样复跑：
 #   python scripts/coverage_gate.py --profile coverage.out --overall 85 --pkg server/service:85
+#   python scripts/coverage_evidence_gate.py
+#   python scripts/scenario_gate.py
+#   python scripts/git_process_gate.py
+#   python scripts/record_gate.py
+#   python scripts/secret_scan_gate.py
 #   python scripts/deploy_gate.py
 # 题面共同要求「流水线实际执行质量、覆盖率、构建和部署门禁」；AGENTS.md Q-02/Q-04 给出具体阈值。
+# AGENTS.md 2.5 的八项门禁在本文件中逐项落地：
+#   单元测试→单元测试；覆盖率→覆盖率阈值判定 + 覆盖率证据一致性门禁；
+#   并发竞争检测→竞态检测；格式与静态检查→gofmt / go vet；
+#   五组场景→五组必演示场景门禁；Git 流程→Git 流程门禁；
+#   AI 与 Skill 记录→AI 与 Skill 记录齐备性门禁；部署→部署门禁作业。
 
 on:
   push:
@@ -56,6 +66,8 @@ jobs:
             --profile coverage.out \
             --overall 85 \
             --pkg server/service:85 \
+            --revision "${GITHUB_REF_NAME}" \
+            --commit "${GITHUB_SHA}" \
             | tee coverage-gate-report.txt
           status=${PIPESTATUS[0]}
           echo "coverage-gate exit=${status}"
@@ -63,6 +75,23 @@ jobs:
 
       - name: 覆盖率明细
         run: go tool cover -func=coverage.out
+
+      # 覆盖率证据一致性门禁：快照须带版本标注与提交哈希，阈值达标，
+      # 且用同一口径重新解析快照后的数字与清单一致（防止口径漂移与数字失真）。
+      - name: 覆盖率证据一致性门禁
+        run: |
+          python3 scripts/coverage_evidence_gate.py | tee coverage-evidence-gate.txt
+          status=${PIPESTATUS[0]}
+          echo "coverage-evidence-gate exit=${status}"
+          exit ${status}
+
+      # 五组必演示场景门禁：TST-S1~S5 证据齐备且关键失败码真实命中。
+      - name: 五组必演示场景门禁
+        run: |
+          python3 scripts/scenario_gate.py | tee scenario-gate.txt
+          status=${PIPESTATUS[0]}
+          echo "scenario-gate exit=${status}"
+          exit ${status}
 
       - name: 上传覆盖率原始文件与门禁报告
         if: always()
@@ -72,10 +101,62 @@ jobs:
           path: |
             coverage.out
             coverage-gate-report.txt
+            coverage-evidence-gate.txt
+            scenario-gate.txt
+
+  process-gate:
+    name: 过程门禁（提交格式/记录齐备/敏感信息）
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          # Git 流程门禁需要完整提交历史
+          fetch-depth: 0
+
+      - name: setup-go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      # Git 流程门禁：业务提交必须在开发分支；提交消息须符合 commit-convention.md；
+      # 不得用 merge 提交掩盖阶段提交历史。
+      - name: Git 流程门禁
+        run: |
+          python3 scripts/git_process_gate.py | tee git-process-gate.txt
+          status=${PIPESTATUS[0]}
+          echo "git-process-gate exit=${status}"
+          exit ${status}
+
+      # AI 与 Skill 记录齐备性门禁：会话导出、Skill 使用记录、skill-usage.md 等过程记录须齐备。
+      - name: AI 与 Skill 记录齐备性门禁
+        run: |
+          python3 scripts/record_gate.py | tee record-gate.txt
+          status=${PIPESTATUS[0]}
+          echo "record-gate exit=${status}"
+          exit ${status}
+
+      # 敏感信息扫描门禁：密钥、令牌、演示口令不得进入仓库。
+      - name: 敏感信息扫描门禁
+        run: |
+          python3 scripts/secret_scan_gate.py | tee secret-scan-gate.txt
+          status=${PIPESTATUS[0]}
+          echo "secret-scan-gate exit=${status}"
+          exit ${status}
+
+      - name: 上传过程门禁报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: process-gate-reports
+          path: |
+            git-process-gate.txt
+            record-gate.txt
+            secret-scan-gate.txt
 
   deploy-gate:
     name: 部署门禁（构建制品/健康检查/业务冒烟/回退准备）
-    needs: quality-gate
+    needs: [quality-gate, process-gate]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
