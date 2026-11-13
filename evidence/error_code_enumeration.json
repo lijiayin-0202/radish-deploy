@@ -1,0 +1,1085 @@
+{
+  "generated_at": "2026-11-13 09:03:41",
+  "port": 18098,
+  "mode": "demo-memory",
+  "codes": [
+    {
+      "code": "M-01",
+      "message": "商品未上架，不能购买",
+      "source_refs": 12,
+      "observed": [
+        {
+          "case": "下单 goods_id=999",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-02",
+      "message": "可售数量不足，下单失败",
+      "source_refs": 7,
+      "observed": [
+        {
+          "case": "下单 C（商品1×2，可售不足）",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-03",
+      "message": "每单数量只能是 1 或 2 件",
+      "source_refs": 10,
+      "observed": [
+        {
+          "case": "下单 quantity=3",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-04",
+      "message": "一单只能购买一种商品",
+      "source_refs": 4,
+      "observed": [
+        {
+          "case": "下单 goods_id=0",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-05",
+      "message": "该订单状态不允许此操作",
+      "source_refs": 24,
+      "observed": [
+        {
+          "case": "已取消订单申请退款",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-06",
+      "message": "订单已超时关闭（服务端时间满 10 分钟），占用已释放",
+      "source_refs": 2,
+      "observed": [
+        {
+          "case": "取消已超时订单",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-07",
+      "message": "退款申请审核中 / 处理中，发货已暂停",
+      "source_refs": 0,
+      "observed": [],
+      "state": "文案常量"
+    },
+    {
+      "code": "M-08",
+      "message": "渠道退款失败，已保留待处理记录，请客服重试",
+      "source_refs": 13,
+      "observed": [
+        {
+          "case": "退款渠道首次失败",
+          "field": "$.code"
+        },
+        {
+          "case": "迟到退款渠道首次失败",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-09",
+      "message": "迟到支付：订单已关闭，支付成功通知不能恢复订单或重新占用库存，已转异常支付待处理",
+      "source_refs": 10,
+      "observed": [
+        {
+          "case": "已关闭订单支付通知（迟到支付）",
+          "field": "$.code"
+        },
+        {
+          "case": "订单 D 迟到支付（生成异常记录）",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-10",
+      "message": "重复操作被拒绝，不产生第二笔业务结果",
+      "source_refs": 51,
+      "observed": [
+        {
+          "case": "重复取消订单 B",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-11",
+      "message": "已发货订单不受理本题售前退款",
+      "source_refs": 6,
+      "observed": [
+        {
+          "case": "已退款订单再申请退款",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-12",
+      "message": "已有订单的下单时商品与价格不受本次调价 / 上下架影响",
+      "source_refs": 7,
+      "observed": [
+        {
+          "case": "运营调价（回传 M-12 / M-13 提示）",
+          "field": "$.data.hint"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-13",
+      "message": "不得通过商品维护或改写订单状态消除异常记录",
+      "source_refs": 4,
+      "observed": [
+        {
+          "case": "运营调价（回传 M-12 / M-13 提示）",
+          "field": "$.data.constraint"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-14",
+      "message": "异常记录不能通过直接修改订单状态消失",
+      "source_refs": 12,
+      "observed": [
+        {
+          "case": "核实未知异常事件",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-15",
+      "message": "迟到支付订单保持已关闭终态",
+      "source_refs": 5,
+      "observed": [
+        {
+          "case": "已取消订单支付通知（终态非已关闭）",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-16",
+      "message": "退款失败待处理，请客服跟进重试",
+      "source_refs": 0,
+      "observed": [],
+      "state": "文案常量"
+    },
+    {
+      "code": "M-17",
+      "message": "核查结果：无重复释放、无重复退款",
+      "source_refs": 6,
+      "observed": [
+        {
+          "case": "逐单核查库存恢复（回传 M-17 结论）",
+          "field": "$.data.conclusion"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-18",
+      "message": "只有合法待发货订单可登记发货",
+      "source_refs": 3,
+      "observed": [
+        {
+          "case": "待支付订单登记发货",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-19",
+      "message": "该订单已登记发货，不能重复登记",
+      "source_refs": 8,
+      "observed": [
+        {
+          "case": "重复登记发货",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-20",
+      "message": "无权限 / 越权：不能查看或处理他人订单",
+      "source_refs": 49,
+      "observed": [
+        {
+          "case": "买家查他人订单",
+          "field": "$.code"
+        },
+        {
+          "case": "买家查运营汇总",
+          "field": "$.code"
+        },
+        {
+          "case": "买家调整演示时钟",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-21",
+      "message": "当前为演示教学时钟，10 分钟超时已缩短为 X，测试与线上演示规则一致",
+      "source_refs": 0,
+      "observed": [],
+      "state": "文案常量"
+    },
+    {
+      "code": "M-22",
+      "message": "退款与发货并发：本单已进入退款流程，发货未登记；仅形成一种合法业务结果",
+      "source_refs": 5,
+      "observed": [
+        {
+          "case": "退款审核中登记发货",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-23",
+      "message": "承运方或运单号未填写，不能登记发货",
+      "source_refs": 3,
+      "observed": [
+        {
+          "case": "发货不填承运方",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-24",
+      "message": "审核退款 / 核实异常必须写明原因",
+      "source_refs": 25,
+      "observed": [
+        {
+          "case": "退款审核不写原因",
+          "field": "$.code"
+        },
+        {
+          "case": "核实异常支付（不写原因）",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-25",
+      "message": "重复支付通知已幂等处理，未重复记款",
+      "source_refs": 4,
+      "observed": [
+        {
+          "case": "支付 A 重复通知（幂等）",
+          "field": "$.data.failure_code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-26",
+      "message": "迟到支付对应的退款不得再次恢复此前已释放数量",
+      "source_refs": 8,
+      "observed": [
+        {
+          "case": "发起迟到支付退款",
+          "field": "$.data.failure_code"
+        },
+        {
+          "case": "迟到退款渠道首次失败",
+          "field": "$.data.failure_reason"
+        },
+        {
+          "case": "迟到退款客服重试",
+          "field": "$.data.failure_code"
+        },
+        {
+          "case": "迟到退款渠道成功",
+          "field": "$.data.failure_code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-27",
+      "message": "同一渠道交易号已归属其他订单，本次关联被拒",
+      "source_refs": 22,
+      "observed": [
+        {
+          "case": "同一渠道交易号用于另一订单",
+          "field": "$.code"
+        },
+        {
+          "case": "退款通知缺渠道交易号",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-28",
+      "message": "支付通知验签失败，订单状态不变",
+      "source_refs": 10,
+      "observed": [
+        {
+          "case": "支付 A 验签失败",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-29",
+      "message": "支付通知金额与订单不符，订单状态不变",
+      "source_refs": 10,
+      "observed": [
+        {
+          "case": "支付 A 金额不符",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    },
+    {
+      "code": "M-30",
+      "message": "支付通知指向未知订单，订单状态不变",
+      "source_refs": 28,
+      "observed": [
+        {
+          "case": "支付未知订单",
+          "field": "$.code"
+        }
+      ],
+      "state": "已触发"
+    }
+  ],
+  "steps": [
+    {
+      "label": "下单 goods_id=0",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-04",
+      "matched_codes": [
+        "M-04"
+      ],
+      "expect": "M-04",
+      "ok": true,
+      "note": "一单只能购买一种商品"
+    },
+    {
+      "label": "下单 quantity=3",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-03",
+      "matched_codes": [
+        "M-03"
+      ],
+      "expect": "M-03",
+      "ok": true,
+      "note": "数量只能 1 或 2 件"
+    },
+    {
+      "label": "下单 goods_id=999",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-01",
+      "matched_codes": [
+        "M-01"
+      ],
+      "expect": "M-01",
+      "ok": true,
+      "note": "商品未上架"
+    },
+    {
+      "label": "下单 A（商品1×2）",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "下单 B（商品1×2）",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "下单 C（商品1×2，可售不足）",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-02",
+      "matched_codes": [
+        "M-02"
+      ],
+      "expect": "M-02",
+      "ok": true,
+      "note": "可售数量不足"
+    },
+    {
+      "label": "下单 E（商品1×1，退款链专用）",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer03",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "支付 A 验签失败",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-28",
+      "matched_codes": [
+        "M-28"
+      ],
+      "expect": "M-28",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "支付 A 金额不符",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-29",
+      "matched_codes": [
+        "M-29"
+      ],
+      "expect": "M-29",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "支付 A 正常成功",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "支付 A 重复通知（幂等）",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [
+        "M-25"
+      ],
+      "expect": "M-25",
+      "ok": true,
+      "note": "未重复记款"
+    },
+    {
+      "label": "同一渠道交易号用于另一订单",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-27",
+      "matched_codes": [
+        "M-27"
+      ],
+      "expect": "M-27",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "支付未知订单",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-30",
+      "matched_codes": [
+        "M-30"
+      ],
+      "expect": "M-30",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "买家查他人订单",
+      "method": "GET",
+      "path": "/api/v1/orders/ORD-1794531821357021400-1001-1",
+      "account": "buyer02",
+      "http": 200,
+      "top_code": "M-20",
+      "matched_codes": [
+        "M-20"
+      ],
+      "expect": "M-20",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "买家查运营汇总",
+      "method": "GET",
+      "path": "/api/v1/ops/summary",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-20",
+      "matched_codes": [
+        "M-20"
+      ],
+      "expect": "M-20",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "买家调整演示时钟",
+      "method": "POST",
+      "path": "/api/v1/admin/clock",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-20",
+      "matched_codes": [
+        "M-20"
+      ],
+      "expect": "M-20",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "待支付订单登记发货",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821371084800-1001-2/shipment",
+      "account": "warehouse01",
+      "http": 200,
+      "top_code": "M-18",
+      "matched_codes": [
+        "M-18"
+      ],
+      "expect": "M-18",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "发货不填承运方",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821357021400-1001-1/shipment",
+      "account": "warehouse01",
+      "http": 200,
+      "top_code": "M-23",
+      "matched_codes": [
+        "M-23"
+      ],
+      "expect": "M-23",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "发货登记成功",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821357021400-1001-1/shipment",
+      "account": "warehouse01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "重复登记发货",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821357021400-1001-1/shipment",
+      "account": "warehouse01",
+      "http": 200,
+      "top_code": "M-19",
+      "matched_codes": [
+        "M-19"
+      ],
+      "expect": "M-19",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "支付 E 正常成功",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "申请整单退款",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821387985000-1003-3/refund/apply",
+      "account": "buyer03",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "退款审核中登记发货",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821387985000-1003-3/shipment",
+      "account": "warehouse01",
+      "http": 200,
+      "top_code": "M-22",
+      "matched_codes": [
+        "M-22"
+      ],
+      "expect": "M-22",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "退款审核不写原因",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821387985000-1003-3/refund/approve",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "M-24",
+      "matched_codes": [
+        "M-24"
+      ],
+      "expect": "M-24",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "退款审核同意",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821387985000-1003-3/refund/approve",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "退款渠道首次失败",
+      "method": "POST",
+      "path": "/api/v1/refund/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-08",
+      "matched_codes": [
+        "M-08"
+      ],
+      "expect": "M-08",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "客服重试退款",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821387985000-1003-3/refund/retry",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "退款渠道成功",
+      "method": "POST",
+      "path": "/api/v1/refund/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "已退款订单再申请退款",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821387985000-1003-3/refund/apply",
+      "account": "buyer03",
+      "http": 200,
+      "top_code": "M-11",
+      "matched_codes": [
+        "M-11"
+      ],
+      "expect": "M-11",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "退款通知缺渠道交易号",
+      "method": "POST",
+      "path": "/api/v1/refund/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-27",
+      "matched_codes": [
+        "M-27"
+      ],
+      "expect": "M-27",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "取消订单 B",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821371084800-1001-2/cancel",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "重复取消订单 B",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821371084800-1001-2/cancel",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-10",
+      "matched_codes": [
+        "M-10"
+      ],
+      "expect": "M-10",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "已取消订单申请退款",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821371084800-1001-2/refund/apply",
+      "account": "buyer01",
+      "http": 200,
+      "top_code": "M-05",
+      "matched_codes": [
+        "M-05"
+      ],
+      "expect": "M-05",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "已取消订单支付通知（终态非已关闭）",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-15",
+      "matched_codes": [
+        "M-15"
+      ],
+      "expect": "M-15",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "运营调价（回传 M-12 / M-13 提示）",
+      "method": "POST",
+      "path": "/api/v1/admin/goods/1/price",
+      "account": "ops01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [
+        "M-12",
+        "M-13"
+      ],
+      "expect": "M-12",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "逐单核查库存恢复（回传 M-17 结论）",
+      "method": "GET",
+      "path": "/api/v1/ops/stock-check/ORD-1794531821387985000-1003-3",
+      "account": "ops01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [
+        "M-17"
+      ],
+      "expect": "M-17",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "运营核查汇总",
+      "method": "GET",
+      "path": "/api/v1/ops/summary",
+      "account": "ops01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "下单 C（商品2×1）",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer02",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "下单 D（商品2×1）",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "account": "buyer03",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "推进演示时钟 11 分钟",
+      "method": "POST",
+      "path": "/api/v1/admin/clock",
+      "account": "ops01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "取消已超时订单",
+      "method": "POST",
+      "path": "/api/v1/orders/ORD-1794531821559637900-1002-4/cancel",
+      "account": "buyer02",
+      "http": 200,
+      "top_code": "M-06",
+      "matched_codes": [
+        "M-06"
+      ],
+      "expect": "M-06",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "关闭超时订单",
+      "method": "POST",
+      "path": "/api/v1/admin/orders/close-expired",
+      "account": "ops01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "已关闭订单支付通知（迟到支付）",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-09",
+      "matched_codes": [
+        "M-09"
+      ],
+      "expect": "M-09",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "订单 D 迟到支付（生成异常记录）",
+      "method": "POST",
+      "path": "/api/v1/payment/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-09",
+      "matched_codes": [
+        "M-09"
+      ],
+      "expect": "M-09",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "核实异常支付（不写原因）",
+      "method": "POST",
+      "path": "/api/v1/late-payment/1/verify",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "M-24",
+      "matched_codes": [
+        "M-24"
+      ],
+      "expect": "M-24",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "核实异常支付",
+      "method": "POST",
+      "path": "/api/v1/late-payment/35/verify",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "发起迟到支付退款",
+      "method": "POST",
+      "path": "/api/v1/late-payment/35/refund/initiate",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [
+        "M-26"
+      ],
+      "expect": "M-26",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "迟到退款渠道首次失败",
+      "method": "POST",
+      "path": "/api/v1/late-payment/refund/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "M-08",
+      "matched_codes": [
+        "M-08",
+        "M-26"
+      ],
+      "expect": "M-08",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "迟到退款客服重试",
+      "method": "POST",
+      "path": "/api/v1/late-payment/refund/retry",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [
+        "M-26"
+      ],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "迟到退款渠道成功",
+      "method": "POST",
+      "path": "/api/v1/late-payment/refund/callback",
+      "account": "mock01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [
+        "M-26"
+      ],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "核实未知异常事件",
+      "method": "POST",
+      "path": "/api/v1/late-payment/999999/verify",
+      "account": "cs01",
+      "http": 200,
+      "top_code": "M-14",
+      "matched_codes": [
+        "M-14"
+      ],
+      "expect": "M-14",
+      "ok": true,
+      "note": ""
+    },
+    {
+      "label": "恢复演示时钟",
+      "method": "POST",
+      "path": "/api/v1/admin/clock",
+      "account": "ops01",
+      "http": 200,
+      "top_code": "0",
+      "matched_codes": [],
+      "expect": null,
+      "ok": true,
+      "note": ""
+    }
+  ],
+  "failures": []
+}
