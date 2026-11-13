@@ -10,6 +10,8 @@
     python scripts/coverage_gate.py --profile coverage.out
     python scripts/coverage_gate.py --profile coverage.out --overall 85 --pkg server/service:85
     python scripts/coverage_gate.py --profile coverage.out --json
+    python scripts/coverage_gate.py --profile coverage.out --revision v1.8.0 --commit abc1234 \
+        --manifest evidence/coverage/manifest.json
 
 退出码：
     0  全部阈值达标
@@ -19,7 +21,9 @@ import argparse
 import json
 import os
 import pathlib
+import subprocess
 import sys
+import time
 
 # 核心业务包默认阈值；接入层不设阈值，仅统计展示。
 DEFAULT_PACKAGES = [
@@ -88,6 +92,9 @@ def main():
     ap.add_argument('--pkg', action='append', default=None,
                     help='核心包阈值，形如 server/service:85，可重复指定')
     ap.add_argument('--json', action='store_true', help='以 JSON 输出结果')
+    ap.add_argument('--revision', default='', help='本轮交付版本号，写入报告头用于版本标注')
+    ap.add_argument('--commit', default='', help='本轮对应的提交哈希，写入报告头')
+    ap.add_argument('--manifest', default='', help='把结果另存为该 JSON 清单文件（版本标注）')
     args = ap.parse_args()
 
     profile = pathlib.Path(args.profile)
@@ -124,6 +131,12 @@ def main():
 
     result = {
         'profile': str(profile),
+        'revision': args.revision,
+        'commit': args.commit,
+        'generated_at': time.strftime('%Y-%m-%d %H:%M:%S'),
+        'go_version': subprocess.run(['go', 'version'], capture_output=True,
+                                     text=True, encoding='utf-8', errors='replace').stdout.strip(),
+        'collect_command': 'go test -count=1 -coverpkg=./... -coverprofile=%s ./...' % profile,
         'overall_coverage': overall,
         'overall_threshold': args.overall,
         'overall_pass': overall >= args.overall,
@@ -135,11 +148,22 @@ def main():
         'pass': not failures,
     }
 
+    if args.manifest:
+        manifest_path = pathlib.Path(args.manifest)
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n',
+                                  encoding='utf-8')
+
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print('===== 覆盖率阈值门禁 =====')
         print('覆盖率文件：%s' % profile)
+        if args.revision or args.commit:
+            print('版本标注：%s%s' % (args.revision or '(未标注版本)',
+                                     '（提交 %s）' % args.commit if args.commit else ''))
+        print('生成时间：%s' % result['generated_at'])
+        print('采集命令：%s' % result['collect_command'])
         print('整体语句覆盖率：%.2f%% （阈值 %.2f%%）→ %s'
               % (overall, args.overall, 'PASS' if overall >= args.overall else 'FAIL'))
         print('语句总数：%d，已覆盖：%d' % (total, covered))
