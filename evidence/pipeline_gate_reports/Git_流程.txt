@@ -2,9 +2,9 @@ $ D:\python\python.exe -X utf8 scripts/git_process_gate.py
 ===== Git 流程门禁 =====
 仓库：D:\Desktop\shop
 当前分支：dev/01
-提交总数：23
-类型分布：docs=9, feat(基线)=1, opt=6, test=7
-受检提交（AGENTS.md 生效后）：22 条；格式合规：22 条；不合规：0 条
+提交总数：26
+类型分布：docs=10, feat(基线)=1, opt=7, test=8
+受检提交（AGENTS.md 生效后）：25 条；格式合规：25 条；不合规：0 条
 基线提交豁免：6cc6f134ee07 | feat: 电商订单售前退款完整业务实现
   说明：该提交为 AGENTS.md 生效前的题集基线交付，历史不得事后改写，按基线豁免处理并在此显式登记，不计入不合规。
 merge 提交：0 条

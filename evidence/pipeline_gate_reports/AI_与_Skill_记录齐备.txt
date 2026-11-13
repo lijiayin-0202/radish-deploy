@@ -12,7 +12,7 @@ evidence/agent-rules-load-log.md               AGENTS 约束加载登记        
 evidence/门禁自查汇总.md                             门禁自查汇总                 51       PASS
 evidence/交付证据说明.md                             交付证据说明                 82       PASS
 evidence/验收报告说明.md                             验收报告归档说明               36       PASS
-evidence/CI流水线说明.md                            流水线说明                  39       PASS
+evidence/CI流水线说明.md                            流水线说明                  55       PASS
 evidence/quality_gate_output.txt               质量门禁原始输出               220      PASS
 evidence/race_raw_output.txt                   竞态检测原始输出               14       PASS
 evidence/demo-five-scenarios-output.txt        五组场景原始输出               46       PASS
