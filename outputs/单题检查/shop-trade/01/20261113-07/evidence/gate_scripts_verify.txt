@@ -1,0 +1,113 @@
+===== 第 7 轮新增门禁脚本本地实测 =====
+时间：2026-11-13 08:33:56
+仓库：d:\Desktop\shop
+
+==============================================================================
+用例 1（正向）：真实覆盖率文件必须通过阈值判定
+命令：D:\python\python.exe -X utf8 scripts/coverage_gate.py --profile evidence/coverage-gate.out --overall 85 --pkg server/service:85
+预期：exit 0；整体与核心业务包 server/service 均达标
+==============================================================================
+===== 覆盖率阈值门禁 =====
+覆盖率文件：evidence\coverage-gate.out
+整体语句覆盖率：94.19% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1508
+--- 核心业务包 ---
+  server/service      98.47%  (阈值 85.00%)  语句 1179 / 覆盖 1161  → PASS
+--- 其它包（仅统计）---
+  server/api/v1       82.21%
+  server/initialize   90.00%
+  server/model       100.00%
+  server/router      100.00%
+  shop-trade          64.10%
+结论：PASS
+
+退出码：0（符合预期）
+判定：PASS
+
+==============================================================================
+用例 2（反向）：低覆盖样本必须被阈值判定拦下
+命令：D:\python\python.exe -X utf8 scripts/coverage_gate.py --profile outputs/单题检查/shop-trade/01/20261113-07/evidence/low_coverage_sample.out --overall 85 --pkg server/service:85
+预期：exit 1；证明阈值判定会真实阻断，而非只统计不判定
+==============================================================================
+===== 覆盖率阈值门禁 =====
+覆盖率文件：outputs\单题检查\shop-trade\01\20261113-07\evidence\low_coverage_sample.out
+整体语句覆盖率：0.00% （阈值 85.00%）→ FAIL
+语句总数：326，已覆盖：0
+--- 核心业务包 ---
+--- 其它包（仅统计）---
+  server/api/v1        0.00%
+结论：FAIL
+  未达标：整体覆盖率 0.00% < 阈值 85.00%
+  未达标：核心包 server/service 在覆盖率文件中不存在（无法核验阈值）
+
+退出码：1（符合预期）
+判定：PASS
+
+==============================================================================
+用例 3：核心业务包缺失时必须被判为不可核验并失败
+命令：D:\python\python.exe -X utf8 scripts/coverage_gate.py --profile evidence/coverage-gate.out --pkg server/nonexistent:85
+预期：exit 1；核心包不存在时不得静默放过
+==============================================================================
+===== 覆盖率阈值门禁 =====
+覆盖率文件：evidence\coverage-gate.out
+整体语句覆盖率：94.19% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1508
+--- 核心业务包 ---
+--- 其它包（仅统计）---
+  server/api/v1       82.21%
+  server/initialize   90.00%
+  server/model       100.00%
+  server/router      100.00%
+  server/service      98.47%
+  shop-trade          64.10%
+结论：FAIL
+  未达标：核心包 server/nonexistent 在覆盖率文件中不存在（无法核验阈值）
+
+退出码：1（符合预期）
+判定：PASS
+
+==============================================================================
+用例 4：基础部署门禁必须全流程通过
+命令：D:\python\python.exe -X utf8 scripts/deploy_gate.py --addr 127.0.0.1:18080 --out dist
+预期：exit 0；构建、启动、健康检查、业务冒烟与回退准备全部通过
+==============================================================================
+===== 基础部署门禁 =====
+时间：2026-11-13 08:33:56
+仓库：D:\Desktop\shop
+
+--- 1. 构建制品 ---
+$ go build -o D:\Desktop\shop\dist\shop-trade.exe . -> exit=0
+制品大小：15592448 字节
+
+--- 2. 登记制品版本 ---
+提交：c452555824bb（分支 dev/01）
+制品 sha256：336b6c41eb491724455bdda4799c2b4fd72abfea61c781976297a157c44e3b5c
+版本清单：D:\Desktop\shop\dist\manifest.json
+
+--- 3. 启动实例 ---
+进程已启动 pid=43772（GVA_MYSQL_DSN 未设置，模式 demo-memory）
+健康检查：PASS（GET /health -> 200）
+
+--- 4. 业务冒烟 ---
+GET /api/v1/goods -> 200 code=0 商品数=2 → PASS
+POST /api/v1/orders -> 200 code=0 order_no=ORD-1794530041140613500-1001-1 → PASS
+GET /api/v1/orders/ORD-1794530041140613500-1001-1 -> 200 → PASS
+实例已停止
+
+--- 5. 回退准备校验 ---
+上一可用版本：commit=a31384b76888 sha256=b59fa0259e0f46e0
+回退步骤：停止当前实例 → 回滚到上述 commit 重新构建 → 重跑本门禁 → 恢复流量
+回退准备校验：PASS
+版本历史已追加：dist/manifest_history.jsonl
+
+结论：PASS —— 构建、启动、健康检查、业务冒烟与回退准备全部通过，允许进入发布
+
+退出码：0（符合预期）
+判定：PASS
+
+===== 实测汇总 =====
+用例 1：PASS
+用例 2：PASS
+用例 3：PASS
+用例 4：PASS
+合计 4 个用例，PASS 4 个，FAIL 0 个
