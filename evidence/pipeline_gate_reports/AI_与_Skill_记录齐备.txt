@@ -1,0 +1,23 @@
+$ D:\python\python.exe -X utf8 scripts/record_gate.py
+===== AI 与 Skill 记录齐备性门禁 =====
+仓库：D:\Desktop\shop
+------------------------------------------------------------------------------------------------
+文件                                             说明                     有效行数     判定
+------------------------------------------------------------------------------------------------
+skill-usage.md                                 Skill 调用记录             169      PASS
+evidence/AI使用说明.md                             AI 使用与过程说明             40       PASS
+evidence/会话导出说明.md                             会话导出说明                 25       PASS
+evidence/事件清单说明.md                             事件清单说明                 47       PASS
+evidence/agent-rules-load-log.md               AGENTS 约束加载登记          32       PASS
+evidence/门禁自查汇总.md                             门禁自查汇总                 51       PASS
+evidence/交付证据说明.md                             交付证据说明                 82       PASS
+evidence/验收报告说明.md                             验收报告归档说明               36       PASS
+evidence/CI流水线说明.md                            流水线说明                  39       PASS
+evidence/quality_gate_output.txt               质量门禁原始输出               220      PASS
+evidence/race_raw_output.txt                   竞态检测原始输出               14       PASS
+evidence/demo-five-scenarios-output.txt        五组场景原始输出               46       PASS
+evidence/error_code_enumeration.txt            错误码穷举原始输出              98       PASS
+------------------------------------------------------------------------------------------------
+记录项：13；通过：13；不通过：0
+结论：PASS 过程类记录齐备
+[exit=0]

@@ -1,0 +1,3 @@
+$ gofmt -l .
+
+[exit=0]

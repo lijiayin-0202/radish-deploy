@@ -1,0 +1,18 @@
+$ D:\python\python.exe -X utf8 scripts/coverage_evidence_gate.py
+===== 覆盖率证据一致性门禁 =====
+快照目录：D:\Desktop\shop\evidence\coverage
+------------------------------------------------------------------------------------------------
+快照前缀：coverage-v1.8.0-def0977
+版本标注：v1.8.0；提交哈希：def0977；生成时间：2026-11-13 09:05:16
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=evidence\coverage\coverage-v1.8.0-def0977.out ./...
+重新解析快照：整体 97.63%（1563/1601）
+  server/api/v1           99.08%  (323/326)
+  server/initialize       90.00%  (27/30)
+  server/model           100.00%  (3/3)
+  server/router          100.00%  (24/24)
+  server/service          98.47%  (1161/1179)
+  shop-trade              64.10%  (25/39)
+------------------------------------------------------------------------------------------------
+快照组数：1；不合格项：0
+结论：PASS 覆盖率证据齐备、可追溯且达标
+[exit=0]

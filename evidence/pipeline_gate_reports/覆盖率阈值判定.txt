@@ -1,0 +1,17 @@
+$ D:\python\python.exe -X utf8 scripts/coverage_gate.py --profile evidence/coverage-gate.out --overall 85 --pkg server/service:85
+===== 覆盖率阈值门禁 =====
+覆盖率文件：evidence\coverage-gate.out
+生成时间：2026-11-13 10:09:49
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=evidence\coverage-gate.out ./...
+整体语句覆盖率：97.63% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1563
+--- 核心业务包 ---
+  server/service      98.47%  (阈值 85.00%)  语句 1179 / 覆盖 1161  → PASS
+--- 其它包（仅统计）---
+  server/api/v1       99.08%
+  server/initialize   90.00%
+  server/model       100.00%
+  server/router      100.00%
+  shop-trade          64.10%
+结论：PASS
+[exit=0]

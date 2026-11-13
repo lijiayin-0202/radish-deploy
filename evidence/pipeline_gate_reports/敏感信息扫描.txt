@@ -1,0 +1,7 @@
+$ D:\python\python.exe -X utf8 scripts/secret_scan_gate.py
+===== 敏感信息扫描门禁 =====
+仓库：D:\Desktop\shop
+已扫描文件：211；跳过（二进制/覆盖率 profile/截图）：116
+命中：0 处
+结论：PASS 未发现密钥、令牌、演示口令等敏感信息
+[exit=0]

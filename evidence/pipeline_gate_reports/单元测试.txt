@@ -1,0 +1,9 @@
+$ go test -count=1 ./...
+ok  	shop-trade	0.334s
+ok  	shop-trade/server/api/v1	0.293s
+?   	shop-trade/server/global	[no test files]
+ok  	shop-trade/server/initialize	0.367s
+ok  	shop-trade/server/model	0.266s
+ok  	shop-trade/server/router	0.448s
+ok  	shop-trade/server/service	0.448s
+[exit=0]
