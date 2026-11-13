@@ -1,0 +1,33 @@
+{
+  "profile": "evidence\\coverage\\coverage-v1.8.0-def0977.out",
+  "revision": "v1.8.0",
+  "commit": "def0977",
+  "generated_at": "2026-11-13 09:05:16",
+  "go_version": "go version go1.26.0 windows/amd64",
+  "collect_command": "go test -count=1 -coverpkg=./... -coverprofile=evidence\\coverage\\coverage-v1.8.0-def0977.out ./...",
+  "overall_coverage": 97.63,
+  "overall_threshold": 85.0,
+  "overall_pass": true,
+  "statements": 1601,
+  "covered_statements": 1563,
+  "packages": [
+    {
+      "package": "server/service",
+      "coverage": 98.47,
+      "statements": 1179,
+      "covered": 1161,
+      "threshold": 85.0,
+      "pass": true
+    }
+  ],
+  "all_packages": {
+    "server/api/v1": 99.08,
+    "server/initialize": 90.0,
+    "server/model": 100.0,
+    "server/router": 100.0,
+    "server/service": 98.47,
+    "shop-trade": 64.1
+  },
+  "failures": [],
+  "pass": true
+}

@@ -1,6 +1,7 @@
 质量门禁复跑（题目 01 shop-trade）
-时间：2026-11-12 19:24:49
+时间：2026-11-13 09:09:08
 仓库：D:\Desktop\shop
+版本标注：v1.8.0（提交 def0977）
 Go：go version go1.26.0 windows/amd64
 
 ==============================================================================
@@ -24,25 +25,25 @@ $ go build ./...
 ==============================================================================
 $ go test -count=1 ./...
 ==============================================================================
-ok  	shop-trade	0.715s
-ok  	shop-trade/server/api/v1	0.631s
+ok  	shop-trade	0.722s
+ok  	shop-trade/server/api/v1	0.624s
 ?   	shop-trade/server/global	[no test files]
-ok  	shop-trade/server/initialize	0.738s
-ok  	shop-trade/server/model	0.386s
-ok  	shop-trade/server/router	0.675s
-ok  	shop-trade/server/service	0.538s
+ok  	shop-trade/server/initialize	0.713s
+ok  	shop-trade/server/model	0.379s
+ok  	shop-trade/server/router	0.664s
+ok  	shop-trade/server/service	0.514s
 [exit=0]
 
 ==============================================================================
 $ go test -count=1 -coverpkg=./... -coverprofile=D:\Desktop\shop\evidence\coverage-gate.out ./...
 ==============================================================================
-ok  	shop-trade	1.003s	coverage: 5.7% of statements in ./...
-ok  	shop-trade/server/api/v1	0.898s	coverage: 63.5% of statements in ./...
+ok  	shop-trade	0.820s	coverage: 5.7% of statements in ./...
+ok  	shop-trade/server/api/v1	0.787s	coverage: 68.1% of statements in ./...
 ?   	shop-trade/server/global	[no test files]
-ok  	shop-trade/server/initialize	1.032s	coverage: 4.7% of statements in ./...
-ok  	shop-trade/server/model	0.392s	coverage: 0.2% of statements in ./...
-ok  	shop-trade/server/router	0.940s	coverage: 2.6% of statements in ./...
-ok  	shop-trade/server/service	0.791s	coverage: 72.7% of statements in ./...
+ok  	shop-trade/server/initialize	0.820s	coverage: 4.7% of statements in ./...
+ok  	shop-trade/server/model	0.487s	coverage: 0.2% of statements in ./...
+ok  	shop-trade/server/router	0.609s	coverage: 2.6% of statements in ./...
+ok  	shop-trade/server/service	0.643s	coverage: 72.7% of statements in ./...
 [exit=0]
 
 ==============================================================================
@@ -61,32 +62,32 @@ shop-trade/server/api/v1/health.go:6:			Health					100.0%
 shop-trade/server/api/v1/order.go:47:			NewOrderApi				100.0%
 shop-trade/server/api/v1/order.go:57:			ok					100.0%
 shop-trade/server/api/v1/order.go:61:			paramError				100.0%
-shop-trade/server/api/v1/order.go:67:			writeErr				87.5%
+shop-trade/server/api/v1/order.go:67:			writeErr				100.0%
 shop-trade/server/api/v1/order.go:80:			actor					100.0%
 shop-trade/server/api/v1/order.go:90:			bindJSON				100.0%
 shop-trade/server/api/v1/order.go:98:			boolOrTrue				100.0%
 shop-trade/server/api/v1/order.go:105:			parseUintParam				100.0%
 shop-trade/server/api/v1/order.go:115:			Me					100.0%
-shop-trade/server/api/v1/order.go:129:			ListGoods				57.1%
-shop-trade/server/api/v1/order.go:147:			CreateOrder				90.9%
-shop-trade/server/api/v1/order.go:165:			GetOrder				87.5%
-shop-trade/server/api/v1/order.go:179:			GetOrderStatus				66.7%
-shop-trade/server/api/v1/order.go:207:			CancelOrder				87.5%
-shop-trade/server/api/v1/order.go:229:			HandlePaymentCallback			81.8%
-shop-trade/server/api/v1/order.go:256:			CloseExpiredOrders			68.8%
-shop-trade/server/api/v1/order.go:285:			ApplyRefund				63.6%
-shop-trade/server/api/v1/order.go:307:			RejectRefund				72.7%
-shop-trade/server/api/v1/order.go:325:			ApproveRefund				63.6%
-shop-trade/server/api/v1/order.go:343:			RetryRefund				63.6%
-shop-trade/server/api/v1/order.go:369:			HandleRefundCallback			81.8%
-shop-trade/server/api/v1/order.go:398:			RegisterShipment			81.8%
-shop-trade/server/api/v1/order.go:416:			VerifyLatePayment			71.4%
-shop-trade/server/api/v1/order.go:443:			InitiateLatePaymentRefund		64.3%
-shop-trade/server/api/v1/order.go:473:			HandleLatePaymentRefundCallback		81.8%
-shop-trade/server/api/v1/order.go:503:			RetryLatePaymentRefund			63.6%
-shop-trade/server/api/v1/order.go:521:			GetOpsSummary				62.5%
-shop-trade/server/api/v1/order.go:535:			GetClock				75.0%
-shop-trade/server/api/v1/order.go:553:			SetClock				88.2%
+shop-trade/server/api/v1/order.go:129:			ListGoods				100.0%
+shop-trade/server/api/v1/order.go:147:			CreateOrder				100.0%
+shop-trade/server/api/v1/order.go:165:			GetOrder				100.0%
+shop-trade/server/api/v1/order.go:179:			GetOrderStatus				100.0%
+shop-trade/server/api/v1/order.go:207:			CancelOrder				100.0%
+shop-trade/server/api/v1/order.go:229:			HandlePaymentCallback			100.0%
+shop-trade/server/api/v1/order.go:256:			CloseExpiredOrders			100.0%
+shop-trade/server/api/v1/order.go:285:			ApplyRefund				100.0%
+shop-trade/server/api/v1/order.go:307:			RejectRefund				90.9%
+shop-trade/server/api/v1/order.go:325:			ApproveRefund				100.0%
+shop-trade/server/api/v1/order.go:343:			RetryRefund				100.0%
+shop-trade/server/api/v1/order.go:369:			HandleRefundCallback			100.0%
+shop-trade/server/api/v1/order.go:398:			RegisterShipment			100.0%
+shop-trade/server/api/v1/order.go:416:			VerifyLatePayment			100.0%
+shop-trade/server/api/v1/order.go:443:			InitiateLatePaymentRefund		92.9%
+shop-trade/server/api/v1/order.go:473:			HandleLatePaymentRefundCallback		100.0%
+shop-trade/server/api/v1/order.go:503:			RetryLatePaymentRefund			100.0%
+shop-trade/server/api/v1/order.go:521:			GetOpsSummary				100.0%
+shop-trade/server/api/v1/order.go:535:			GetClock				100.0%
+shop-trade/server/api/v1/order.go:553:			SetClock				100.0%
 shop-trade/server/api/v1/views.go:12:			orderView				100.0%
 shop-trade/server/api/v1/views.go:45:			paymentView				100.0%
 shop-trade/server/api/v1/views.go:68:			summaryView				100.0%
@@ -205,4 +206,25 @@ shop-trade/server/service/types.go:161:			isTerminal				100.0%
 shop-trade/server/service/types.go:170:			contains				100.0%
 shop-trade/server/service/types.go:179:			boolPtr					100.0%
 shop-trade/server/service/types.go:180:			stringPtr				100.0%
-total:							(statements)				94.2%
+total:							(statements)				97.6%
+
+==============================================================================
+$ -X utf8 scripts/coverage_gate.py --profile D:\Desktop\shop\evidence\coverage-gate.out --overall 85 --pkg server/service:85 --revision v1.8.0 --commit def0977
+==============================================================================
+===== 覆盖率阈值门禁 =====
+覆盖率文件：D:\Desktop\shop\evidence\coverage-gate.out
+版本标注：v1.8.0（提交 def0977）
+生成时间：2026-11-13 09:09:14
+采集命令：go test -count=1 -coverpkg=./... -coverprofile=D:\Desktop\shop\evidence\coverage-gate.out ./...
+整体语句覆盖率：97.63% （阈值 85.00%）→ PASS
+语句总数：1601，已覆盖：1563
+--- 核心业务包 ---
+  server/service      98.47%  (阈值 85.00%)  语句 1179 / 覆盖 1161  → PASS
+--- 其它包（仅统计）---
+  server/api/v1       99.08%
+  server/initialize   90.00%
+  server/model       100.00%
+  server/router      100.00%
+  shop-trade          64.10%
+结论：PASS
+[exit=0]
